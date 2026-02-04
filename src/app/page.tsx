@@ -1,66 +1,66 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { Button, Card, Input, Badge } from "muka-ui";
+import { useState } from "react";
 
 export default function Home() {
+  const [clickCount, setClickCount] = useState(0);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
+      <h1 style={{ marginBottom: "1rem" }}>
+        Tax Calculator{" "}
+        <Badge variant="info" size="sm">
+          Beta
+        </Badge>
+      </h1>
+      <p style={{ marginBottom: "2rem", color: "var(--color-text-subtle-default)" }}>
+        Vehicle tax optimization for Dutch ZZP professionals
+      </p>
+
+      <Card>
+        <h2 style={{ marginBottom: "1rem" }}>Muka UI Integration Test</h2>
+        <p style={{ marginBottom: "1.5rem" }}>
+          This page verifies that muka-ui components work correctly via npm link.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <Input
+            label="Vehicle Value (€)"
+            type="number"
+            placeholder="Enter vehicle value"
+            name="vehicle-value"
+          />
+
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
+              Calculate Tax
+            </Button>
+            <Button variant="secondary" onClick={() => setClickCount(0)}>
+              Reset
+            </Button>
+            <Button variant="ghost">Learn More</Button>
+          </div>
+
+          {clickCount > 0 && (
+            <p style={{ marginTop: "1rem" }}>
+              Button clicked {clickCount} time{clickCount !== 1 ? "s" : ""} - interactivity works!
+            </p>
+          )}
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </Card>
+
+      <div style={{ marginTop: "2rem", display: "flex", gap: "0.5rem" }}>
+        <Button size="sm" variant="primary">
+          Small
+        </Button>
+        <Button size="md" variant="primary">
+          Medium
+        </Button>
+        <Button size="lg" variant="primary">
+          Large
+        </Button>
+      </div>
+    </main>
   );
 }
