@@ -33,13 +33,13 @@ export default function Home() {
           />
 
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
+            <Button variant="primary" size="sm" onClick={() => setClickCount((c) => c + 1)}>
               Calculate Tax
             </Button>
-            <Button variant="secondary" onClick={() => setClickCount(0)}>
+            <Button variant="secondary" size="sm" onClick={() => setClickCount(0)}>
               Reset
             </Button>
-            <Button variant="ghost">Learn More</Button>
+            <Button variant="ghost" size="sm">Learn More</Button>
           </div>
 
           {clickCount > 0 && (
@@ -49,18 +49,6 @@ export default function Home() {
           )}
         </div>
       </Card>
-
-      <div style={{ marginTop: "2rem", display: "flex", gap: "0.5rem" }}>
-        <Button size="sm" variant="primary">
-          Small
-        </Button>
-        <Button size="md" variant="primary">
-          Medium
-        </Button>
-        <Button size="lg" variant="primary">
-          Large
-        </Button>
-      </div>
     </main>
   );
 }
