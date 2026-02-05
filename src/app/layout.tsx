@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 // Import Muka UI styles (includes tokens + component styles)
-import "muka-ui/styles";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import "muka-ui/styles/index.css";
+import { Header, Footer } from "@/components/layout";
 
 export const metadata: Metadata = {
   title: "Tax Calculator - Dutch ZZP Vehicle Tax Optimization",
@@ -25,9 +15,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+    <html lang="nl">
+      <body>
+        <div className="app-layout">
+          <Header />
+          <main className="app-main">
+            <div className="app-main__content">{children}</div>
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
