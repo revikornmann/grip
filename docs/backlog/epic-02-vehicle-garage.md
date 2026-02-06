@@ -332,3 +332,59 @@ function duplicateVehicle(id: string): GarageVehicle
 - [ ] Form validation prevents invalid data
 - [ ] Keyboard navigation works for all actions
 - [ ] Mobile touch targets are adequate size
+
+---
+
+## Implementation Plan
+
+> **BLOCKED:** Do not implement until the Modal/Dialog component is available in muka-ui Storybook. US-02-002, 004, 005, and 009 all require Modal. See the [component dependency workflow](./EPICS.md#component-dependency-workflow).
+
+### Prerequisite: Modal component in muka-ui
+
+Build `Modal`, `ModalHeader`, `ModalBody`, `ModalFooter` as a compound component in `/Users/revikornmann/dev/muka`:
+
+- **API:** `<Modal open={bool} onClose={fn} size="sm|md|lg">` with `ModalHeader`, `ModalBody`, `ModalFooter` children
+- **Behaviour:** Portal to `document.body`, focus trap (Tab/Shift+Tab cycle), Escape to close, overlay click to close, body scroll lock, restore focus on close
+- **Accessibility:** `role="dialog"`, `aria-modal="true"`, auto-generated `aria-labelledby` from ModalHeader
+- **Sizes:** sm (400px), md (560px), lg (720px)
+- **CSS:** BEM naming (`.muka-modal`, `.muka-modal__overlay`, etc.), existing tokens for surface, spacing, radius, shadow
+- **Files:** `components/Modal/Modal.tsx`, `Modal.css`, `Modal.stories.tsx`; export from `components/index.ts`; run `npm run build`
+
+### Data model migration
+
+The lookup page (Epic 01) currently stores raw `Vehicle[]` under the `"garage"` storage key. This must be migrated to the `GarageVehicle` data model with `id`, `addedAt`, nested `rdw` + `user` data. The lookup page's `handleAddToGarage` will be replaced by opening `VehicleFormModal` so the user can enter purchase price, km, and ownership type before saving.
+
+### Files to create/modify
+
+| # | File | Action | Stories |
+|---|------|--------|---------|
+| 1 | `src/types/garage.ts` | Create | All |
+| 2 | `src/lib/garage.ts` | Create | All |
+| 3 | `src/components/garage/VehicleFormModal.tsx` | Create | US-02-002, 004, 006, 007, 008, 009 |
+| 4 | `src/components/garage/GarageCard.tsx` | Create | US-02-003, 004, 005, 009, 010 |
+| 5 | `src/components/garage/EmptyGarage.tsx` | Create | US-02-001 |
+| 6 | `src/app/garage/page.tsx` | Rewrite | US-02-001, 003, 005, 010 |
+| 7 | `src/app/lookup/page.tsx` | Modify | US-02-002 |
+
+### Component architecture
+
+**`src/types/garage.ts`** — `GarageVehicle` interface matching the data model above. Nullable types for fields that may be absent from RDW (`brandstof_omschrijving: string | null`, `co2_uitstoot_gecombineerd: number | null`, etc.).
+
+**`src/lib/garage.ts`** — Storage service wrapping `@/lib/storage`. Functions: `getGarage()`, `addVehicle(rdw, user)` (generates UUID + timestamp), `updateVehicle(id, updates)`, `removeVehicle(id)`, `duplicateVehicle(id)` (copies RDW data, appends "(kopie)" to nickname), `isInGarage(plate)`, `getVehicleByPlate(plate)`.
+
+**`src/components/garage/VehicleFormModal.tsx`** — Shared add/edit form used from both lookup and garage pages. Props: `open`, `onClose`, `onSave`, `vehicle?` (edit mode), `rdwData?` (new from lookup). Form fields: purchase price (Input, pre-filled from catalogPrice), annual km (Input, default 15.000), business km (Input, validated ≤ annual), ownership type (RadioTile pair: "Privé"/"Zakelijk"), nickname (optional Input), notes (optional Input). Footer: "Sla op" (primary) / "Annuleren" (secondary).
+
+**`src/components/garage/GarageCard.tsx`** — Vehicle card for the garage list. Shows make/model (or nickname), formatted plate, ownership Badge ("Privé"/"Zakelijk"), purchase price, annual km. Actions: "Bewerken", "Dupliceren", "Verwijderen" (ghost), "Vernieuwen" (ghost). Uses Card, Badge, Button, Divider, Label.
+
+**`src/components/garage/EmptyGarage.tsx`** — Empty state with Card + "Je garage is nog leeg" headline + explanation + "Voertuig opzoeken" CTA Button (→ /lookup).
+
+**`src/app/garage/page.tsx`** — Full page: loads from `getGarage()`, renders `EmptyGarage` or grid of `GarageCard` (2 cols desktop, 1 col mobile via CSS grid). Sort dropdown (Select): date added, make/model, price. Delete confirmation via Modal + Alert (warning). Refresh via `lookupVehicle()` from `@/lib/rdw`. Toast for all mutations.
+
+**`src/app/lookup/page.tsx`** — Replace direct `Vehicle[]` storage with `garage.isInGarage()` / open `VehicleFormModal`. Remove `GARAGE_KEY` constant.
+
+### Verification
+
+1. `npm run build && npm run lint` — no errors
+2. Browser: empty garage → CTA → lookup → add (modal form) → garage list → edit → duplicate → delete → refresh
+3. Mobile (375px): cards stack, modal full-width
+4. Keyboard: Tab through actions, Escape closes modals
