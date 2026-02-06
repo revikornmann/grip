@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "muka-ui/styles/index.css";
-import { Header, Footer } from "@/components/layout";
+import { TopNav, BottomNav, Footer } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -44,11 +44,14 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <div className="app-layout">
-            <Header />
+            <div className="app-topnav">
+              <TopNav />
+            </div>
             <main className="app-main">
               <div className="app-main__content">{children}</div>
+              <Footer />
             </main>
-            <Footer />
+            <BottomNav />
           </div>
         </ThemeProvider>
       </body>

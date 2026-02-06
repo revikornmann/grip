@@ -17,17 +17,9 @@ export default function Home() {
       <section
         style={{
           textAlign: "center",
-          padding: "var(--spacing-8) 0",
+          paddingBottom: "var(--spacing-4)",
         }}
       >
-        <h1
-          style={{
-            fontSize: "var(--font-size-4xl)",
-            marginBottom: "var(--spacing-3)",
-          }}
-        >
-          Bespaar op uw autobelasting
-        </h1>
         <p
           style={{
             fontSize: "var(--font-size-lg)",

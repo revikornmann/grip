@@ -10,12 +10,14 @@ import {
   formatPlateDisplay,
 } from "@/lib/validation";
 import { storage } from "@/lib/storage";
+import { isInGarage as checkIsInGarage, addVehicle } from "@/lib/garage";
 import type { Vehicle, RecentLookup } from "@/types/vehicle";
+import type { GarageVehicle } from "@/types/garage";
 import { VehicleCard } from "@/components/lookup/VehicleCard";
 import { RecentLookups } from "@/components/lookup/RecentLookups";
+import { VehicleFormModal } from "@/components/garage/VehicleFormModal";
 
 const RECENT_LOOKUPS_KEY = "recent-lookups";
-const GARAGE_KEY = "garage";
 const MAX_RECENT = 5;
 const MAX_RETRIES = 3;
 
@@ -36,7 +38,8 @@ function LookupContent() {
   const [recentLookups, setRecentLookups] = useState<RecentLookup[]>([]);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [isInGarage, setIsInGarage] = useState(false);
+  const [vehicleInGarage, setVehicleInGarage] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
 
   // Focus input on mount
   useEffect(() => {
@@ -54,7 +57,7 @@ function LookupContent() {
       setIsLoading(true);
       setApiError(null);
       setVehicle(null);
-      setIsInGarage(false);
+      setVehicleInGarage(false);
 
       try {
         const result = await lookupVehicle(normalized);
@@ -66,8 +69,7 @@ function LookupContent() {
         router.replace(`/lookup?plate=${formatted}`, { scroll: false });
 
         // Check if already in garage
-        const garage = storage.get<Vehicle[]>(GARAGE_KEY) ?? [];
-        setIsInGarage(garage.some((v) => v.plate === result.plate));
+        setVehicleInGarage(checkIsInGarage(result.plate));
 
         // Save to recent lookups
         const lookup: RecentLookup = {
@@ -182,16 +184,24 @@ function LookupContent() {
   const handleAddToGarage = () => {
     if (!vehicle) return;
 
-    const garage = storage.get<Vehicle[]>(GARAGE_KEY) ?? [];
-
-    if (garage.some((v) => v.plate === vehicle.plate)) {
+    if (vehicleInGarage) {
       router.push("/garage");
       return;
     }
 
-    storage.set(GARAGE_KEY, [...garage, vehicle]);
-    setIsInGarage(true);
-    setToastMessage(`${vehicle.make} ${vehicle.model} toegevoegd aan garage`);
+    setFormOpen(true);
+  };
+
+  const handleFormSave = (
+    rdw: GarageVehicle["rdw"],
+    user: GarageVehicle["user"],
+  ) => {
+    addVehicle(rdw, user);
+    setVehicleInGarage(true);
+    setFormOpen(false);
+    setToastMessage(
+      `${vehicle?.make} ${vehicle?.model} toegevoegd aan garage`,
+    );
     setToastOpen(true);
   };
 
@@ -217,15 +227,6 @@ function LookupContent() {
         gap: "var(--spacing-6)",
       }}
     >
-      <h1
-        style={{
-          fontSize: "var(--font-size-2xl)",
-          margin: 0,
-        }}
-      >
-        Kenteken opzoeken
-      </h1>
-
       {/* Search form */}
       {/* onBlur wrapper captures blur from child Input for validation */}
       <div onBlur={handleBlur}>
@@ -303,7 +304,9 @@ function LookupContent() {
           {/* Actions */}
           <div style={{ display: "flex", gap: "var(--spacing-3)" }}>
             <Button variant="primary" onClick={handleAddToGarage}>
-              {isInGarage ? "Bekijk in garage" : "Toevoegen aan garage"}
+              {vehicleInGarage
+                ? "Bekijk in garage"
+                : "Toevoegen aan garage"}
             </Button>
             <Button variant="secondary" onClick={handleCopyLink}>
               Kopieer link
@@ -317,6 +320,14 @@ function LookupContent() {
         lookups={recentLookups}
         onSelect={handleRecentSelect}
         onClear={handleClearHistory}
+      />
+
+      {/* Add to garage form modal */}
+      <VehicleFormModal
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSave={handleFormSave}
+        rdwData={vehicle ?? undefined}
       />
 
       {/* Toast notifications */}
