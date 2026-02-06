@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Button, Divider } from "muka-ui";
 import { Navigation } from "./Navigation";
+import { ThemeToggle } from "../ThemeToggle";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -35,6 +36,7 @@ export function Header() {
 
         <div className="app-header__nav-desktop">
           <Navigation orientation="horizontal" />
+          <ThemeToggle />
         </div>
 
         <div className="app-header__nav-mobile">
@@ -83,6 +85,9 @@ export function Header() {
           />
           <div className="mobile-menu" id="mobile-menu" role="navigation">
             <Navigation orientation="vertical" onNavigate={closeMenu} />
+            <div style={{ padding: "var(--spacing-4) var(--spacing-6)" }}>
+              <ThemeToggle />
+            </div>
           </div>
         </>
       )}

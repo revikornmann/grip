@@ -1,13 +1,35 @@
 import type { Metadata } from "next";
 import "./globals.css";
-// Import Muka UI styles (includes tokens + component styles)
 import "muka-ui/styles/index.css";
 import { Header, Footer } from "@/components/layout";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Tax Calculator - Dutch ZZP Vehicle Tax Optimization",
   description: "Vehicle tax optimization tool for Dutch ZZP professionals",
 };
+
+const themeScript = `
+(function() {
+  try {
+    var raw = localStorage.getItem('tax-calc:theme');
+    var parsed = raw ? JSON.parse(raw) : null;
+    var theme = parsed && parsed.data ? parsed.data : 'system';
+    var resolved = theme;
+    if (theme === 'system') {
+      resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', resolved);
+    if (resolved === 'dark') {
+      var link = document.createElement('link');
+      link.id = 'muka-dark-tokens';
+      link.rel = 'stylesheet';
+      link.href = '/themes/tokens-muka-dark.css';
+      document.head.appendChild(link);
+    }
+  } catch(e) {}
+})();
+`;
 
 export default function RootLayout({
   children,
@@ -15,15 +37,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl">
+    <html lang="nl" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
-        <div className="app-layout">
-          <Header />
-          <main className="app-main">
-            <div className="app-main__content">{children}</div>
-          </main>
-          <Footer />
-        </div>
+        <ThemeProvider>
+          <div className="app-layout">
+            <Header />
+            <main className="app-main">
+              <div className="app-main__content">{children}</div>
+            </main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

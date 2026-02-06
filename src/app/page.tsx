@@ -1,54 +1,138 @@
 "use client";
 
-import { Button, Card, Input, Badge } from "muka-ui";
-import { useState } from "react";
+import { Button, Card, Badge } from "muka-ui";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [clickCount, setClickCount] = useState(0);
+  const router = useRouter();
 
   return (
-    <main style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "1rem" }}>
-        Tax Calculator{" "}
-        <Badge variant="info" size="sm">
-          Beta
-        </Badge>
-      </h1>
-      <p style={{ marginBottom: "2rem", color: "var(--color-text-subtle-default)" }}>
-        Vehicle tax optimization for Dutch ZZP professionals
-      </p>
-
-      <Card>
-        <h2 style={{ marginBottom: "1rem" }}>Muka UI Integration Test</h2>
-        <p style={{ marginBottom: "1.5rem" }}>
-          This page verifies that muka-ui components work correctly via npm link.
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--spacing-8)",
+      }}
+    >
+      <section
+        style={{
+          textAlign: "center",
+          padding: "var(--spacing-8) 0",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "var(--font-size-4xl)",
+            marginBottom: "var(--spacing-3)",
+          }}
+        >
+          Bespaar op uw autobelasting
+        </h1>
+        <p
+          style={{
+            fontSize: "var(--font-size-lg)",
+            color: "var(--color-text-subtle-default)",
+            maxWidth: "600px",
+            margin: "0 auto",
+          }}
+        >
+          Vergelijk de kosten van privé- en zakelijk autobezit als ZZP&apos;er.
+          Ontdek welke optie het meest voordelig is voor uw situatie.
         </p>
+      </section>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <Input
-            label="Vehicle Value (€)"
-            type="number"
-            placeholder="Enter vehicle value"
-            name="vehicle-value"
-          />
-
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            <Button variant="primary" size="sm" onClick={() => setClickCount((c) => c + 1)}>
-              Calculate Tax
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => setClickCount(0)}>
-              Reset
-            </Button>
-            <Button variant="ghost" size="sm">Learn More</Button>
-          </div>
-
-          {clickCount > 0 && (
-            <p style={{ marginTop: "1rem" }}>
-              Button clicked {clickCount} time{clickCount !== 1 ? "s" : ""} - interactivity works!
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "var(--spacing-4)",
+        }}
+      >
+        <Card>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-3)",
+            }}
+          >
+            <Badge variant="info" size="sm">
+              RDW Data
+            </Badge>
+            <h3 style={{ fontSize: "var(--font-size-lg)" }}>
+              Kenteken opzoeken
+            </h3>
+            <p style={{ color: "var(--color-text-subtle-default)" }}>
+              Voer uw kenteken in en ontvang direct alle voertuiggegevens via de
+              RDW.
             </p>
-          )}
-        </div>
-      </Card>
-    </main>
+          </div>
+        </Card>
+        <Card>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-3)",
+            }}
+          >
+            <Badge variant="success" size="sm">
+              Berekeningen
+            </Badge>
+            <h3 style={{ fontSize: "var(--font-size-lg)" }}>
+              Kosten berekenen
+            </h3>
+            <p style={{ color: "var(--color-text-subtle-default)" }}>
+              Bereken de totale kosten inclusief bijtelling, BTW-aftrek en
+              afschrijving.
+            </p>
+          </div>
+        </Card>
+        <Card>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-3)",
+            }}
+          >
+            <Badge variant="warning" size="sm">
+              Vergelijking
+            </Badge>
+            <h3 style={{ fontSize: "var(--font-size-lg)" }}>
+              Privé vs. zakelijk
+            </h3>
+            <p style={{ color: "var(--color-text-subtle-default)" }}>
+              Vergelijk privé- en zakelijk autobezit en ontdek het verschil per
+              maand.
+            </p>
+          </div>
+        </Card>
+      </section>
+
+      <section
+        style={{
+          display: "flex",
+          gap: "var(--spacing-4)",
+          justifyContent: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={() => router.push("/lookup")}
+        >
+          Voertuig opzoeken
+        </Button>
+        <Button
+          variant="secondary"
+          size="lg"
+          onClick={() => router.push("/garage")}
+        >
+          Mijn garage
+        </Button>
+      </section>
+    </div>
   );
 }
