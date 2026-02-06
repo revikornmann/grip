@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, Input, Button, RadioTile } from "muka-ui";
+import { Dialog, Input, Button, RadioTile, Icon } from "muka-ui";
 import type { GarageVehicle } from "@/types/garage";
 import type { Vehicle } from "@/types/vehicle";
 import { formatCurrency } from "@/lib/formatting";
@@ -14,14 +14,6 @@ interface VehicleFormModalProps {
   vehicle?: GarageVehicle;
   /** Fresh lookup result — add mode */
   rdwData?: Vehicle;
-}
-
-function CloseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
 }
 
 /**
@@ -136,7 +128,7 @@ function VehicleFormInner({
           onClick={onClose}
           aria-label="Sluiten"
         >
-          <CloseIcon />
+          <Icon name="x" size="sm" />
         </Button>
       }
       footer={

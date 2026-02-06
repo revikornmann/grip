@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Select, Dialog, Button, Alert, Toast } from "muka-ui";
+import { Select, Dialog, Button, Alert, Toast, Icon } from "muka-ui";
 import type { GarageVehicle } from "@/types/garage";
 import {
   getGarage,
@@ -47,25 +47,6 @@ function sortVehicles(
         (a, b) => b.user.purchasePrice - a.user.purchasePrice,
       );
   }
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M15 5L5 15M5 5l10 10"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
 }
 
 export default function GaragePage() {
@@ -255,7 +236,7 @@ export default function GaragePage() {
             onClick={handleDeleteClose}
             aria-label="Sluiten"
           >
-            <CloseIcon />
+            <Icon name="x" size="sm" />
           </Button>
         }
         footer={
