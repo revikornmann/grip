@@ -9,6 +9,7 @@ const NAV_ITEMS: { href: string; label: string; iconName: IconName }[] = [
   { href: "/garage", label: "Garage", iconName: "car" },
   { href: "/calculator", label: "Calculator", iconName: "calculator" },
   { href: "/compare", label: "Vergelijk", iconName: "bar-chart" },
+  { href: "/tracking", label: "Ritten", iconName: "map-pin" },
 ];
 
 export function BottomNav() {
