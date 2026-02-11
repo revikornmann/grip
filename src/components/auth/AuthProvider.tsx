@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === "SIGNED_IN" && session?.user) {
         try {
           const result = await migrateLocalToSupabase(session.user.id);
-          if (result.migrated > 0) {
+          if (result.migrated > 0 || result.failed > 0) {
             setMigrationResult(result);
           }
         } catch {
@@ -101,9 +101,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const signOut = useCallback(async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
+    console.log("signOut called");
     setUser(null);
+    console.log("User cleared");
+    if (supabase) {
+      supabase.auth.signOut({ scope: "local" }).catch(console.error);
+    }
   }, [supabase]);
 
   return (

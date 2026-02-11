@@ -8,7 +8,7 @@
 
 **Phase:** 1 (MVP)
 **Priority:** P2
-**Dependencies:** Epic 02 (Vehicle Garage), Epic 04 (Cost Calculator)
+**Dependencies:** Epic 02 (Vehicle Garage), Epic 03 (User Accounts), Epic 04 (Cost Calculator)
 
 ---
 
@@ -234,12 +234,14 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
   - Key assumptions used
   - Recommendation summary
   - Date generated
+  - User name and email (if logged in) for accountant reference
 - [ ] Professional formatting suitable for accountant
 - [ ] Works on mobile (triggers download)
+- [ ] Anonymous users can still export (without user info header)
 
 **Muka UI components:** Button, Icon (download)
 
-**Dependencies:** US-05-003
+**Dependencies:** US-05-003, Epic 03
 
 **Estimate:** 1 day
 

@@ -158,10 +158,13 @@ function UserMenu() {
                   variant="ghost"
                   size="sm"
                   fullWidth
-                  onClick={async () => {
+                  onClick={() => {
+                    console.log("Logout clicked");
                     setMenuOpen(false);
-                    await signOut();
-                    router.push("/");
+                    signOut().then(() => {
+                      console.log("SignOut complete");
+                      router.push("/");
+                    });
                   }}
                 >
                   <Icon name="log-out" size="sm" />

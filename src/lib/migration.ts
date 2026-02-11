@@ -32,9 +32,8 @@ export async function migrateLocalToSupabase(
 
   if (failed === 0) {
     clearLocalGarage();
+    storage.set(MIGRATED_KEY, true);
   }
-
-  storage.set(MIGRATED_KEY, true);
 
   return { migrated, failed };
 }

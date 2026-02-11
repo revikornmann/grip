@@ -8,7 +8,7 @@
 
 **Phase:** 2 (Post-MVP)
 **Priority:** P3
-**Dependencies:** Epic 02 (Vehicle Garage), Epic 04 (Cost Calculator)
+**Dependencies:** Epic 02 (Vehicle Garage), Epic 03 (User Accounts), Epic 04 (Cost Calculator)
 
 ---
 
@@ -48,11 +48,12 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 - [ ] Purpose dropdown: Klantbezoek, Vergadering, Inkoop, Privé, etc.
 - [ ] Auto-calculate distance from locations (optional)
 - [ ] Odometer reading option (start/end km)
-- [ ] Save trip to local storage
+- [ ] Save trip using auth-aware storage pattern (Supabase for logged-in, localStorage for anonymous)
+- [ ] Prompt anonymous users to sign in for cloud sync and backup
 
 **Muka UI components:** Input, Select, Button, Card, DatePicker (#21)
 
-**Dependencies:** Epic 02
+**Dependencies:** Epic 02, Epic 03
 
 **Estimate:** 2 days
 
@@ -108,18 +109,20 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 **So that** I don't have to manually enter every business meeting.
 
 **Acceptance criteria:**
-- [ ] OAuth flow to connect Google account
+- [ ] Leverage existing Google OAuth from Epic 03 (Supabase Auth)
+- [ ] Request additional Calendar scope during sign-in or via incremental consent
 - [ ] Select which calendars to sync
 - [ ] Import events with location as potential trips
 - [ ] Events appear as "suggested trips" to confirm
 - [ ] One-click to add suggested trip to log
-- [ ] Can disconnect calendar at any time
+- [ ] Can disconnect calendar access at any time (revoke scope)
+- [ ] Requires user to be logged in (uses `useRequireAuth()` from Epic 03)
 
 **Muka UI components:** Button, Card, ListItem, Badge ("Suggestie")
 
-**Dependencies:** US-06-001
+**Dependencies:** US-06-001, Epic 03
 
-**Estimate:** 3 days
+**Estimate:** 2 days (reduced from 3 — OAuth infrastructure already exists)
 
 ---
 
@@ -277,6 +280,7 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 ```typescript
 interface Trip {
   id: string;
+  userId?: string;                 // Present for Supabase records
   vehicleId: string;
   date: string;                    // ISO date
   startLocation: string;
@@ -306,9 +310,58 @@ type TripPurpose =
   | 'overig';
 ```
 
+### Supabase Table (for logged-in users)
+
+```sql
+-- Trips table with RLS (following pattern from Epic 03)
+create table trips (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  vehicle_id uuid references garage_vehicles(id) on delete cascade not null,
+
+  date date not null,
+  start_location text not null,
+  end_location text not null,
+  distance_km numeric not null,
+  purpose text not null,
+  category text not null check (category in ('business', 'private')),
+  confidence text not null default 'high',
+  calendar_event_id text,
+  odometer_start integer,
+  odometer_end integer,
+  notes text,
+  verified boolean default false,
+
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Row Level Security (same pattern as garage_vehicles)
+alter table trips enable row level security;
+
+create policy "Users can view own trips"
+  on trips for select using (auth.uid() = user_id);
+
+create policy "Users can insert own trips"
+  on trips for insert with check (auth.uid() = user_id);
+
+create policy "Users can update own trips"
+  on trips for update using (auth.uid() = user_id);
+
+create policy "Users can delete own trips"
+  on trips for delete using (auth.uid() = user_id);
+```
+
 ### Calendar Integration
 ```typescript
-// Using Google Calendar API
+// Leverages existing Google OAuth from Epic 03
+// Requires additional scope: 'https://www.googleapis.com/auth/calendar.readonly'
+//
+// Incremental consent flow:
+// 1. User is already signed in via Supabase Google OAuth
+// 2. When enabling calendar sync, request additional scope
+// 3. Store calendar access token separately (Supabase user metadata or encrypted column)
+
 interface CalendarEvent {
   id: string;
   summary: string;
@@ -318,6 +371,7 @@ interface CalendarEvent {
 }
 
 function importCalendarEvents(
+  userId: string,                  // Required - calendar sync only for logged-in users
   startDate: Date,
   endDate: Date
 ): Promise<CalendarEvent[]>
@@ -373,11 +427,13 @@ src/
 
 ## Privacy Considerations
 
-- Calendar access requires explicit OAuth consent
-- Trip data stored locally by default
-- Cloud sync is opt-in with clear data policy
-- AI categorization can run locally (no server required)
+- Calendar access requires explicit OAuth consent (incremental scope on existing Google sign-in)
+- Anonymous users: trip data stored in localStorage only
+- Logged-in users: trip data stored in Supabase with RLS (user can only access own data)
+- Clear explanation during sign-in: "Je ritgegevens worden veilig opgeslagen in je account"
+- AI categorization can run locally (no server required for anonymous users)
 - Export includes only what user chooses to share
+- Users can delete all their data via account settings (cascades to trips via RLS)
 
 ---
 

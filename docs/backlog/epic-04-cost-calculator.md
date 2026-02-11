@@ -8,7 +8,7 @@
 
 **Phase:** 1 (MVP)
 **Priority:** P1
-**Dependencies:** Epic 00 (Foundation), Epic 02 (Vehicle Garage)
+**Dependencies:** Epic 00 (Foundation), Epic 02 (Vehicle Garage), Epic 03 (User Accounts)
 
 ---
 
@@ -268,14 +268,15 @@
 
 **Acceptance criteria:**
 - [ ] All input values persist when leaving calculator
-- [ ] Values stored in garage vehicle record
+- [ ] Values stored in garage vehicle record (Supabase for logged-in users, localStorage for anonymous)
 - [ ] Returning to calculator shows previous values
 - [ ] "Reset naar standaard" option to clear custom values
 - [ ] Version assumption values for future changes
+- [ ] Assumptions sync across devices for logged-in users
 
 **Muka UI components:** Button (reset)
 
-**Dependencies:** US-04-001, Epic 02
+**Dependencies:** US-04-001, Epic 02, Epic 03
 
 **Estimate:** 0.5 day
 
@@ -360,6 +361,31 @@ src/
     ├── calculator.ts             # Calculation engine
     ├── tax-rates.ts              # Tax constants and rates
     └── mrb-rates.ts              # Road tax rates by province
+```
+
+### Storage Pattern
+
+Cost calculation assumptions are stored as part of the garage vehicle record. Following the dual-backend pattern from Epic 03:
+
+```typescript
+// Extended vehicle record with calculator assumptions
+interface GarageVehicleWithAssumptions extends GarageVehicle {
+  calculatorAssumptions?: {
+    fuelConsumption: number;
+    fuelPrice: number;
+    insurancePremium: number;
+    maintenanceCost: number;
+    ownershipYears: number;
+    residualValue: number;
+    province: string;
+    taxBracket: number;
+    updatedAt: string;
+  };
+}
+
+// Uses auth-aware garage service from Epic 03
+// - Logged-in users: assumptions saved to Supabase, synced across devices
+// - Anonymous users: assumptions saved to localStorage
 ```
 
 ---

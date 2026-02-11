@@ -21,10 +21,10 @@ They need to understand:
 
 | Epic | Name | Phase | Priority | Status |
 |------|------|-------|----------|--------|
-| 00 | [Foundation](./epic-00-foundation.md) | 1 | P0 | Not Started |
-| 01 | [License Plate Lookup](./epic-01-license-plate-lookup.md) | 1 | P0 | Not Started |
-| 02 | [Vehicle Garage](./epic-02-vehicle-garage.md) | 1 | P1 | Not Started |
-| 03 | [User Accounts](./epic-03-user-accounts.md) | 1 | P1 | Not Started |
+| 00 | [Foundation](./epic-00-foundation.md) | 1 | P0 | ✅ Complete |
+| 01 | [License Plate Lookup](./epic-01-license-plate-lookup.md) | 1 | P0 | ✅ Complete |
+| 02 | [Vehicle Garage](./epic-02-vehicle-garage.md) | 1 | P1 | ✅ Complete |
+| 03 | [User Accounts](./epic-03-user-accounts.md) | 1 | P1 | ✅ Complete |
 | 04 | [Cost Calculator](./epic-04-cost-calculator.md) | 1 | P1 | Not Started |
 | 05 | [Ownership Comparison](./epic-05-ownership-comparison.md) | 1 | P2 | Not Started |
 | 06 | [Kilometer Tracking](./epic-06-kilometer-tracking.md) | 2 | P3 | Not Started |
@@ -196,6 +196,20 @@ The MVP allows a user to:
 ## Technical Notes
 
 - **Data source:** RDW Open Data API for vehicle data
-- **Storage:** Local storage for MVP (no backend required)
+- **Storage:** Dual-backend pattern (localStorage for anonymous users, Supabase for logged-in users)
+- **Authentication:** Google OAuth via Supabase Auth
+- **Database:** Supabase PostgreSQL with Row Level Security (RLS)
 - **Calculations:** Client-side JavaScript
 - **Design system:** muka-ui (npm linked for development)
+
+### Key Infrastructure (Epic 03)
+
+The following patterns are established and should be reused in Epics 04-06:
+
+| Pattern | Usage |
+|---------|-------|
+| `useAuth()` hook | Access current user, loading state, signIn/signOut functions |
+| `useRequireAuth()` hook | Redirect to `/auth` if not logged in |
+| Auth-aware services | Pass `userId` to service functions; when present, use Supabase; when absent, use localStorage |
+| Supabase RLS | All tables use Row Level Security — users can only access their own data |
+| Pending item flow | Store in `sessionStorage`, redirect to `/auth`, save after login |

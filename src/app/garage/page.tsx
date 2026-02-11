@@ -79,6 +79,7 @@ export default function GaragePage() {
   // Toast state
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState<"success" | "warning">("success");
 
   const reload = useCallback(async () => {
     setGarageLoading(true);
@@ -120,14 +121,28 @@ export default function GaragePage() {
 
   // Show migration toast
   useEffect(() => {
-    if (migrationResult && migrationResult.migrated > 0) {
+    if (!migrationResult) return;
+
+    if (migrationResult.failed > 0 && migrationResult.migrated > 0) {
+      setToastMessage(
+        `${migrationResult.migrated} voertuig(en) overgezet, ${migrationResult.failed} mislukt — probeer later opnieuw`
+      );
+      setToastVariant("warning");
+      setToastOpen(true);
+    } else if (migrationResult.failed > 0) {
+      setToastMessage("Overzetten van voertuigen mislukt — probeer later opnieuw");
+      setToastVariant("warning");
+      setToastOpen(true);
+    } else if (migrationResult.migrated > 0) {
       setToastMessage("Je bestaande voertuigen zijn overgezet naar je account");
+      setToastVariant("success");
       setToastOpen(true);
     }
   }, [migrationResult]);
 
-  const showToast = (message: string) => {
+  const showToast = (message: string, variant: "success" | "warning" = "success") => {
     setToastMessage(message);
+    setToastVariant(variant);
     setToastOpen(true);
   };
 
@@ -323,7 +338,7 @@ export default function GaragePage() {
 
       {/* Toast */}
       <Toast
-        variant="success"
+        variant={toastVariant}
         open={toastOpen}
         onClose={() => setToastOpen(false)}
         duration={3000}
