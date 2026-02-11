@@ -11,6 +11,7 @@ import {
 } from "@/lib/validation";
 import { storage } from "@/lib/storage";
 import { isInGarage as checkIsInGarage, addVehicle } from "@/lib/garage";
+import { useAuth } from "@/components/auth/AuthProvider";
 import type { Vehicle, RecentLookup } from "@/types/vehicle";
 import type { GarageVehicle } from "@/types/garage";
 import { VehicleCard } from "@/components/lookup/VehicleCard";
@@ -18,6 +19,7 @@ import { RecentLookups } from "@/components/lookup/RecentLookups";
 import { VehicleFormModal } from "@/components/garage/VehicleFormModal";
 
 const RECENT_LOOKUPS_KEY = "recent-lookups";
+const PENDING_VEHICLE_KEY = "pendingVehicle";
 const MAX_RECENT = 5;
 const MAX_RETRIES = 3;
 
@@ -25,6 +27,8 @@ function LookupContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const hasInitRef = useRef(false);
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
 
   const [plate, setPlate] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -68,8 +72,9 @@ function LookupContent() {
         const formatted = formatPlateDisplay(normalized);
         router.replace(`/lookup?plate=${formatted}`, { scroll: false });
 
-        // Check if already in garage
-        setVehicleInGarage(checkIsInGarage(result.plate));
+        // Check if already in garage (async now)
+        const inGarage = await checkIsInGarage(result.plate, userId);
+        setVehicleInGarage(inGarage);
 
         // Save to recent lookups
         const lookup: RecentLookup = {
@@ -98,7 +103,7 @@ function LookupContent() {
         setIsLoading(false);
       }
     },
-    [router],
+    [router, userId],
   );
 
   // Auto-lookup from URL param on mount
@@ -192,17 +197,38 @@ function LookupContent() {
     setFormOpen(true);
   };
 
-  const handleFormSave = (
+  const handleFormSave = async (
     rdw: GarageVehicle["rdw"],
     user: GarageVehicle["user"],
   ) => {
-    addVehicle(rdw, user);
-    setVehicleInGarage(true);
-    setFormOpen(false);
-    setToastMessage(
-      `${vehicle?.make} ${vehicle?.model} toegevoegd aan garage`,
-    );
-    setToastOpen(true);
+    if (!userId) {
+      // Not logged in: store pending vehicle in sessionStorage and redirect to auth
+      try {
+        sessionStorage.setItem(
+          PENDING_VEHICLE_KEY,
+          JSON.stringify({ rdw, user }),
+        );
+      } catch {
+        // sessionStorage unavailable
+      }
+      setFormOpen(false);
+      router.push("/auth?returnTo=/garage");
+      return;
+    }
+
+    // Logged in: save directly
+    try {
+      await addVehicle(rdw, user, userId);
+      setVehicleInGarage(true);
+      setFormOpen(false);
+      setToastMessage(
+        `${vehicle?.make} ${vehicle?.model} toegevoegd aan garage`,
+      );
+      setToastOpen(true);
+    } catch {
+      setToastMessage("Opslaan mislukt — probeer het opnieuw");
+      setToastOpen(true);
+    }
   };
 
   const handleCopyLink = async () => {

@@ -446,3 +446,46 @@ No new Muka UI components are strictly required for this epic. All stories can b
 4. Logout → garage shows local storage data only
 5. New browser/device: login → see same garage data
 6. Mobile: full flow works on iOS Safari and Android Chrome
+
+---
+
+## Implementation Summary
+
+### Approach
+
+The implementation followed the planned story order and used a **dual-backend pattern** as the central architectural decision: every garage service function accepts an optional `userId` parameter. When `userId` is present, operations go through Supabase; when absent, they use localStorage (the original behavior). This allowed the refactored `lib/garage.ts` to maintain backwards compatibility while adding cloud persistence.
+
+All garage functions were converted from synchronous to **async** (returning `Promise`), and all consumers (garage page, lookup page) were updated accordingly.
+
+### Files created
+
+| File | Purpose |
+|------|---------|
+| `src/lib/supabase.ts` | Supabase browser client singleton with `isSupabaseConfigured()` guard for build-time safety |
+| `src/lib/auth.ts` | `useRequireAuth()` hook for protecting future routes |
+| `src/lib/migration.ts` | One-time local storage → Supabase migration logic with `garage_migrated` flag |
+| `src/types/auth.ts` | `AuthUser` and `AuthState` interfaces |
+| `src/types/database.ts` | `GarageVehicleRow` type matching Supabase table schema |
+| `src/components/auth/AuthProvider.tsx` | `AuthProvider` context + `useAuth()` hook; handles session, migration on sign-in |
+| `src/app/auth/page.tsx` | Login page with "Inloggen met Google" button, auto-redirect if already logged in |
+| `src/app/auth/callback/route.ts` | Server-side OAuth callback that exchanges code for session |
+| `.env.local.example` | Documents required Supabase environment variables |
+
+### Files modified
+
+| File | Changes |
+|------|---------|
+| `src/lib/garage.ts` | Full rewrite: dual-backend (localStorage / Supabase), all functions async, added `getLocalGarageData()` and `clearLocalGarage()` for migration |
+| `src/app/layout.tsx` | Wrapped app in `AuthProvider` |
+| `src/app/garage/page.tsx` | Async garage operations with `userId`, pending vehicle processing from `sessionStorage`, migration toast |
+| `src/app/lookup/page.tsx` | Auth gate on form save: logged-in saves directly, anonymous stores in `sessionStorage` and redirects to `/auth` |
+| `src/components/layout/TopNav.tsx` | Added `UserMenu` component (avatar dropdown with name/email/logout), "Inloggen" button when anonymous, `/auth` route config |
+| `package.json` | Added `@supabase/supabase-js` and `@supabase/ssr` dependencies |
+
+### Key design decisions
+
+1. **Build-time safety**: `AuthProvider` gracefully handles missing Supabase env vars (returns `null` client, `loading: false`, `user: null`) so `npm run build` works without `.env.local`
+2. **Pending vehicle flow**: When an anonymous user fills out the vehicle form, the data is stored in `sessionStorage` under `pendingVehicle`. After auth redirect, the garage page picks it up and saves it to Supabase
+3. **Migration runs once**: The `garage_migrated` localStorage flag prevents re-migration on subsequent sign-ins. Partial failures keep remaining local data intact
+4. **No new Muka UI components needed**: Avatar uses a styled `<button>` with `next/image` for the Google profile picture (or initials fallback), dropdown uses existing `Card` and `Divider`
+5. **Supabase client per-call**: The garage service creates a fresh Supabase client for each operation rather than sharing one, keeping things simple and avoiding stale session references

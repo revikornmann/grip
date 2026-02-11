@@ -3,6 +3,7 @@ import "./globals.css";
 import "muka-ui/styles/index.css";
 import { TopNav, BottomNav, Footer, MainContent } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Tax Calculator - Dutch ZZP Vehicle Tax Optimization",
@@ -43,16 +44,18 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <div className="app-layout">
-            <div className="app-topnav">
-              <TopNav />
+          <AuthProvider>
+            <div className="app-layout">
+              <div className="app-topnav">
+                <TopNav />
+              </div>
+              <main className="app-main">
+                <MainContent>{children}</MainContent>
+                <Footer />
+              </main>
+              <BottomNav />
             </div>
-            <main className="app-main">
-              <MainContent>{children}</MainContent>
-              <Footer />
-            </main>
-            <BottomNav />
-          </div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

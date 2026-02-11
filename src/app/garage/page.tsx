@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Select, Dialog, Button, Alert, Toast, Icon } from "muka-ui";
 import type { GarageVehicle } from "@/types/garage";
 import {
@@ -13,9 +13,12 @@ import {
   vehicleToRdw,
 } from "@/lib/garage";
 import { lookupVehicle } from "@/lib/rdw";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { GarageCard } from "@/components/garage/GarageCard";
 import { EmptyGarage } from "@/components/garage/EmptyGarage";
 import { VehicleFormModal } from "@/components/garage/VehicleFormModal";
+
+const PENDING_VEHICLE_KEY = "pendingVehicle";
 
 type SortKey = "addedAt" | "name" | "price";
 
@@ -50,8 +53,13 @@ function sortVehicles(
 }
 
 export default function GaragePage() {
+  const { user, migrationResult } = useAuth();
+  const userId = user?.id ?? null;
+  const pendingProcessed = useRef(false);
+
   const [vehicles, setVehicles] = useState<GarageVehicle[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("addedAt");
+  const [garageLoading, setGarageLoading] = useState(true);
 
   // Form modal state
   const [formOpen, setFormOpen] = useState(false);
@@ -72,13 +80,51 @@ export default function GaragePage() {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  const reload = useCallback(() => {
-    setVehicles(getGarage());
-  }, []);
+  const reload = useCallback(async () => {
+    setGarageLoading(true);
+    try {
+      const data = await getGarage(userId);
+      setVehicles(data);
+    } catch {
+      setVehicles([]);
+    } finally {
+      setGarageLoading(false);
+    }
+  }, [userId]);
 
   useEffect(() => {
     reload();
   }, [reload]);
+
+  // Process pending vehicle from sessionStorage (after auth redirect)
+  useEffect(() => {
+    if (pendingProcessed.current || !userId || garageLoading) return;
+    pendingProcessed.current = true;
+
+    try {
+      const raw = sessionStorage.getItem(PENDING_VEHICLE_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(PENDING_VEHICLE_KEY);
+
+      const { rdw, user: userData } = JSON.parse(raw);
+      addVehicle(rdw, userData, userId).then(() => {
+        reload().then(() => {
+          setToastMessage("Voertuig toegevoegd aan garage");
+          setToastOpen(true);
+        });
+      });
+    } catch {
+      // Invalid or missing pending data
+    }
+  }, [userId, garageLoading, reload]);
+
+  // Show migration toast
+  useEffect(() => {
+    if (migrationResult && migrationResult.migrated > 0) {
+      setToastMessage("Je bestaande voertuigen zijn overgezet naar je account");
+      setToastOpen(true);
+    }
+  }, [migrationResult]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -91,20 +137,24 @@ export default function GaragePage() {
     setFormOpen(true);
   };
 
-  const handleFormSave = (
+  const handleFormSave = async (
     rdw: GarageVehicle["rdw"],
     user: GarageVehicle["user"],
   ) => {
-    if (editingVehicle) {
-      updateVehicle(editingVehicle.id, user);
-      showToast("Voertuig bijgewerkt");
-    } else {
-      addVehicle(rdw, user);
-      showToast("Voertuig toegevoegd aan garage");
+    try {
+      if (editingVehicle) {
+        await updateVehicle(editingVehicle.id, user, userId);
+        showToast("Voertuig bijgewerkt");
+      } else {
+        await addVehicle(rdw, user, userId);
+        showToast("Voertuig toegevoegd aan garage");
+      }
+      setFormOpen(false);
+      setEditingVehicle(undefined);
+      await reload();
+    } catch {
+      showToast("Er is iets misgegaan — probeer het opnieuw");
     }
-    setFormOpen(false);
-    setEditingVehicle(undefined);
-    reload();
   };
 
   const handleFormClose = () => {
@@ -113,13 +163,17 @@ export default function GaragePage() {
   };
 
   // --- Duplicate ---
-  const handleDuplicate = (vehicle: GarageVehicle) => {
-    const copy = duplicateVehicle(vehicle.id);
-    if (copy) {
-      showToast(
-        `${vehicle.rdw.merk} ${vehicle.rdw.handelsbenaming} gedupliceerd`,
-      );
-      reload();
+  const handleDuplicate = async (vehicle: GarageVehicle) => {
+    try {
+      const copy = await duplicateVehicle(vehicle.id, userId);
+      if (copy) {
+        showToast(
+          `${vehicle.rdw.merk} ${vehicle.rdw.handelsbenaming} gedupliceerd`,
+        );
+        await reload();
+      }
+    } catch {
+      showToast("Dupliceren mislukt — probeer het opnieuw");
     }
   };
 
@@ -129,13 +183,17 @@ export default function GaragePage() {
     setDeleteOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deletingVehicle) return;
-    removeVehicle(deletingVehicle.id);
-    showToast("Voertuig verwijderd");
-    setDeleteOpen(false);
-    setDeletingVehicle(undefined);
-    reload();
+    try {
+      await removeVehicle(deletingVehicle.id, userId);
+      showToast("Voertuig verwijderd");
+      setDeleteOpen(false);
+      setDeletingVehicle(undefined);
+      await reload();
+    } catch {
+      showToast("Verwijderen mislukt — probeer het opnieuw");
+    }
   };
 
   const handleDeleteClose = () => {
@@ -148,9 +206,9 @@ export default function GaragePage() {
     setRefreshingId(vehicle.id);
     try {
       const result = await lookupVehicle(vehicle.rdw.kenteken);
-      updateVehicleRdw(vehicle.id, vehicleToRdw(result));
+      await updateVehicleRdw(vehicle.id, vehicleToRdw(result), userId);
       showToast("RDW gegevens bijgewerkt");
-      reload();
+      await reload();
     } catch {
       showToast("Vernieuwen mislukt — probeer het later opnieuw");
     } finally {
@@ -160,6 +218,10 @@ export default function GaragePage() {
 
   const sorted = sortVehicles(vehicles, sortKey);
   const isEmpty = vehicles.length === 0;
+
+  if (garageLoading) {
+    return null;
+  }
 
   return (
     <>
