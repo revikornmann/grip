@@ -1,4 +1,4 @@
-# Epic 03: Cost Calculator
+# Epic 04: Cost Calculator
 
 > **Component Constraint:** All UI must use Muka UI components. If a component doesn't exist, build it in muka-ui first. See [EPICS.md](./EPICS.md#component-dependency-workflow) for the workflow.
 
@@ -39,7 +39,7 @@
 
 ## User Stories
 
-### US-03-001: View cost calculator for a vehicle
+### US-04-001: View cost calculator for a vehicle
 
 **As a** user with a vehicle in my garage,
 **I want to** see a breakdown of annual costs,
@@ -61,7 +61,7 @@
 
 ---
 
-### US-03-002: Enter fuel consumption
+### US-04-002: Enter fuel consumption
 
 **As a** user,
 **I want to** enter or estimate fuel consumption,
@@ -76,13 +76,13 @@
 
 **Muka UI components:** Input (number), Label, Select (unit)
 
-**Dependencies:** US-03-001
+**Dependencies:** US-04-001
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-03-003: Use current fuel prices
+### US-04-003: Use current fuel prices
 
 **As a** user,
 **I want** fuel costs calculated with current prices,
@@ -98,13 +98,13 @@
 
 **Muka UI components:** Input (number with prefix €), Label
 
-**Dependencies:** US-03-002
+**Dependencies:** US-04-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-03-004: Estimate insurance costs
+### US-04-004: Estimate insurance costs
 
 **As a** user,
 **I want to** enter or estimate insurance costs,
@@ -119,13 +119,13 @@
 
 **Muka UI components:** Input (number), Select (coverage type)
 
-**Dependencies:** US-03-001
+**Dependencies:** US-04-001
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-03-005: Calculate road tax (MRB)
+### US-04-005: Calculate road tax (MRB)
 
 **As a** user,
 **I want** road tax automatically calculated,
@@ -141,13 +141,13 @@
 
 **Muka UI components:** Select (province), Label, Card
 
-**Dependencies:** US-03-001
+**Dependencies:** US-04-001
 
 **Estimate:** 1 day
 
 ---
 
-### US-03-006: Estimate maintenance costs
+### US-04-006: Estimate maintenance costs
 
 **As a** user,
 **I want to** estimate maintenance costs,
@@ -163,13 +163,13 @@
 
 **Muka UI components:** Input (number), Slider (if available), Badge
 
-**Dependencies:** US-03-001
+**Dependencies:** US-04-001
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-03-007: Calculate depreciation
+### US-04-007: Calculate depreciation
 
 **As a** user,
 **I want to** see estimated depreciation,
@@ -185,13 +185,13 @@
 
 **Muka UI components:** Input (number), Select (years)
 
-**Dependencies:** US-03-001
+**Dependencies:** US-04-001
 
 **Estimate:** 1 day
 
 ---
 
-### US-03-008: Calculate bijtelling (business ownership)
+### US-04-008: Calculate bijtelling (business ownership)
 
 **As a** ZZP'er with a business vehicle,
 **I want** bijtelling calculated correctly,
@@ -210,13 +210,13 @@
 
 **Muka UI components:** Select (tax bracket), Input (override), Card
 
-**Dependencies:** US-03-001, US-02-008
+**Dependencies:** US-04-001, US-02-008
 
 **Estimate:** 1 day
 
 ---
 
-### US-03-009: Calculate BTW aftrek (business ownership)
+### US-04-009: Calculate BTW aftrek (business ownership)
 
 **As a** ZZP'er buying a vehicle through my business,
 **I want** BTW (VAT) deduction calculated,
@@ -232,13 +232,13 @@
 
 **Muka UI components:** Card, Input (business %), Alert (#24)
 
-**Dependencies:** US-03-001, US-02-007
+**Dependencies:** US-04-001, US-02-007
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-03-010: Show cost summary and total
+### US-04-010: Show cost summary and total
 
 **As a** user,
 **I want** a clear summary of all costs,
@@ -254,13 +254,13 @@
 
 **Muka UI components:** Card, Badge, Divider, Chart (if available)
 
-**Dependencies:** US-03-001 through US-03-009
+**Dependencies:** US-04-001 through US-04-009
 
 **Estimate:** 1 day
 
 ---
 
-### US-03-011: Save calculation assumptions
+### US-04-011: Save calculation assumptions
 
 **As a** user,
 **I want** my entered assumptions saved with the vehicle,
@@ -275,7 +275,7 @@
 
 **Muka UI components:** Button (reset)
 
-**Dependencies:** US-03-001, Epic 02
+**Dependencies:** US-04-001, Epic 02
 
 **Estimate:** 0.5 day
 

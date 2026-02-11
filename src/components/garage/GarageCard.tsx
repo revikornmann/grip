@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Badge, Button, Divider, Label } from "muka-ui";
+import { Card, Chip, Button, Divider, Label } from "muka-ui";
 import type { GarageVehicle } from "@/types/garage";
 import { formatPlateDisplay } from "@/lib/validation";
 import { formatCurrency, formatNumber } from "@/lib/formatting";
@@ -39,9 +39,14 @@ export function GarageCard({
   isRefreshing,
 }: GarageCardProps) {
   const displayName =
-    vehicle.user.nickname ||
-    `${vehicle.rdw.merk} ${vehicle.rdw.handelsbenaming}`;
-  const plate = formatPlateDisplay(vehicle.rdw.kenteken);
+    vehicle.user?.nickname ||
+    `${vehicle.rdw?.merk ?? ""} ${vehicle.rdw?.handelsbenaming ?? ""}`.trim() ||
+    "Onbekend voertuig";
+  const plate = vehicle.rdw?.kenteken
+    ? formatPlateDisplay(vehicle.rdw.kenteken)
+    : "—";
+
+  const ownershipType = vehicle.user?.ownershipType ?? "private";
 
   return (
     <Card padding="lg" as="article" aria-label={displayName}>
@@ -77,13 +82,11 @@ export function GarageCard({
               {plate}
             </p>
           </div>
-          <Badge
-            variant={
-              vehicle.user.ownershipType === "business" ? "info" : "default"
-            }
+          <Chip
+            variant={ownershipType === "business" ? "info" : "default"}
           >
-            {vehicle.user.ownershipType === "business" ? "Zakelijk" : "Privé"}
-          </Badge>
+            {ownershipType === "business" ? "Zakelijk" : "Privé"}
+          </Chip>
         </div>
 
         <Divider />
@@ -92,16 +95,16 @@ export function GarageCard({
         <div>
           <DetailRow
             label="Aankoopprijs"
-            value={formatCurrency(vehicle.user.purchasePrice, 0)}
+            value={formatCurrency(vehicle.user?.purchasePrice ?? 0, 0)}
           />
           <DetailRow
             label="Jaarkilometers"
-            value={`${formatNumber(vehicle.user.annualKilometers)} km`}
+            value={`${formatNumber(vehicle.user?.annualKilometers ?? 0)} km`}
           />
-          {vehicle.user.businessKilometers > 0 && (
+          {(vehicle.user?.businessKilometers ?? 0) > 0 && (
             <DetailRow
               label="Zakelijke km"
-              value={`${formatNumber(vehicle.user.businessKilometers)} km`}
+              value={`${formatNumber(vehicle.user?.businessKilometers ?? 0)} km`}
             />
           )}
         </div>

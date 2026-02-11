@@ -220,13 +220,7 @@ function LookupContent() {
     isLoading || !plate.trim() || !isValidDutchPlate(normalizePlate(plate));
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--spacing-6)",
-      }}
-    >
+    <>
       {/* Search form */}
       {/* onBlur wrapper captures blur from child Input for validation */}
       <div onBlur={handleBlur}>
@@ -339,7 +333,7 @@ function LookupContent() {
       >
         {toastMessage}
       </Toast>
-    </div>
+    </>
   );
 }
 

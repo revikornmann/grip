@@ -1,4 +1,4 @@
-# Epic 05: Kilometer Tracking
+# Epic 06: Kilometer Tracking
 
 > **Component Constraint:** All UI must use Muka UI components. If a component doesn't exist, build it in muka-ui first. See [EPICS.md](./EPICS.md#component-dependency-workflow) for the workflow.
 
@@ -8,7 +8,7 @@
 
 **Phase:** 2 (Post-MVP)
 **Priority:** P3
-**Dependencies:** Epic 02 (Vehicle Garage), Epic 03 (Cost Calculator)
+**Dependencies:** Epic 02 (Vehicle Garage), Epic 04 (Cost Calculator)
 
 ---
 
@@ -36,7 +36,7 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 ## User Stories
 
-### US-05-001: Manual trip entry
+### US-06-001: Manual trip entry
 
 **As a** business vehicle owner,
 **I want to** log individual trips,
@@ -58,7 +58,7 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 ---
 
-### US-05-002: View trip history
+### US-06-002: View trip history
 
 **As a** user,
 **I want to** see all my logged trips,
@@ -74,13 +74,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** ListItem, Select (filters), Input (search), Badge
 
-**Dependencies:** US-05-001
+**Dependencies:** US-06-001
 
 **Estimate:** 1 day
 
 ---
 
-### US-05-003: Edit and delete trips
+### US-06-003: Edit and delete trips
 
 **As a** user,
 **I want to** correct mistakes in logged trips,
@@ -95,13 +95,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Button, Modal (#15)
 
-**Dependencies:** US-05-002
+**Dependencies:** US-06-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-05-004: Connect Google Calendar
+### US-06-004: Connect Google Calendar
 
 **As a** user with appointments in Google Calendar,
 **I want to** import calendar events as potential trips,
@@ -117,13 +117,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Button, Card, ListItem, Badge ("Suggestie")
 
-**Dependencies:** US-05-001
+**Dependencies:** US-06-001
 
 **Estimate:** 3 days
 
 ---
 
-### US-05-005: AI trip categorization
+### US-06-005: AI trip categorization
 
 **As a** user,
 **I want** trips automatically categorized as business or private,
@@ -139,13 +139,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Badge (confidence), Button (confirm/change)
 
-**Dependencies:** US-05-004
+**Dependencies:** US-06-004
 
 **Estimate:** 3 days
 
 ---
 
-### US-05-006: Track business vs private ratio
+### US-06-006: Track business vs private ratio
 
 **As a** user,
 **I want to** see my business/private kilometer split,
@@ -160,13 +160,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Card, Progress (#28), Chart (if available)
 
-**Dependencies:** US-05-001
+**Dependencies:** US-06-001
 
 **Estimate:** 1 day
 
 ---
 
-### US-05-007: 500 km private use warning
+### US-06-007: 500 km private use warning
 
 **As a** business vehicle owner,
 **I want to** be warned when approaching the 500 km private limit,
@@ -181,13 +181,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Alert (#24), Badge, Card
 
-**Dependencies:** US-05-006
+**Dependencies:** US-06-006
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-05-008: Monthly summary report
+### US-06-008: Monthly summary report
 
 **As a** user,
 **I want** a monthly summary of my kilometers,
@@ -202,13 +202,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Card, Table (#12), Button
 
-**Dependencies:** US-05-002
+**Dependencies:** US-06-002
 
 **Estimate:** 1 day
 
 ---
 
-### US-05-009: Export kilometer log
+### US-06-009: Export kilometer log
 
 **As a** user filing taxes,
 **I want to** export my kilometer administration,
@@ -223,13 +223,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Button, Select (format), Modal (#15)
 
-**Dependencies:** US-05-002
+**Dependencies:** US-06-002
 
 **Estimate:** 1.5 days
 
 ---
 
-### US-05-010: Recurring trips
+### US-06-010: Recurring trips
 
 **As a** user with regular commutes,
 **I want to** set up recurring trips,
@@ -244,13 +244,13 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Select, Input, DatePicker (#21)
 
-**Dependencies:** US-05-001
+**Dependencies:** US-06-001
 
 **Estimate:** 1.5 days
 
 ---
 
-### US-05-011: Multiple vehicles tracking
+### US-06-011: Multiple vehicles tracking
 
 **As a** user with multiple business vehicles,
 **I want to** track kilometers per vehicle,
@@ -265,7 +265,7 @@ Without proper records, the tax authority may deny bijtelling benefits or assess
 
 **Muka UI components:** Select (vehicle), Tabs
 
-**Dependencies:** US-05-001, Epic 02
+**Dependencies:** US-06-001, Epic 02
 
 **Estimate:** 1 day
 

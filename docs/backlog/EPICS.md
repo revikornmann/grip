@@ -24,9 +24,10 @@ They need to understand:
 | 00 | [Foundation](./epic-00-foundation.md) | 1 | P0 | Not Started |
 | 01 | [License Plate Lookup](./epic-01-license-plate-lookup.md) | 1 | P0 | Not Started |
 | 02 | [Vehicle Garage](./epic-02-vehicle-garage.md) | 1 | P1 | Not Started |
-| 03 | [Cost Calculator](./epic-03-cost-calculator.md) | 1 | P1 | Not Started |
-| 04 | [Ownership Comparison](./epic-04-ownership-comparison.md) | 1 | P2 | Not Started |
-| 05 | [Kilometer Tracking](./epic-05-kilometer-tracking.md) | 2 | P3 | Not Started |
+| 03 | [User Accounts](./epic-03-user-accounts.md) | 1 | P1 | Not Started |
+| 04 | [Cost Calculator](./epic-04-cost-calculator.md) | 1 | P1 | Not Started |
+| 05 | [Ownership Comparison](./epic-05-ownership-comparison.md) | 1 | P2 | Not Started |
+| 06 | [Kilometer Tracking](./epic-06-kilometer-tracking.md) | 2 | P3 | Not Started |
 
 ### Priority Legend
 - **P0** — Must have for MVP launch
@@ -57,19 +58,25 @@ They need to understand:
          │                            │
          ▼                            │
 ┌─────────────────┐                   │
-│ E03: Cost       │                   │
+│ E03: User       │                   │
+│ Accounts        │                   │
+└────────┬────────┘                   │
+         │                            │
+         ▼                            │
+┌─────────────────┐                   │
+│ E04: Cost       │                   │
 │ Calculator      │                   │
 └────────┬────────┘                   │
          │                            │
          ▼                            │
 ┌─────────────────┐                   │
-│ E04: Ownership  │                   │
+│ E05: Ownership  │                   │
 │ Comparison      │                   │
 └────────┬────────┘                   │
          │                            │
          ▼                            │
 ┌─────────────────┐                   │
-│ E05: Kilometer  │───────────────────┘
+│ E06: Kilometer  │───────────────────┘
 │ Tracking        │ (uses garage data)
 └─────────────────┘
 ```
@@ -116,14 +123,14 @@ For reference when writing stories:
 | Component | Roadmap # | Blocking Stories |
 |-----------|-----------|------------------|
 | Modal/Dialog | #15 | US-02-002, US-02-004, US-02-005 |
-| Alert/Toast | #24 | US-01-004, US-01-005, US-04-11 |
-| Table | #12 | US-03-001, US-04-002 |
+| Alert/Toast | #24 | US-01-004, US-01-005, US-05-11 |
+| Table | #12 | US-04-001, US-05-002 |
 | Loading/Spinner | #27 | US-01-001 |
 | Skeleton | #29 | US-00-006 |
-| Tooltip | #18 | US-04-009 |
-| Progress | #28 | US-05-006 |
+| Tooltip | #18 | US-05-009 |
+| Progress | #28 | US-06-006 |
 | Empty State | #30 | US-02-001 |
-| DatePicker | #21 | US-05-001 |
+| DatePicker | #21 | US-06-001 |
 
 ### Workflow When Component is Missing
 
@@ -173,13 +180,13 @@ For reference when writing stories:
 The MVP allows a user to:
 1. Look up a vehicle by license plate
 2. Save vehicles to a personal garage (local storage)
-3. Enter cost assumptions (fuel, insurance, maintenance)
-4. See total annual cost calculated
-5. Compare private vs business ownership for a vehicle
+3. Create an account (Google sign-in) to persist garage data across devices
+4. Enter cost assumptions (fuel, insurance, maintenance)
+5. See total annual cost calculated
+6. Compare private vs business ownership for a vehicle
 
 **Out of scope for MVP:**
-- User accounts / authentication
-- Cloud sync
+- Cloud sync (beyond garage data)
 - Kilometer tracking
 - Calendar integration
 - Export functionality

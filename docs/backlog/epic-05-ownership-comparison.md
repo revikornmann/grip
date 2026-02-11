@@ -1,4 +1,4 @@
-# Epic 04: Ownership Comparison
+# Epic 05: Ownership Comparison
 
 > **Component Constraint:** All UI must use Muka UI components. If a component doesn't exist, build it in muka-ui first. See [EPICS.md](./EPICS.md#component-dependency-workflow) for the workflow.
 
@@ -8,7 +8,7 @@
 
 **Phase:** 1 (MVP)
 **Priority:** P2
-**Dependencies:** Epic 02 (Vehicle Garage), Epic 03 (Cost Calculator)
+**Dependencies:** Epic 02 (Vehicle Garage), Epic 04 (Cost Calculator)
 
 ---
 
@@ -26,7 +26,7 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 ## User Stories
 
-### US-04-001: Initiate comparison from garage
+### US-05-001: Initiate comparison from garage
 
 **As a** user with vehicles in my garage,
 **I want to** compare ownership scenarios for a vehicle,
@@ -41,13 +41,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Button, Card, Select
 
-**Dependencies:** Epic 02, Epic 03
+**Dependencies:** Epic 02, Epic 04
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-04-002: Side-by-side cost comparison
+### US-05-002: Side-by-side cost comparison
 
 **As a** user comparing ownership options,
 **I want to** see costs side-by-side,
@@ -63,13 +63,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Card, Table (#12), Badge, Tabs (for mobile)
 
-**Dependencies:** US-04-001
+**Dependencies:** US-05-001
 
 **Estimate:** 1 day
 
 ---
 
-### US-04-003: Show net annual cost difference
+### US-05-003: Show net annual cost difference
 
 **As a** user,
 **I want to** see the bottom-line difference between scenarios,
@@ -84,13 +84,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Card (highlight), Badge, Icon
 
-**Dependencies:** US-04-002
+**Dependencies:** US-05-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-04-004: Adjust comparison inputs
+### US-05-004: Adjust comparison inputs
 
 **As a** user,
 **I want to** change assumptions and see how they affect the comparison,
@@ -108,13 +108,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Input, Select, Button
 
-**Dependencies:** US-04-002
+**Dependencies:** US-05-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-04-005: Explain bijtelling impact
+### US-05-005: Explain bijtelling impact
 
 **As a** user unfamiliar with bijtelling,
 **I want** a clear explanation of how it affects the comparison,
@@ -129,13 +129,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Card (collapsible), Label, Divider, Icon (info)
 
-**Dependencies:** US-04-002
+**Dependencies:** US-05-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-04-006: Show break-even point
+### US-05-006: Show break-even point
 
 **As a** user,
 **I want to** know at what business use percentage the scenarios are equal,
@@ -150,13 +150,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Card, Slider (read-only visualization)
 
-**Dependencies:** US-04-003
+**Dependencies:** US-05-003
 
 **Estimate:** 1 day
 
 ---
 
-### US-04-007: Compare multiple vehicles
+### US-05-007: Compare multiple vehicles
 
 **As a** user considering multiple vehicles,
 **I want to** compare them against each other,
@@ -171,13 +171,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Select (multi), Table (#12), Card
 
-**Dependencies:** US-04-002, Epic 02
+**Dependencies:** US-05-002, Epic 02
 
 **Estimate:** 1 day
 
 ---
 
-### US-04-008: EV-specific comparison benefits
+### US-05-008: EV-specific comparison benefits
 
 **As a** user considering an electric vehicle,
 **I want to** see EV-specific tax benefits highlighted,
@@ -193,13 +193,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Badge (EV), Card (highlight), Alert (#24)
 
-**Dependencies:** US-04-002
+**Dependencies:** US-05-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-04-009: Youngtimer advantage display
+### US-05-009: Youngtimer advantage display
 
 **As a** user considering an older vehicle,
 **I want to** see youngtimer tax benefits highlighted,
@@ -214,13 +214,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Badge, Card, Tooltip (#18)
 
-**Dependencies:** US-04-002
+**Dependencies:** US-05-002
 
 **Estimate:** 0.5 day
 
 ---
 
-### US-04-010: Export comparison as PDF
+### US-05-010: Export comparison as PDF
 
 **As a** user,
 **I want to** export the comparison results,
@@ -239,13 +239,13 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Button, Icon (download)
 
-**Dependencies:** US-04-003
+**Dependencies:** US-05-003
 
 **Estimate:** 1 day
 
 ---
 
-### US-04-011: Disclaimer and accuracy notice
+### US-05-011: Disclaimer and accuracy notice
 
 **As a** user making financial decisions,
 **I want to** understand the limitations of the calculations,
@@ -260,7 +260,7 @@ For MVP, we focus on **Privé** vs **Zakelijk** (combined), with BV-specific nua
 
 **Muka UI components:** Alert (#24), Card (footer)
 
-**Dependencies:** US-04-001
+**Dependencies:** US-05-001
 
 **Estimate:** 0.5 day
 

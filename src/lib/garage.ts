@@ -89,9 +89,9 @@ export function duplicateVehicle(id: string): GarageVehicle | null {
 }
 
 export function isInGarage(plate: string): boolean {
-  return getGarage().some((v) => v.rdw.kenteken === plate);
+  return getGarage().some((v) => v.rdw?.kenteken === plate);
 }
 
 export function getVehicleByPlate(plate: string): GarageVehicle | null {
-  return getGarage().find((v) => v.rdw.kenteken === plate) ?? null;
+  return getGarage().find((v) => v.rdw?.kenteken === plate) ?? null;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Badge, Label, Divider } from "muka-ui";
+import { Card, Chip, Label, Divider } from "muka-ui";
 import type { Vehicle } from "@/types/vehicle";
 import { formatCurrency, formatDate } from "@/lib/formatting";
 
@@ -91,8 +91,8 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             {vehicle.make} {vehicle.model}
           </h2>
           <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
-            {ev && <Badge variant="success">Elektrisch</Badge>}
-            {youngtimer && <Badge variant="info">Youngtimer</Badge>}
+            {ev && <Chip variant="success">Elektrisch</Chip>}
+            {youngtimer && <Chip variant="info">Youngtimer</Chip>}
           </div>
         </div>
 

@@ -47,16 +47,8 @@ a {
   overflow-y: auto;
   background: var(--color-surface-level2);
   -webkit-overflow-scrolling: touch;
-}
-
-.app-main__content {
-  max-width: var(--container-max-width-large);
-  margin: 0 auto;
-  padding: var(--section-padding-vertical-default, var(--spacing-8))
-    var(--section-padding-horizontal-default, var(--spacing-4));
-  padding-bottom: calc(
-    var(--section-padding-vertical-default, var(--spacing-8)) + 6rem
-  );
+  /* Extra bottom padding for floating BottomNav */
+  padding-bottom: 6rem;
 }
 
 /* ===== Bottom Navigation (fixed floating) ===== */
@@ -74,17 +66,11 @@ a {
 }
 
 /* ===== Footer ===== */
-.app-footer {
-  padding: var(--spacing-4);
-}
-
 .app-footer__inner {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-3);
-  max-width: var(--container-max-width-xlarge);
-  margin: 0 auto;
 }
 
 .app-footer__links {

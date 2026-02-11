@@ -162,13 +162,7 @@ export default function GaragePage() {
   const isEmpty = vehicles.length === 0;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--spacing-6)",
-      }}
-    >
+    <>
       {/* Sort control */}
       {!isEmpty && (
         <div
@@ -199,17 +193,16 @@ export default function GaragePage() {
             gap: "var(--spacing-4)",
           }}
         >
-          {sorted.map((vehicle) => (
-            <div key={vehicle.id}>
-              <GarageCard
-                vehicle={vehicle}
-                onEdit={() => handleEdit(vehicle)}
-                onDuplicate={() => handleDuplicate(vehicle)}
-                onDelete={() => handleDeleteClick(vehicle)}
-                onRefresh={() => handleRefresh(vehicle)}
-                isRefreshing={refreshingId === vehicle.id}
-              />
-            </div>
+          {sorted.map((vehicle, index) => (
+            <GarageCard
+              key={vehicle.id || `vehicle-${index}`}
+              vehicle={vehicle}
+              onEdit={() => handleEdit(vehicle)}
+              onDuplicate={() => handleDuplicate(vehicle)}
+              onDelete={() => handleDeleteClick(vehicle)}
+              onRefresh={() => handleRefresh(vehicle)}
+              isRefreshing={refreshingId === vehicle.id}
+            />
           ))}
         </div>
       )}
@@ -275,6 +268,6 @@ export default function GaragePage() {
       >
         {toastMessage}
       </Toast>
-    </div>
+    </>
   );
 }
