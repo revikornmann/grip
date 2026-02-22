@@ -60,13 +60,20 @@ import { Button, Card, Input } from 'muka-ui';
 
 Tax Calculator is a vehicle tax optimization tool for Dutch ZZP'ers (self-employed professionals). It helps calculate and compare tax efficiency across private vs business vehicle ownership.
 
+> **Product Specification:** For the full product specification — including data model, ownership types, calculation formulas, tax constants, and screen architecture — read `docs/PRODUCT_BRIEF.md`. This is the single source of truth for E04 and E05.
+
 ### Key features (planned)
 
-1. License plate lookup via RDW API
-2. Vehicle garage (local storage)
-3. Cost calculator with Dutch tax rules
-4. Private vs business ownership comparison
-5. Kilometer tracking (Phase 2)
+- Onboarding flow to capture user profile (income, BTW status, province)
+- License plate lookup via RDW API (complete)
+- Vehicle garage with Supabase persistence (complete)
+- Scenario model: five ownership types per vehicle
+  (private_owned / private_lease / financial_lease / operational_lease / business_owned)
+- Per-scenario cost calculation with full Dutch tax logic
+  (bijtelling, BTW aftrek, km deduction, afschrijving, cost deductibility)
+- Youngtimer detection with 2027 threshold change warning
+- Side-by-side scenario comparison
+- Kilometer tracking (Phase 2)
 
 ---
 
@@ -104,47 +111,74 @@ npm run build
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx          # Root layout (imports muka-ui styles)
-│   ├── page.tsx            # Home page
-│   ├── lookup/             # License plate lookup
-│   ├── garage/             # Vehicle garage
-│   ├── calculator/         # Cost calculator
-│   └── compare/            # Ownership comparison
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── auth/               # Google OAuth (complete)
+│   ├── onboarding/         # NEW: Profile setup flow (Sprint 1)
+│   ├── lookup/             # License plate lookup (complete)
+│   ├── garage/             # Vehicle garage (complete)
+│   ├── scenarios/          # NEW: Scenario list = home screen (Sprint 2-3)
+│   │   ├── new/            # Add scenario flow
+│   │   └── [id]/           # Scenario detail + edit
+│   ├── compare/            # Side-by-side comparison (Sprint 7)
+│   └── settings/           # NEW: Profile edit + sign out
 ├── components/             # App-specific NON-UI components only
-│   └── (providers, context, layouts - NOT buttons, cards, etc.)
-├── lib/                    # Utilities and services
-│   ├── rdw.ts              # RDW API client
-│   ├── storage.ts          # Local storage abstraction
-│   ├── calculator.ts       # Cost calculations
+├── lib/
+│   ├── rdw.ts              # RDW API client (complete)
+│   ├── storage.ts          # localStorage abstraction (complete)
+│   ├── calculator.ts       # REWRITE REQUIRED — see PRODUCT_BRIEF.md §4
+│   ├── tax-constants.ts    # NEW: 2026 tax constants extracted here
+│   ├── bijtelling.ts       # NEW: Bijtelling + youngtimer logic
 │   └── validation.ts       # Input validation
-└── types/                  # TypeScript definitions
+└── types/
+    ├── garage.ts           # GarageVehicle (add dagwaarde field)
+    ├── scenario.ts         # NEW: Scenario + all OwnershipType input shapes
+    └── profile.ts          # NEW: UserProfile type
 ```
 
 ---
 
 ## Available Muka UI Components
 
+Muka UI is linked to this project via `npm link` for local development. Check the running Storybook at `http://localhost:6006` to verify current component availability.
+
 Current (check Storybook for latest):
-- `Button` — primary, secondary, ghost variants; sm/md/lg sizes
-- `Input` — text input with label, helper text, error states
-- `Card` — content container
+- `Alert` — info, success, warning, error variants
 - `Badge` — status indicators
-- `Label` — form labels
-- `Icon` — icon wrapper
+- `BottomBar` — mobile navigation bar
+- `Button` — primary, secondary, ghost variants; sm/md/lg sizes
+- `Card` — content container
+- `Checkbox` — checkbox input
+- `CheckboxTile` — checkbox with tile styling
+- `Chip` — compact interactive element
+- `Container` — layout container
+- `DatePicker` — date selection
+- `Dialog` — modal dialog
 - `Divider` — visual separator
-- `Select` — dropdown select
-- `Tabs`, `TabList`, `Tab`, `TabPanel` — tabbed interface
+- `FormProgressBar` — multi-step form progress
+- `Icon` — icon wrapper
+- `Input` — text input with label, helper text, error states
+- `Label` — form labels
 - `ListItem` — list items
+- `PriceTag` — price display component
+- `Progress` — progress indicator
+- `Radio` — radio input
+- `RadioTile` — radio with tile styling
+- `Section` — content section
+- `SegmentGroup` — segmented control
+- `Select` — dropdown select
+- `Sheet` — bottom sheet overlay
+- `Table` — data table
+- `Tabs`, `TabList`, `Tab`, `TabPanel` — tabbed interface
+- `Tile` — clickable tile
+- `Toast` — notification toast
+- `Toggle` — toggle switch
+- `TopBar` — top navigation bar
 
 Needed but not yet built:
-- Modal/Dialog
-- Alert/Toast
-- Table
-- Loading/Spinner
 - Skeleton
 - Tooltip
-- Progress
 - Empty State
 
 ---
@@ -153,11 +187,18 @@ Needed but not yet built:
 
 | Term | Description |
 |------|-------------|
-| Bijtelling | Taxable benefit for private use of company car |
-| BTW aftrek | VAT deduction on business vehicle costs |
-| MIA/VAMIL | Environmental investment deductions |
-| Youngtimer | 15+ year old vehicles with reduced bijtelling |
-| Cataloguswaarde | Official catalog price for bijtelling calculation |
+| Bijtelling | Taxable benefit added to income for private use of a company car. % of cataloguswaarde (22% standard, 16% PHEV, 18% EV in 2026). Applied when private use exceeds 500km/year. |
+| Youngtimer bijtelling | 35% over dagwaarde (market value) for cars 15+ years old. Threshold changes to 25+ years from 1 Jan 2027. No transition period. |
+| BTW aftrek | VAT recovery on business vehicle costs, proportional to business use. Only for BTW-plichtig users with ≥10% business use. |
+| Kostenaftrek | All business vehicle costs reduce taxable profit. Tax saving = cost × marginal tax rate. |
+| Km-vergoeding | €0.23/km deduction for business use of a privately owned or leased vehicle. |
+| Afschrijving | Depreciation on business-owned vehicles. Minimum 5 years, minimum residual value 10% of purchase price (fiscal floor). |
+| Operational lease | Fixed monthly rental including maintenance and all-risk insurance. Full lease cost deductible. No afschrijving. Bijtelling still applies. |
+| Financial lease | Bank-financed, car on ZZP'er's balance sheet. Same tax treatment as business_owned. Full monthly payment deductible (or interest-only if rate provided). |
+| Cataloguswaarde | Official list price at first registration, including BPM and VAT. Used for standard bijtelling calculation. |
+| Dagwaarde | Current market value. Used only for youngtimer bijtelling calculation. |
+| Belastingschijf | Income tax bracket. 2026: 35.75% (≤€38.883) / 37.56% (≤€78.426) / 49.50% (>€78.426). |
+| MRB | Road tax (motorrijtuigenbelasting). Based on province, fuel type, and vehicle weight. |
 
 ---
 

@@ -7,26 +7,41 @@
 import type { GarageVehicle } from "@/types/garage";
 
 // ---------------------------------------------------------------------------
-// Tax Constants (2024)
+// Tax Constants — 2026
+// Source: docs/PRODUCT_BRIEF.md §6. Update annually.
 // ---------------------------------------------------------------------------
 
 export const TAX_CONSTANTS = {
-  /** Bijtelling percentages for private use of business vehicles */
   bijtelling: {
-    standard: 0.22, // 22% for standard vehicles
-    lowEmission: 0.16, // 16% for CO2 ≤ 50 g/km (PHEV)
-    ev: 0.16, // 16% for EV (through 2024)
-    youngtimerReduction: 0.35, // 35% reduction for 15+ year old vehicles
+    standard: 0.22,
+    lowEmission: 0.16,       // PHEV, CO2 ≤ 50 g/km
+    ev: 0.18,                // EV rate for 2026
+    ev_2026: 0.18,
+    ev_2027: 0.20,
+    ev_2028_plus: 0.22,
+    youngtimer_rate: 0.35,   // Applied to dagwaarde, not cataloguswaarde
+    youngtimerReduction: 0.35, // Legacy alias
   },
-  /** Income tax brackets (2024) */
+  /** Income tax brackets (2026) — legacy format for backward compatibility */
   taxBrackets: {
-    low: 0.3693, // Up to €73,031
-    high: 0.495, // Above €73,031
+    low: 0.3575,             // Schijf 1: up to €38.883
+    mid: 0.3756,             // Schijf 2: €38.883 – €78.426
+    high: 0.495,             // Schijf 3: above €78.426
   },
-  /** BTW (VAT) rate */
+  /** Income tax brackets (2026) — structured format */
+  taxBrackets2026: [
+    { upTo: 38883, rate: 0.3575 },
+    { upTo: 78426, rate: 0.3756 },
+    { upTo: Infinity, rate: 0.495 },
+  ],
   btw: 0.21,
-  /** Minimum business use for BTW deduction */
   minBusinessUseForBtw: 0.10,
+  kmDeduction: 0.23,         // €/km for private vehicle business use (2026)
+  youngtimer: {
+    thresholdUntil2026: 15,  // years
+    thresholdFrom2027: 25,   // years — new rule, no transition period
+    changeDate: '2027-01-01',
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
