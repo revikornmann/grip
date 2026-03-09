@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { TopBar, Button, Icon, Card, Divider } from "muka-ui";
+import { TopBar, Button, Icon, Card, Divider, Toggle } from "muka-ui";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useTheme } from "@/components/ThemeProvider";
 
 /**
  * Route configuration for TopBar rendering.
@@ -46,6 +47,68 @@ function getInitials(name: string): string {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+}
+
+function SettingsMenu() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div style={{ position: "relative" }}>
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
+        aria-label="Instellingen"
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen(!menuOpen)}
+      >
+        <Icon name="settings" size="md" />
+      </Button>
+
+      {menuOpen && (
+        <>
+          <div
+            onClick={() => setMenuOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 30,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              right: 0,
+              top: "calc(100% + var(--spacing-2))",
+              zIndex: 31,
+              minWidth: "200px",
+            }}
+          >
+            <Card padding="sm">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "var(--spacing-2)",
+                }}
+              >
+                <Toggle
+                  label="Donker thema"
+                  checked={resolvedTheme === "dark"}
+                  onChange={() =>
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                  }
+                  name="theme-toggle"
+                />
+              </div>
+            </Card>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 function UserMenu() {
@@ -106,7 +169,6 @@ function UserMenu() {
 
       {menuOpen && (
         <>
-          {/* Backdrop */}
           <div
             onClick={() => setMenuOpen(false)}
             style={{
@@ -115,7 +177,6 @@ function UserMenu() {
               zIndex: 30,
             }}
           />
-          {/* Dropdown */}
           <div
             style={{
               position: "absolute",
@@ -197,7 +258,13 @@ export function TopNav() {
       </Button>
     ) : undefined;
 
-  const trailing = pathname !== "/auth" ? <UserMenu /> : undefined;
+  const trailing =
+    pathname !== "/auth" ? (
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-2)" }}>
+        <UserMenu />
+        <SettingsMenu />
+      </div>
+    ) : undefined;
 
   return <TopBar title={config.title} leading={leading} trailing={trailing} />;
 }
