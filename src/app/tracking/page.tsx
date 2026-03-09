@@ -244,22 +244,15 @@ export default function TrackingPage() {
             <Icon name="x" size="sm" />
           </Button>
         }
-        footer={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "var(--spacing-3)",
-              padding: "var(--spacing-4)",
-            }}
-          >
+        footerActions={
+          <>
             <Button variant="secondary" onClick={() => setDeleteOpen(false)}>
               Annuleren
             </Button>
             <Button variant="primary" onClick={handleDeleteConfirm}>
               Verwijderen
             </Button>
-          </div>
+          </>
         }
       >
         <Alert variant="warning">

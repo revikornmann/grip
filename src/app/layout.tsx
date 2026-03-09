@@ -21,12 +21,17 @@ const themeScript = `
       resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     document.documentElement.setAttribute('data-theme', resolved);
+    var lightLink = document.createElement('link');
+    lightLink.id = 'grip-light-tokens';
+    lightLink.rel = 'stylesheet';
+    lightLink.href = '/themes/tokens-grip-light.css';
+    document.head.appendChild(lightLink);
     if (resolved === 'dark') {
-      var link = document.createElement('link');
-      link.id = 'muka-dark-tokens';
-      link.rel = 'stylesheet';
-      link.href = '/themes/tokens-muka-dark.css';
-      document.head.appendChild(link);
+      var darkLink = document.createElement('link');
+      darkLink.id = 'grip-dark-tokens';
+      darkLink.rel = 'stylesheet';
+      darkLink.href = '/themes/tokens-grip-dark.css';
+      document.head.appendChild(darkLink);
     }
   } catch(e) {}
 })();
@@ -40,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="nl" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>

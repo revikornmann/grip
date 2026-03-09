@@ -131,22 +131,15 @@ function VehicleFormInner({
           <Icon name="x" size="sm" />
         </Button>
       }
-      footer={
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "var(--spacing-3)",
-            padding: "var(--spacing-4)",
-          }}
-        >
+      footerActions={
+        <>
           <Button variant="secondary" onClick={onClose}>
             Annuleren
           </Button>
           <Button variant="primary" onClick={handleSave}>
             {isEdit ? "Opslaan" : "Sla op"}
           </Button>
-        </div>
+        </>
       }
     >
       <div

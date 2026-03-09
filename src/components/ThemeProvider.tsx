@@ -12,6 +12,8 @@ import {
   type Theme,
   type ResolvedTheme,
   THEME_STORAGE_KEY,
+  LIGHT_TOKENS_PATH,
+  LIGHT_LINK_ID,
   DARK_TOKENS_PATH,
   DARK_LINK_ID,
 } from "@/lib/theme";
@@ -42,19 +44,28 @@ function resolveTheme(theme: Theme): ResolvedTheme {
   return theme;
 }
 
+function ensureLink(id: string, href: string) {
+  if (!document.getElementById(id)) {
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+  }
+}
+
 function applyTheme(resolved: ResolvedTheme) {
   document.documentElement.setAttribute("data-theme", resolved);
 
-  const existingLink = document.getElementById(DARK_LINK_ID);
+  // Always load grip light tokens as base
+  ensureLink(LIGHT_LINK_ID, LIGHT_TOKENS_PATH);
 
-  if (resolved === "dark" && !existingLink) {
-    const link = document.createElement("link");
-    link.id = DARK_LINK_ID;
-    link.rel = "stylesheet";
-    link.href = DARK_TOKENS_PATH;
-    document.head.appendChild(link);
-  } else if (resolved === "light" && existingLink) {
-    existingLink.remove();
+  const existingDarkLink = document.getElementById(DARK_LINK_ID);
+
+  if (resolved === "dark" && !existingDarkLink) {
+    ensureLink(DARK_LINK_ID, DARK_TOKENS_PATH);
+  } else if (resolved === "light" && existingDarkLink) {
+    existingDarkLink.remove();
   }
 }
 
