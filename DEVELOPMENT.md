@@ -10,7 +10,7 @@ This project uses [muka-ui](https://github.com/uxdelta/muka) as a local dependen
 
 ### The Rule
 
-Every button, input, card, badge, and UI element must be imported from `muka-ui`. This forces the design system to grow based on real application needs and keeps the tax-calculator consistent and maintainable.
+Every button, input, card, badge, and UI element must be imported from `muka-ui`. This forces the design system to grow based on real application needs and keeps the grip consistent and maintainable.
 
 ### Check Available Components
 
@@ -57,11 +57,11 @@ const StyledButton = styled.button`...`;
 
 If you need a component that isn't in Muka UI yet:
 
-1. **Stop** — the tax-calculator feature is blocked
+1. **Stop** — the grip feature is blocked
 2. **Switch to muka-ui** — create the component there first
 3. **Add to Storybook** — verify it works with all themes
 4. **Build muka-ui** — run `npm run build` in the muka directory
-5. **Resume** — continue the tax-calculator feature
+5. **Resume** — continue the grip feature
 
 This workflow ensures all UI components are reusable and documented.
 
@@ -73,7 +73,7 @@ This workflow ensures all UI components are reusable and documented.
 - npm 9+
 - Both projects cloned:
   - `/Users/revikornmann/dev/muka` (muka-ui design system)
-  - `/Users/revikornmann/dev/tax-calculator` (this app)
+  - `/Users/revikornmann/dev/grip` (this app)
 
 ## Initial Setup
 
@@ -88,8 +88,8 @@ npm run build
 # 2. Register muka-ui globally
 npm link
 
-# 3. Link in tax-calculator
-cd /Users/revikornmann/dev/tax-calculator
+# 3. Link in grip
+cd /Users/revikornmann/dev/grip
 npm install
 npm link muka-ui
 ```
@@ -106,7 +106,7 @@ npm run dev  # Starts Storybook on http://localhost:6006
 
 **Terminal 2 - Tax Calculator:**
 ```bash
-cd /Users/revikornmann/dev/tax-calculator
+cd /Users/revikornmann/dev/grip
 npm run dev  # Starts Next.js on http://localhost:3000
 ```
 
@@ -119,7 +119,7 @@ When you modify components in muka-ui:
    cd /Users/revikornmann/dev/muka
    npm run build:components
    ```
-   The tax-calculator app will pick up changes on next refresh.
+   The grip app will pick up changes on next refresh.
 
 2. **For token/CSS changes:**
    ```bash
@@ -146,8 +146,8 @@ npm install
 npm run build
 npm link
 
-# 2. Re-link in tax-calculator
-cd /Users/revikornmann/dev/tax-calculator
+# 2. Re-link in grip
+cd /Users/revikornmann/dev/grip
 npm install
 npm link muka-ui
 ```
@@ -157,7 +157,7 @@ npm link muka-ui
 When muka-ui is published to npm:
 
 ```bash
-cd /Users/revikornmann/dev/tax-calculator
+cd /Users/revikornmann/dev/grip
 
 # 1. Unlink the local package
 npm unlink muka-ui
@@ -205,14 +205,14 @@ import 'muka-ui/styles/wireframe-dark.css';  // Wireframe brand, dark
 The link may be broken. Re-run:
 ```bash
 cd /Users/revikornmann/dev/muka && npm link
-cd /Users/revikornmann/dev/tax-calculator && npm link muka-ui
+cd /Users/revikornmann/dev/grip && npm link muka-ui
 ```
 
 ### "Invalid hook call" Error
 
 This usually means duplicate React instances. Ensure:
 1. muka-ui has React as a `peerDependency` (not regular dependency)
-2. Only tax-calculator's React is being used
+2. Only grip's React is being used
 
 Check for duplicate React:
 ```bash

@@ -1,6 +1,6 @@
 export const STORAGE_VERSION = 1;
 
-export const STORAGE_PREFIX = 'tax-calc:';
+export const STORAGE_PREFIX = 'grip:';
 
 export interface StorageMeta {
   version: number;

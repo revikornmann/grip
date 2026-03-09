@@ -2,9 +2,11 @@
 
 import { Button, Card, Chip } from "muka-ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
   const router = useRouter();
+  const t = useTranslations("home");
 
   return (
     <>
@@ -17,8 +19,7 @@ export default function Home() {
           margin: "0 auto",
         }}
       >
-        Vergelijk de kosten van privé- en zakelijk autobezit als ZZP&apos;er.
-        Ontdek welke optie het meest voordelig is voor uw situatie.
+        {t("subtitle")}
       </p>
 
       <div
@@ -37,14 +38,13 @@ export default function Home() {
             }}
           >
             <Chip variant="info" size="sm">
-              RDW Data
+              {t("rdwData")}
             </Chip>
             <h3 style={{ fontSize: "var(--font-size-lg)" }}>
-              Kenteken opzoeken
+              {t("lookupTitle")}
             </h3>
             <p style={{ color: "var(--color-text-subtle-default)" }}>
-              Voer uw kenteken in en ontvang direct alle voertuiggegevens via de
-              RDW.
+              {t("lookupDescription")}
             </p>
           </div>
         </Card>
@@ -57,14 +57,13 @@ export default function Home() {
             }}
           >
             <Chip variant="success" size="sm">
-              Berekeningen
+              {t("calculationsChip")}
             </Chip>
             <h3 style={{ fontSize: "var(--font-size-lg)" }}>
-              Kosten berekenen
+              {t("calculatorTitle")}
             </h3>
             <p style={{ color: "var(--color-text-subtle-default)" }}>
-              Bereken de totale kosten inclusief bijtelling, BTW-aftrek en
-              afschrijving.
+              {t("calculatorDescription")}
             </p>
           </div>
         </Card>
@@ -77,14 +76,13 @@ export default function Home() {
             }}
           >
             <Chip variant="warning" size="sm">
-              Vergelijking
+              {t("comparisonChip")}
             </Chip>
             <h3 style={{ fontSize: "var(--font-size-lg)" }}>
-              Privé vs. zakelijk
+              {t("comparisonTitle")}
             </h3>
             <p style={{ color: "var(--color-text-subtle-default)" }}>
-              Vergelijk privé- en zakelijk autobezit en ontdek het verschil per
-              maand.
+              {t("comparisonDescription")}
             </p>
           </div>
         </Card>
@@ -103,14 +101,14 @@ export default function Home() {
           size="lg"
           onClick={() => router.push("/lookup")}
         >
-          Voertuig opzoeken
+          {t("lookupButton")}
         </Button>
         <Button
           variant="secondary"
           size="lg"
           onClick={() => router.push("/garage")}
         >
-          Mijn garage
+          {t("garageButton")}
         </Button>
       </div>
     </>

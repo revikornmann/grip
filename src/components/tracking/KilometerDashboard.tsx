@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, Badge, Progress, Alert, Divider } from "muka-ui";
 import type { TripStats } from "@/lib/trips";
 import { PRIVATE_KM_LIMIT, PRIVATE_KM_WARNING } from "@/lib/trips";
@@ -16,21 +17,20 @@ interface KilometerDashboardProps {
 }
 
 export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboardProps) {
+  const t = useTranslations("kmDashboard");
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
       {/* 500km Warning */}
       {privateKmStatus.status === "warning" && (
-        <Alert variant="warning" title="Opgelet: privékilometers bijna op">
-          Je hebt {formatNumber(privateKmStatus.currentKm, 0)} privékilometers gereden.
-          Nog {formatNumber(privateKmStatus.remainingKm, 0)} km tot de grens van{" "}
-          {formatNumber(PRIVATE_KM_LIMIT, 0)} km. Bij overschrijding geldt volledige bijtelling.
+        <Alert variant="warning" title={t("warningTitle")}>
+          {t("warningText", { driven: formatNumber(privateKmStatus.currentKm, 0), remaining: formatNumber(privateKmStatus.remainingKm, 0), limit: PRIVATE_KM_LIMIT })}
         </Alert>
       )}
 
       {privateKmStatus.status === "exceeded" && (
-        <Alert variant="error" title="Privélimiet overschreden">
-          Je hebt de grens van {formatNumber(PRIVATE_KM_LIMIT, 0)} privékilometers overschreden.
-          Volledige bijtelling is nu van toepassing op dit voertuig.
+        <Alert variant="error" title={t("exceededTitle")}>
+          {t("exceededText", { limit: PRIVATE_KM_LIMIT })}
         </Alert>
       )}
 
@@ -38,7 +38,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
       <Card>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
           <h3 style={{ margin: 0, fontSize: "var(--text-heading-sm-semibold-fontSize)" }}>
-            Kilometeroverzicht {new Date().getFullYear()}
+            {t("overviewTitle", { year: new Date().getFullYear() })}
           </h3>
 
           {/* Total km */}
@@ -50,7 +50,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Totaal gereden
+              {t("totalDriven")}
             </p>
             <p
               style={{
@@ -59,7 +59,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
                 fontWeight: "var(--text-heading-lg-semibold-fontWeight)",
               }}
             >
-              {formatNumber(stats.totalKm, 0)} km
+              {t("km", { value: formatNumber(stats.totalKm, 0) })}
             </p>
             <p
               style={{
@@ -68,7 +68,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              {stats.tripCount} ritten
+              {t("tripCount", { count: stats.tripCount })}
             </p>
           </div>
 
@@ -83,16 +83,16 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
                 marginBottom: "var(--spacing-2)",
               }}
             >
-              <span>Zakelijk</span>
+              <span>{t("businessLabel")}</span>
               <span style={{ color: "var(--color-state-success-foreground)" }}>
-                {formatNumber(stats.businessKm, 0)} km ({formatPercentage(stats.businessPercent, 0)})
+                {t("businessKm", { value: formatNumber(stats.businessKm, 0), percent: formatPercentage(stats.businessPercent, 0) })}
               </span>
             </div>
             <Progress
               variant="bar"
               value={stats.businessPercent * 100}
               size="md"
-              aria-label="Zakelijke kilometers"
+              aria-label={t("businessKmProgress")}
             />
           </div>
 
@@ -104,16 +104,16 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
                 marginBottom: "var(--spacing-2)",
               }}
             >
-              <span>Privé</span>
+              <span>{t("privateLabel")}</span>
               <span style={{ color: "var(--color-state-warning-foreground)" }}>
-                {formatNumber(stats.privateKm, 0)} km ({formatPercentage(stats.privatePercent, 0)})
+                {t("privateKm", { value: formatNumber(stats.privateKm, 0), percent: formatPercentage(stats.privatePercent, 0) })}
               </span>
             </div>
             <Progress
               variant="bar"
               value={stats.privatePercent * 100}
               size="md"
-              aria-label="Privé kilometers"
+              aria-label={t("privateKmProgress")}
             />
           </div>
 
@@ -130,7 +130,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
           >
             <div>
               <Badge variant="success" size="sm" dot>
-                Zakelijke ritten
+                {t("businessTrips")}
               </Badge>
               <p
                 style={{
@@ -144,7 +144,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
             </div>
             <div>
               <Badge variant="warning" size="sm" dot>
-                Privéritten
+                {t("privateTrips")}
               </Badge>
               <p
                 style={{
@@ -165,7 +165,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-3)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h4 style={{ margin: 0, fontSize: "var(--text-label-md-semibold-fontSize)" }}>
-              Privékilometers limiet
+              {t("privateLimitTitle")}
             </h4>
             <Badge
               variant={
@@ -178,10 +178,10 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
               size="sm"
             >
               {privateKmStatus.status === "ok"
-                ? "Op schema"
+                ? t("onTrack")
                 : privateKmStatus.status === "warning"
-                ? "Bijna vol"
-                : "Overschreden"}
+                ? t("almostFull")
+                : t("exceeded")}
             </Badge>
           </div>
 
@@ -201,7 +201,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
               variant="bar"
               value={Math.min(100, (privateKmStatus.currentKm / PRIVATE_KM_LIMIT) * 100)}
               size="lg"
-              aria-label="Privékilometers limiet"
+              aria-label={t("privateLimitTitle")}
             />
           </div>
 
@@ -213,8 +213,7 @@ export function KilometerDashboard({ stats, privateKmStatus }: KilometerDashboar
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Nog {formatNumber(privateKmStatus.remainingKm, 0)} km beschikbaar voor privégebruik
-              zonder volledige bijtelling.
+              {t("remainingKm", { value: formatNumber(privateKmStatus.remainingKm, 0) })}
             </p>
           )}
         </div>

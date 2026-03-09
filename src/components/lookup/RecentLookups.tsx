@@ -1,6 +1,7 @@
 "use client";
 
 import { ListItem, Button } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { RecentLookup } from "@/types/vehicle";
 import { formatPlateDisplay } from "@/lib/validation";
 
@@ -15,6 +16,8 @@ export function RecentLookups({
   onSelect,
   onClear,
 }: RecentLookupsProps) {
+  const t = useTranslations("lookup");
+
   if (lookups.length === 0) return null;
 
   return (
@@ -39,10 +42,10 @@ export function RecentLookups({
             margin: 0,
           }}
         >
-          Recente zoekopdrachten
+          {t("recentSearches")}
         </h3>
         <Button variant="ghost" size="sm" onClick={onClear}>
-          Wis geschiedenis
+          {t("clearHistory")}
         </Button>
       </div>
       <div>

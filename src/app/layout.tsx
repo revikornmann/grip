@@ -4,16 +4,17 @@ import "muka-ui/styles/index.css";
 import { TopNav, BottomNav, Footer, MainContent } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { LocaleProvider } from "@/components/LocaleProvider";
 
 export const metadata: Metadata = {
-  title: "Tax Calculator - Dutch ZZP Vehicle Tax Optimization",
+  title: "Grip - Dutch ZZP Vehicle Tax Optimization",
   description: "Vehicle tax optimization tool for Dutch ZZP professionals",
 };
 
 const themeScript = `
 (function() {
   try {
-    var raw = localStorage.getItem('tax-calc:theme');
+    var raw = localStorage.getItem('grip:theme');
     var parsed = raw ? JSON.parse(raw) : null;
     var theme = parsed && parsed.data ? parsed.data : 'system';
     var resolved = theme;
@@ -51,20 +52,22 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <ThemeProvider>
-          <AuthProvider>
-            <div className="app-layout">
-              <div className="app-topnav">
-                <TopNav />
+        <LocaleProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <div className="app-layout">
+                <div className="app-topnav">
+                  <TopNav />
+                </div>
+                <main className="app-main">
+                  <MainContent>{children}</MainContent>
+                  <Footer />
+                </main>
+                <BottomNav />
               </div>
-              <main className="app-main">
-                <MainContent>{children}</MainContent>
-                <Footer />
-              </main>
-              <BottomNav />
-            </div>
-          </AuthProvider>
-        </ThemeProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

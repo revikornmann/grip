@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Input, Button, Alert, Toast } from "muka-ui";
 import { lookupVehicle, RDWError } from "@/lib/rdw";
 import {
@@ -28,6 +29,7 @@ function LookupContent() {
   const router = useRouter();
   const hasInitRef = useRef(false);
   const { user } = useAuth();
+  const t = useTranslations("lookup");
   const userId = user?.id ?? null;
 
   const [plate, setPlate] = useState("");
@@ -94,7 +96,7 @@ function LookupContent() {
           setApiError({ message: err.message, code: err.code });
         } else {
           setApiError({
-            message: "Er is een onbekende fout opgetreden",
+            message: t("unknownError"),
             code: "UNKNOWN",
           });
         }
@@ -103,7 +105,7 @@ function LookupContent() {
         setIsLoading(false);
       }
     },
-    [router, userId],
+    [router, userId, t],
   );
 
   // Auto-lookup from URL param on mount
@@ -120,7 +122,7 @@ function LookupContent() {
     if (isValidDutchPlate(normalized)) {
       performLookup(normalized);
     } else {
-      setValidationError("Ongeldig kenteken in URL");
+      setValidationError(t("invalidPlateUrl"));
     }
   }, [searchParams, performLookup]);
 
@@ -129,12 +131,12 @@ function LookupContent() {
     const normalized = normalizePlate(plate);
 
     if (!normalized) {
-      setValidationError("Voer een kenteken in");
+      setValidationError(t("enterPlate"));
       return;
     }
 
     if (!isValidDutchPlate(normalized)) {
-      setValidationError("Voer een geldig Nederlands kenteken in");
+      setValidationError(t("invalidPlate"));
       return;
     }
 
@@ -149,7 +151,7 @@ function LookupContent() {
 
     if (newCount >= MAX_RETRIES) {
       setApiError({
-        message: "Meerdere pogingen mislukt. Probeer het later opnieuw.",
+        message: t("multipleFailures"),
         code: "UNKNOWN",
       });
       return;
@@ -169,7 +171,7 @@ function LookupContent() {
   const handleBlur = () => {
     const normalized = normalizePlate(plate);
     if (normalized && !isValidDutchPlate(normalized)) {
-      setValidationError("Voer een geldig Nederlands kenteken in");
+      setValidationError(t("invalidPlate"));
     }
   };
 
@@ -222,11 +224,11 @@ function LookupContent() {
       setVehicleInGarage(true);
       setFormOpen(false);
       setToastMessage(
-        `${vehicle?.make} ${vehicle?.model} toegevoegd aan garage`,
+        t("addedToGarage", { make: vehicle?.make ?? "", model: vehicle?.model ?? "" }),
       );
       setToastOpen(true);
     } catch {
-      setToastMessage("Opslaan mislukt — probeer het opnieuw");
+      setToastMessage(t("saveFailed"));
       setToastOpen(true);
     }
   };
@@ -234,10 +236,10 @@ function LookupContent() {
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      setToastMessage("Link gekopieerd");
+      setToastMessage(t("linkCopied"));
       setToastOpen(true);
     } catch {
-      setToastMessage("Kopiëren mislukt");
+      setToastMessage(t("copyFailed"));
       setToastOpen(true);
     }
   };
@@ -260,8 +262,8 @@ function LookupContent() {
         >
           <div style={{ flex: 1 }}>
             <Input
-              label="Kenteken"
-              placeholder="Bijv. AB-123-CD"
+              label={t("plateLabel")}
+              placeholder={t("platePlaceholder")}
               value={plate}
               onChange={handleInputChange}
               error={!!validationError}
@@ -277,7 +279,7 @@ function LookupContent() {
               variant="primary"
               disabled={isSubmitDisabled}
             >
-              {isLoading ? "Zoeken..." : "Zoeken"}
+              {isLoading ? t("searching") : t("search")}
             </Button>
           </div>
         </form>
@@ -287,9 +289,9 @@ function LookupContent() {
       {apiError && (
         <Alert variant="error" title={apiError.message}>
           {apiError.code === "NOT_FOUND" ? (
-            "Controleer het kenteken op typfouten en probeer het opnieuw."
+            t("checkPlate")
           ) : retryCount >= MAX_RETRIES ? (
-            "Er zijn meerdere pogingen mislukt. Probeer het later opnieuw."
+            t("multipleFailures")
           ) : (
             <div
               style={{
@@ -299,10 +301,10 @@ function LookupContent() {
                 marginTop: "var(--spacing-2)",
               }}
             >
-              <span>Controleer uw verbinding en probeer het opnieuw.</span>
+              <span>{t("checkConnection")}</span>
               {retryCount < MAX_RETRIES && (
                 <Button variant="secondary" size="sm" onClick={handleRetry}>
-                  Opnieuw proberen
+                  {t("retryButton")}
                 </Button>
               )}
             </div>
@@ -325,11 +327,11 @@ function LookupContent() {
           <div style={{ display: "flex", gap: "var(--spacing-3)" }}>
             <Button variant="primary" onClick={handleAddToGarage}>
               {vehicleInGarage
-                ? "Bekijk in garage"
-                : "Toevoegen aan garage"}
+                ? t("viewInGarage")
+                : t("addToGarage")}
             </Button>
             <Button variant="secondary" onClick={handleCopyLink}>
-              Kopieer link
+              {t("copyLink")}
             </Button>
           </div>
         </div>

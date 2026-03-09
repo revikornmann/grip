@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Card, Input, Select, Button, Label, Divider, DatePicker } from "muka-ui";
 import type { Trip, TripInput, TripPurpose } from "@/lib/trips";
 import { TRIP_PURPOSE_LABELS, getCategoryFromPurpose } from "@/lib/trips";
@@ -28,6 +29,7 @@ export function TripForm({
   onCancel,
   loading = false,
 }: TripFormProps) {
+  const t = useTranslations("tripForm");
   const [vehicleId, setVehicleId] = useState(trip?.vehicleId ?? selectedVehicleId ?? vehicles[0]?.id ?? "");
   const [date, setDate] = useState<Date | null>(trip ? new Date(trip.date) : new Date());
   const [startLocation, setStartLocation] = useState(trip?.startLocation ?? "");
@@ -72,14 +74,14 @@ export function TripForm({
       <form onSubmit={handleSubmit}>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
           <h3 style={{ margin: 0, fontSize: "var(--text-heading-sm-semibold-fontSize)" }}>
-            {isEditing ? "Rit bewerken" : "Nieuwe rit toevoegen"}
+            {isEditing ? t("editTitle") : t("addTitle")}
           </h3>
 
           {/* Vehicle and date */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-3)" }}>
             <div>
               <Select
-                label="Voertuig"
+                label={t("vehicle")}
                 options={vehicleOptions}
                 value={vehicleId}
                 onChange={(e) => setVehicleId(e.target.value)}
@@ -87,7 +89,7 @@ export function TripForm({
               />
             </div>
             <div>
-              <Label>Datum</Label>
+              <Label>{t("date")}</Label>
               <DatePicker
                 value={date}
                 onChange={(d) => setDate(d)}
@@ -102,17 +104,17 @@ export function TripForm({
           {/* Locations */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-3)" }}>
             <Input
-              label="Vertreklocatie"
+              label={t("startLocation")}
               value={startLocation}
               onChange={(e) => setStartLocation(e.target.value)}
-              placeholder="bijv. Kantoor Amsterdam"
+              placeholder={t("startPlaceholder")}
               disabled={loading || submitting}
             />
             <Input
-              label="Aankomstlocatie"
+              label={t("endLocation")}
               value={endLocation}
               onChange={(e) => setEndLocation(e.target.value)}
-              placeholder="bijv. Klant Utrecht"
+              placeholder={t("endPlaceholder")}
               disabled={loading || submitting}
             />
           </div>
@@ -120,16 +122,16 @@ export function TripForm({
           {/* Distance and purpose */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-3)" }}>
             <Input
-              label="Afstand (km)"
+              label={t("distance")}
               type="number"
               value={String(distanceKm)}
               onChange={(e) => setDistanceKm(Number(e.target.value))}
               disabled={loading || submitting}
-              helperText="In kilometers"
+              helperText={t("distanceHelper")}
             />
             <div>
               <Select
-                label="Doel van de rit"
+                label={t("purpose")}
                 options={PURPOSE_OPTIONS}
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value as TripPurpose)}
@@ -145,17 +147,17 @@ export function TripForm({
                       : "var(--color-state-warning-foreground)",
                 }}
               >
-                Categorie: {category === "business" ? "Zakelijk" : "Privé"}
+                {category === "business" ? t("categoryBusiness") : t("categoryPrivate")}
               </p>
             </div>
           </div>
 
           {/* Notes */}
           <Input
-            label="Notities (optioneel)"
+            label={t("notes")}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Aanvullende informatie"
+            placeholder={t("notesPlaceholder")}
             disabled={loading || submitting}
           />
 
@@ -168,7 +170,7 @@ export function TripForm({
                 onClick={onCancel}
                 disabled={submitting}
               >
-                Annuleren
+                {t("cancel")}
               </Button>
             )}
             <Button
@@ -176,7 +178,7 @@ export function TripForm({
               variant="primary"
               disabled={loading || submitting || !vehicleId || !startLocation || !endLocation || distanceKm <= 0}
             >
-              {submitting ? "Opslaan..." : isEditing ? "Bijwerken" : "Toevoegen"}
+              {submitting ? t("saving") : isEditing ? t("update") : t("add")}
             </Button>
           </div>
         </div>

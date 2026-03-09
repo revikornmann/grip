@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   Badge,
@@ -27,6 +28,8 @@ interface ComparisonRow {
 }
 
 export function ComparisonTable({ result }: ComparisonTableProps) {
+  const tCosts = useTranslations("costs");
+  const tCompare = useTranslations("compare");
   const { scenarios } = result;
   const privateCosts = scenarios.private.costs;
   const businessCosts = scenarios.business.costs;
@@ -34,45 +37,45 @@ export function ComparisonTable({ result }: ComparisonTableProps) {
   const rows: ComparisonRow[] = [
     // Running costs
     {
-      label: "Brandstof / Laden",
+      label: tCosts("fuelCharging"),
       privateValue: privateCosts.running.fuel,
       businessValue: businessCosts.running.fuel,
       category: "running",
     },
     {
-      label: "Verzekering",
+      label: tCosts("insurance"),
       privateValue: privateCosts.running.insurance,
       businessValue: businessCosts.running.insurance,
       category: "running",
     },
     {
-      label: "Wegenbelasting",
+      label: tCosts("roadTax"),
       privateValue: privateCosts.running.roadTax,
       businessValue: businessCosts.running.roadTax,
       category: "running",
     },
     {
-      label: "Onderhoud",
+      label: tCosts("maintenance"),
       privateValue: privateCosts.running.maintenance,
       businessValue: businessCosts.running.maintenance,
       category: "running",
     },
     // Ownership
     {
-      label: "Afschrijving",
+      label: tCosts("depreciation"),
       privateValue: privateCosts.ownership.depreciation,
       businessValue: businessCosts.ownership.depreciation,
       category: "ownership",
     },
     // Tax (business only)
     {
-      label: "Bijtelling (belasting)",
+      label: tCosts("bijtellingTax"),
       privateValue: 0,
       businessValue: businessCosts.tax.bijtelling,
       category: "tax",
     },
     {
-      label: "BTW aftrek",
+      label: tCosts("vatDeduction"),
       privateValue: 0,
       businessValue: businessCosts.tax.btwAftrek,
       category: "tax",
@@ -80,7 +83,7 @@ export function ComparisonTable({ result }: ComparisonTableProps) {
     },
     // Total
     {
-      label: "Netto jaarkosten",
+      label: tCosts("netAnnualCosts"),
       privateValue: scenarios.private.netAnnualCost,
       businessValue: scenarios.business.netAnnualCost,
       category: "total",
@@ -106,26 +109,26 @@ export function ComparisonTable({ result }: ComparisonTableProps) {
     <Card>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
         <h3 style={{ margin: 0, fontSize: "var(--text-heading-sm-semibold-fontSize)" }}>
-          Kostenvergelijking
+          {tCompare("comparisonTitle")}
         </h3>
 
         <Table size="md">
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Kostenpost</TableHeaderCell>
+              <TableHeaderCell>{tCosts("costItem")}</TableHeaderCell>
               <TableHeaderCell align="right">
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "var(--spacing-2)" }}>
-                  Privé
+                  {tCosts("private")}
                   {cheaperOption === "private" && (
-                    <Badge variant="success" size="sm">Goedkoopst</Badge>
+                    <Badge variant="success" size="sm">{tCompare("cheapest")}</Badge>
                   )}
                 </div>
               </TableHeaderCell>
               <TableHeaderCell align="right">
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "var(--spacing-2)" }}>
-                  Zakelijk
+                  {tCosts("business")}
                   {cheaperOption === "business" && (
-                    <Badge variant="success" size="sm">Goedkoopst</Badge>
+                    <Badge variant="success" size="sm">{tCompare("cheapest")}</Badge>
                   )}
                 </div>
               </TableHeaderCell>

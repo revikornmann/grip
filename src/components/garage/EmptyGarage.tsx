@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { Card, Button } from "muka-ui";
+import { useTranslations } from "next-intl";
 
 export function EmptyGarage() {
   const router = useRouter();
+  const t = useTranslations("garage");
 
   return (
     <div
@@ -26,7 +28,7 @@ export function EmptyGarage() {
             }}
           >
             <h2 style={{ fontSize: "var(--font-size-xl)", margin: 0 }}>
-              Je garage is nog leeg
+              {t("emptyTitle")}
             </h2>
             <p
               style={{
@@ -34,15 +36,13 @@ export function EmptyGarage() {
                 margin: 0,
               }}
             >
-              Zoek een voertuig op via het kenteken en voeg het toe aan je
-              garage. Zo kun je meerdere voertuigen vergelijken op kosten en
-              belastingvoordeel.
+              {t("emptyDescription")}
             </p>
             <Button
               variant="primary"
               onClick={() => router.push("/lookup")}
             >
-              Voertuig opzoeken
+              {t("lookupButton")}
             </Button>
           </div>
         </Card>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, Badge, Icon } from "muka-ui";
 import type { ComparisonResult } from "@/lib/comparison";
 import { formatCurrency, formatPercentage } from "@/lib/formatting";
@@ -9,12 +10,14 @@ interface DifferenceSummaryProps {
 }
 
 export function DifferenceSummary({ result }: DifferenceSummaryProps) {
+  const t = useTranslations("compare");
+  const tCosts = useTranslations("costs");
   const { difference, scenarios } = result;
   const { cheaperOption, annual, fiveYear, savingsPercent, breakEvenBusinessPercent } =
     difference;
 
-  const cheaperLabel = cheaperOption === "business" ? "Zakelijk" : "Privé";
-  const moreExpensiveLabel = cheaperOption === "business" ? "Privé" : "Zakelijk";
+  const cheaperLabel = cheaperOption === "business" ? tCosts("business") : tCosts("private");
+  const moreExpensiveLabel = cheaperOption === "business" ? tCosts("private") : tCosts("business");
   const savings = Math.abs(annual);
 
   return (
@@ -38,7 +41,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "var(--spacing-2)" }}>
             <Badge variant="success" size="lg">
               <Icon name="check" size="sm" />
-              {cheaperLabel} is voordeliger
+              {cheaperOption === "business" ? t("businessCheaper") : t("privateCheaper")}
             </Badge>
           </div>
           <p
@@ -49,7 +52,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
               color: "var(--color-state-success-foreground)",
             }}
           >
-            {formatCurrency(savings, 0)} besparing per jaar
+            {t("savingsPerYear", { amount: formatCurrency(savings, 0) })}
           </p>
           <p
             style={{
@@ -58,7 +61,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
               color: "var(--color-state-success-foreground)",
             }}
           >
-            ({formatPercentage(savingsPercent, 0)} goedkoper dan {moreExpensiveLabel.toLowerCase()})
+            {t("cheaperThan", { percent: formatPercentage(savingsPercent, 0), label: moreExpensiveLabel.toLowerCase() })}
           </p>
         </div>
 
@@ -78,7 +81,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Besparing over 5 jaar
+              {t("savingsOver5Years")}
             </p>
             <p
               style={{
@@ -98,7 +101,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Verschil per maand
+              {t("differencePerMonth")}
             </p>
             <p
               style={{
@@ -128,7 +131,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Break-even punt
+              {t("breakEvenPoint")}
             </p>
             <p
               style={{
@@ -136,7 +139,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                 fontWeight: 600,
               }}
             >
-              Bij {formatPercentage(breakEvenBusinessPercent, 0)} zakelijk gebruik zijn de kosten gelijk
+              {t("breakEvenDescription", { percent: formatPercentage(breakEvenBusinessPercent, 0) })}
             </p>
           </div>
         )}
@@ -168,7 +171,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Privé eigendom
+              {tCosts("privateOwnership")}
             </p>
             <p
               style={{
@@ -181,7 +184,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                     : undefined,
               }}
             >
-              {formatCurrency(scenarios.private.netAnnualCost, 0)}/jaar
+              {formatCurrency(scenarios.private.netAnnualCost, 0)}{t("perYear")}
             </p>
           </div>
           <div
@@ -202,7 +205,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Zakelijk eigendom
+              {tCosts("businessOwnership")}
             </p>
             <p
               style={{
@@ -215,7 +218,7 @@ export function DifferenceSummary({ result }: DifferenceSummaryProps) {
                     : undefined,
               }}
             >
-              {formatCurrency(scenarios.business.netAnnualCost, 0)}/jaar
+              {formatCurrency(scenarios.business.netAnnualCost, 0)}{t("perYear")}
             </p>
           </div>
         </div>

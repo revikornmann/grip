@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Alert, Button } from "muka-ui";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getGarage } from "@/lib/garage";
 import {
@@ -18,6 +19,7 @@ import { CostSummary } from "@/components/calculator/CostSummary";
 import Link from "next/link";
 
 export default function CalculatorPage() {
+  const t = useTranslations("calculator");
   const { user } = useAuth();
   const userId = user?.id ?? null;
 
@@ -93,12 +95,12 @@ export default function CalculatorPage() {
   if (vehicles.length === 0) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
-        <Alert variant="info" title="Geen voertuigen">
-          Voeg eerst een voertuig toe aan je garage om de kosten te berekenen.
+        <Alert variant="info" title={t("noVehicles")}>
+          {t("noVehiclesDescription")}
         </Alert>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Link href="/lookup">
-            <Button variant="primary">Voertuig opzoeken</Button>
+            <Button variant="primary">{t("lookupButton")}</Button>
           </Link>
         </div>
       </div>
@@ -163,16 +165,14 @@ export default function CalculatorPage() {
           >
             <Link href={`/compare?vehicle=${selectedId}`}>
               <Button variant="secondary">
-                Vergelijk privé vs zakelijk eigendom
+                {t("compareButton")}
               </Button>
             </Link>
           </div>
 
           {/* Disclaimer */}
-          <Alert variant="info" title="Disclaimer">
-            Deze berekening is indicatief en gebaseerd op gemiddelde waarden.
-            Raadpleeg een boekhouder voor definitief advies over uw specifieke
-            situatie.
+          <Alert variant="info" title={t("disclaimerTitle")}>
+            {t("disclaimerText")}
           </Alert>
         </>
       )}

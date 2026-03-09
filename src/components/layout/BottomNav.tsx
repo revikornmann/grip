@@ -3,23 +3,25 @@
 import type { IconName } from "muka-ui";
 import { usePathname, useRouter } from "next/navigation";
 import { BottomBar, BottomBarTab, Icon } from "muka-ui";
+import { useTranslations } from "next-intl";
 
-const NAV_ITEMS: { href: string; label: string; iconName: IconName }[] = [
-  { href: "/", label: "Home", iconName: "home" },
-  { href: "/garage", label: "Garage", iconName: "car" },
-  { href: "/calculator", label: "Calculator", iconName: "calculator" },
-  { href: "/compare", label: "Vergelijk", iconName: "bar-chart" },
-  { href: "/tracking", label: "Ritten", iconName: "map-pin" },
+const NAV_ITEMS: { href: string; labelKey: string; iconName: IconName }[] = [
+  { href: "/", labelKey: "bottomHome", iconName: "home" },
+  { href: "/garage", labelKey: "bottomGarage", iconName: "car" },
+  { href: "/calculator", labelKey: "bottomCalculator", iconName: "calculator" },
+  { href: "/compare", labelKey: "bottomCompare", iconName: "bar-chart" },
+  { href: "/tracking", labelKey: "bottomTracking", iconName: "map-pin" },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("nav");
 
   return (
     <div className="app-bottomnav">
       <BottomBar variant="navigation" floating>
-        {NAV_ITEMS.map(({ href, label, iconName }) => {
+        {NAV_ITEMS.map(({ href, labelKey, iconName }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
 
@@ -33,7 +35,7 @@ export function BottomNav() {
                   variant={isActive ? "fill" : "line"}
                 />
               }
-              label={label}
+              label={t(labelKey)}
               active={isActive}
               onClick={() => router.push(href)}
             />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, Chip, Label, Divider } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { Vehicle } from "@/types/vehicle";
 import { formatCurrency, formatDate } from "@/lib/formatting";
 
@@ -58,6 +59,7 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
+  const t = useTranslations("vehicle");
   const registrationDate = parseRDWDate(vehicle.firstRegistrationDate);
   const age = getVehicleAge(vehicle.firstRegistrationDate);
   const ev = isEV(vehicle);
@@ -91,8 +93,8 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             {vehicle.make} {vehicle.model}
           </h2>
           <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
-            {ev && <Chip variant="success">Elektrisch</Chip>}
-            {youngtimer && <Chip variant="info">Youngtimer</Chip>}
+            {ev && <Chip variant="success">{t("electric")}</Chip>}
+            {youngtimer && <Chip variant="info">{t("youngtimer")}</Chip>}
           </div>
         </div>
 
@@ -101,45 +103,45 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         {/* Vehicle details */}
         <div>
           <DetailRow
-            label="Eerste toelating"
+            label={t("firstRegistration")}
             value={
               registrationDate
                 ? formatDate(registrationDate)
-                : "Onbekend"
+                : t("unknown")
             }
           />
           <DetailRow
-            label="Leeftijd"
-            value={age !== null ? `${age} jaar` : "Onbekend"}
+            label={t("age")}
+            value={age !== null ? t("years", { count: age }) : t("unknown")}
           />
           <DetailRow
-            label="Brandstoftype"
-            value={vehicle.fuelType ?? "Onbekend"}
+            label={t("fuelType")}
+            value={vehicle.fuelType ?? t("unknown")}
           />
           <DetailRow
-            label="CO₂-uitstoot"
+            label={t("co2")}
             value={
               vehicle.co2Emissions !== null
                 ? ev && vehicle.co2Emissions === 0
-                  ? "0 g/km"
-                  : `${vehicle.co2Emissions} g/km`
-                : "Onbekend"
+                  ? t("co2Zero")
+                  : t("co2Value", { value: vehicle.co2Emissions })
+                : t("unknown")
             }
           />
           <DetailRow
-            label="Catalogusprijs"
+            label={t("catalogPrice")}
             value={
               vehicle.catalogPrice !== null
                 ? formatCurrency(vehicle.catalogPrice, 0)
-                : "Onbekend"
+                : t("unknown")
             }
           />
           <DetailRow
-            label="Bruto BPM"
+            label={t("grossBpm")}
             value={
               vehicle.bpmAmount !== null
                 ? formatCurrency(vehicle.bpmAmount, 0)
-                : "Onbekend"
+                : t("unknown")
             }
           />
         </div>

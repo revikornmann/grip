@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Dialog, Input, Button, RadioTile, Icon } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import type { Vehicle } from "@/types/vehicle";
 import { formatCurrency } from "@/lib/formatting";
@@ -26,8 +27,9 @@ function VehicleFormInner({
   vehicle,
   rdwData,
 }: Omit<VehicleFormModalProps, "open">) {
+  const t = useTranslations("vehicleForm");
   const isEdit = !!vehicle;
-  const title = isEdit ? "Voertuig bewerken" : "Voertuig toevoegen";
+  const title = isEdit ? t("editTitle") : t("addTitle");
   const catalogPrice = vehicle?.rdw.catalogusprijs ?? rdwData?.catalogPrice;
 
   const [purchasePrice, setPurchasePrice] = useState(
@@ -57,15 +59,15 @@ function VehicleFormInner({
     const business = Number(businessKm);
 
     if (!purchasePrice || isNaN(price) || price < 0 || price > 500000) {
-      next.purchasePrice = "Voer een prijs in tussen € 0 en € 500.000";
+      next.purchasePrice = t("purchasePriceError");
     }
     if (!annualKm || isNaN(annual) || annual < 0 || annual > 100000) {
-      next.annualKm = "Voer een waarde in tussen 0 en 100.000 km";
+      next.annualKm = t("annualKmError");
     }
     if (isNaN(business) || business < 0) {
-      next.businessKm = "Voer een geldige waarde in";
+      next.businessKm = t("businessKmError");
     } else if (business > annual) {
-      next.businessKm = "Zakelijke km mag niet hoger zijn dan totale km";
+      next.businessKm = t("businessKmExceedsTotal");
     }
 
     setErrors(next);
@@ -126,7 +128,7 @@ function VehicleFormInner({
           size="sm"
           iconOnly
           onClick={onClose}
-          aria-label="Sluiten"
+          aria-label={t("close")}
         >
           <Icon name="x" size="sm" />
         </Button>
@@ -134,10 +136,10 @@ function VehicleFormInner({
       footerActions={
         <>
           <Button variant="secondary" onClick={onClose}>
-            Annuleren
+            {t("cancel")}
           </Button>
           <Button variant="primary" onClick={handleSave}>
-            {isEdit ? "Opslaan" : "Sla op"}
+            {isEdit ? t("save") : t("saveShort")}
           </Button>
         </>
       }
@@ -164,7 +166,7 @@ function VehicleFormInner({
 
         {/* Purchase price */}
         <Input
-          label="Aankoopprijs (€)"
+          label={t("purchasePrice")}
           type="number"
           value={purchasePrice}
           onChange={(e) => {
@@ -173,8 +175,8 @@ function VehicleFormInner({
           }}
           helperText={
             catalogPrice
-              ? `Catalogusprijs: ${formatCurrency(catalogPrice, 0)}`
-              : "Werkelijke of verwachte aankoopprijs"
+              ? t("catalogPrice", { price: formatCurrency(catalogPrice, 0) })
+              : t("purchasePriceHelper")
           }
           error={!!errors.purchasePrice}
           errorMessage={errors.purchasePrice}
@@ -184,14 +186,14 @@ function VehicleFormInner({
 
         {/* Annual km */}
         <Input
-          label="Jaarkilometers"
+          label={t("annualKm")}
           type="number"
           value={annualKm}
           onChange={(e) => {
             setAnnualKm(e.target.value);
             if (errors.annualKm) clearError("annualKm");
           }}
-          helperText="Gemiddeld rijden Nederlanders 15.000 km per jaar"
+          helperText={t("annualKmHelper")}
           error={!!errors.annualKm}
           errorMessage={errors.annualKm}
           required
@@ -200,14 +202,14 @@ function VehicleFormInner({
 
         {/* Business km */}
         <Input
-          label="Zakelijke kilometers"
+          label={t("businessKm")}
           type="number"
           value={businessKm}
           onChange={(e) => {
             setBusinessKm(e.target.value);
             if (errors.businessKm) clearError("businessKm");
           }}
-          helperText="Aantal km per jaar voor zakelijk gebruik"
+          helperText={t("businessKmHelper")}
           error={!!errors.businessKm}
           errorMessage={errors.businessKm}
           required
@@ -224,20 +226,20 @@ function VehicleFormInner({
               paddingBottom: "var(--spacing-2)",
             }}
           >
-            Eigendomstype
+            {t("ownershipType")}
           </p>
           <div style={{ display: "flex", gap: "var(--spacing-3)" }}>
             <RadioTile
-              label="Privé"
-              caption="Eigen voertuig"
+              label={t("ownershipPrivate")}
+              caption={t("ownershipPrivateCaption")}
               name="ownershipType"
               value="private"
               checked={ownershipType === "private"}
               onChange={() => setOwnershipType("private")}
             />
             <RadioTile
-              label="Zakelijk"
-              caption="Op de zaak"
+              label={t("ownershipBusiness")}
+              caption={t("ownershipBusinessCaption")}
               name="ownershipType"
               value="business"
               checked={ownershipType === "business"}
@@ -248,21 +250,21 @@ function VehicleFormInner({
 
         {/* Nickname (optional) */}
         <Input
-          label="Bijnaam"
+          label={t("nickname")}
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          placeholder="Bijv. 'Dagelijkse auto'"
-          helperText="Optioneel"
+          placeholder={t("nicknamePlaceholder")}
+          helperText={t("optional")}
           fullWidth
         />
 
         {/* Notes (optional) */}
         <Input
-          label="Notities"
+          label={t("notes")}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Eventuele opmerkingen"
-          helperText="Optioneel"
+          placeholder={t("notesPlaceholder")}
+          helperText={t("optional")}
           fullWidth
         />
       </div>

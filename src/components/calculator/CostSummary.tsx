@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, Badge, Divider } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { CostBreakdown } from "@/lib/calculator";
 import { formatCurrency, formatNumber } from "@/lib/formatting";
 
@@ -15,19 +16,20 @@ export function CostSummary({
   annualKilometers,
   ownershipType,
 }: CostSummaryProps) {
+  const t = useTranslations("costs");
   const { totals, running, ownership, tax } = breakdown;
 
   // Find largest cost component
   const costComponents = [
-    { label: "Brandstof", value: running.fuel },
-    { label: "Verzekering", value: running.insurance },
-    { label: "Wegenbelasting", value: running.roadTax },
-    { label: "Onderhoud", value: running.maintenance },
-    { label: "Afschrijving", value: ownership.depreciation },
+    { label: t("fuel"), value: running.fuel },
+    { label: t("insurance"), value: running.insurance },
+    { label: t("roadTax"), value: running.roadTax },
+    { label: t("maintenance"), value: running.maintenance },
+    { label: t("depreciation"), value: ownership.depreciation },
   ];
 
   if (ownershipType === "business" && tax.bijtelling > 0) {
-    costComponents.push({ label: "Bijtelling", value: tax.bijtelling });
+    costComponents.push({ label: t("bijtelling"), value: tax.bijtelling });
   }
 
   const largestCost = costComponents.reduce((max, curr) =>
@@ -53,7 +55,7 @@ export function CostSummary({
               color: "var(--color-text-subtle-default)",
             }}
           >
-            Totale jaarlijkse kosten
+            {t("totalAnnualCosts")}
           </p>
           <p
             style={{
@@ -65,7 +67,7 @@ export function CostSummary({
             {formatCurrency(totals.netAnnual, 0)}
           </p>
           <Badge variant={ownershipType === "business" ? "info" : "neutral"}>
-            {ownershipType === "business" ? "Zakelijk eigendom" : "Privé eigendom"}
+            {ownershipType === "business" ? t("businessOwnership") : t("privateOwnership")}
           </Badge>
         </div>
 
@@ -87,7 +89,7 @@ export function CostSummary({
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Per maand
+              {t("perMonth")}
             </p>
             <p
               style={{
@@ -107,7 +109,7 @@ export function CostSummary({
                 color: "var(--color-text-subtle-default)",
               }}
             >
-              Per kilometer
+              {t("perKm")}
             </p>
             <p
               style={{
@@ -138,7 +140,7 @@ export function CostSummary({
               color: "var(--color-text-subtle-default)",
             }}
           >
-            Grootste kostenpost
+            {t("largestCostItem")}
           </p>
           <p
             style={{
@@ -146,7 +148,7 @@ export function CostSummary({
               fontWeight: 600,
             }}
           >
-            {largestCost.label}: {formatCurrency(largestCost.value, 0)}/jaar
+            {t("costItemPerYear", { label: largestCost.label, amount: formatCurrency(largestCost.value, 0) })}
           </p>
           <p
             style={{
@@ -155,7 +157,7 @@ export function CostSummary({
               color: "var(--color-text-subtle-default)",
             }}
           >
-            {Math.round((largestCost.value / totals.netAnnual) * 100)}% van totaal
+            {t("percentOfTotal", { percent: Math.round((largestCost.value / totals.netAnnual) * 100) })}
           </p>
         </div>
 
@@ -175,7 +177,7 @@ export function CostSummary({
                 color: "var(--color-state-success-foreground)",
               }}
             >
-              BTW voordeel: {formatCurrency(Math.abs(tax.btwAftrek), 0)}/jaar
+              {t("vatBenefit", { amount: formatCurrency(Math.abs(tax.btwAftrek), 0) })}
             </p>
           </div>
         )}
@@ -188,7 +190,7 @@ export function CostSummary({
             color: "var(--color-text-subtle-default)",
           }}
         >
-          Berekend op basis van {formatNumber(annualKilometers, 0)} km/jaar
+          {t("basedOnKm", { km: formatNumber(annualKilometers, 0) })}
         </p>
       </div>
     </Card>

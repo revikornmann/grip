@@ -30,7 +30,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 3. **Build the component** in `/Users/revikornmann/dev/muka`
 4. **Verify** it appears in Storybook at localhost:6006
 5. **Rebuild muka-ui** with `npm run build`
-6. **Continue** with the tax-calculator feature
+6. **Continue** with the Grip feature
 
 ### Acceptable styling patterns
 
@@ -58,7 +58,7 @@ import { Button, Card, Input } from 'muka-ui';
 
 ## Project Overview
 
-Tax Calculator is a vehicle tax optimization tool for Dutch ZZP'ers (self-employed professionals). It helps calculate and compare tax efficiency across private vs business vehicle ownership.
+Grip is a vehicle tax optimization tool for Dutch ZZP'ers (self-employed professionals). It helps calculate and compare tax efficiency across private vs business vehicle ownership.
 
 > **Product Specification:** For the full product specification — including data model, ownership types, calculation formulas, tax constants, and screen architecture — read `docs/PRODUCT_BRIEF.md`. This is the single source of truth for E04 and E05.
 
@@ -94,8 +94,8 @@ Both projects should be running during development:
 cd /Users/revikornmann/dev/muka
 npm run dev
 
-# Terminal 2: Tax Calculator
-cd /Users/revikornmann/dev/tax-calculator
+# Terminal 2: Grip
+cd /Users/revikornmann/dev/grip
 npm run dev
 ```
 

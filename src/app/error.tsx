@@ -2,6 +2,7 @@
 
 import { Card, Button, Alert } from "muka-ui";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export default function Error({
   error,
@@ -10,8 +11,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("error");
+
   useEffect(() => {
-    console.error("[Tax Calculator Error]", error);
+    console.error("[Grip Error]", error);
   }, [error]);
 
   return (
@@ -33,19 +36,18 @@ export default function Error({
               gap: "var(--spacing-4)",
             }}
           >
-            <Alert variant="error" title="Er is iets misgegaan">
-              De pagina kon niet worden geladen. Probeer het opnieuw of ga terug
-              naar de homepagina.
+            <Alert variant="error" title={t("title")}>
+              {t("description")}
             </Alert>
             <div style={{ display: "flex", gap: "var(--spacing-3)" }}>
               <Button variant="primary" onClick={reset}>
-                Probeer opnieuw
+                {t("retry")}
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => (window.location.href = "/")}
               >
-                Naar home
+                {t("goHome")}
               </Button>
             </div>
           </div>

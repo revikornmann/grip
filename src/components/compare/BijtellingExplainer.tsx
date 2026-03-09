@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, Button, Icon, Badge, Divider } from "muka-ui";
 import type { GarageVehicle } from "@/types/garage";
 import {
@@ -20,6 +21,8 @@ export function BijtellingExplainer({
   vehicle,
   taxBracket,
 }: BijtellingExplainerProps) {
+  const t = useTranslations("bijtelling");
+  const tCompare = useTranslations("compare");
   const [expanded, setExpanded] = useState(false);
 
   const catalogValue = vehicle.rdw.catalogusprijs ?? vehicle.user.purchasePrice;
@@ -50,7 +53,7 @@ export function BijtellingExplainer({
         >
           <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-2)" }}>
             <Icon name="info" size="sm" />
-            <span style={{ fontWeight: 600 }}>Wat is bijtelling?</span>
+            <span style={{ fontWeight: 600 }}>{t("title")}</span>
           </div>
           <Icon name={expanded ? "chevron-up" : "chevron-down"} size="sm" />
         </button>
@@ -60,9 +63,7 @@ export function BijtellingExplainer({
             <Divider />
 
             <p style={{ margin: 0, color: "var(--color-text-subtle-default)" }}>
-              Bij zakelijk eigendom wordt privégebruik van de auto als inkomen
-              belast. Dit heet <strong>bijtelling</strong>. De hoogte hangt af van
-              de cataloguswaarde en het bijtellingpercentage.
+              {t("explanation")}
             </p>
 
             {/* Vehicle-specific calculation */}
@@ -79,29 +80,29 @@ export function BijtellingExplainer({
                   fontWeight: 600,
                 }}
               >
-                Berekening voor dit voertuig:
+                {t("calculationTitle")}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-1)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Cataloguswaarde</span>
+                  <span>{t("catalogValue")}</span>
                   <span>{formatCurrency(catalogValue, 0)}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Bijtellingpercentage</span>
+                  <span>{t("percentage")}</span>
                   <span>× {formatPercentage(bijtellingPercent, 1)}</span>
                 </div>
                 <Divider />
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Bijtelling (belastbaar)</span>
+                  <span>{t("taxableAmount")}</span>
                   <span>{formatCurrency(bijtellingAmount, 0)}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Belastingtarief</span>
+                  <span>{t("taxRate")}</span>
                   <span>× {formatPercentage(taxBracket, 1)}</span>
                 </div>
                 <Divider />
                 <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 600 }}>
-                  <span>Jaarlijkse belastingkosten</span>
+                  <span>{t("annualTaxCost")}</span>
                   <span>{formatCurrency(taxCost, 0)}</span>
                 </div>
               </div>
@@ -110,30 +111,30 @@ export function BijtellingExplainer({
             {/* Rate explanation */}
             <div>
               <p style={{ margin: "0 0 var(--spacing-2) 0", fontWeight: 600 }}>
-                Bijtellingpercentages (2024):
+                {t("percentagesTitle")}
               </p>
               <ul style={{ margin: 0, paddingLeft: "var(--spacing-4)" }}>
                 <li>
-                  <strong>22%</strong> — Standaard voor alle voertuigen
+                  {t("standard")}
                   {!isEV && co2 !== null && co2 > 50 && (
                     <span style={{ marginLeft: "var(--spacing-2)" }}>
-                      <Badge variant="info" size="sm">Dit voertuig</Badge>
+                      <Badge variant="info" size="sm">{t("thisVehicle")}</Badge>
                     </span>
                   )}
                 </li>
                 <li>
-                  <strong>16%</strong> — Elektrische voertuigen (0 g/km CO₂)
+                  {t("electricRate")}
                   {isEV && (
                     <span style={{ marginLeft: "var(--spacing-2)" }}>
-                      <Badge variant="success" size="sm">Dit voertuig</Badge>
+                      <Badge variant="success" size="sm">{t("thisVehicle")}</Badge>
                     </span>
                   )}
                 </li>
                 <li>
-                  <strong>16%</strong> — Plug-in hybride (≤50 g/km CO₂)
+                  {t("phevRate")}
                   {!isEV && co2 !== null && co2 > 0 && co2 <= 50 && (
                     <span style={{ marginLeft: "var(--spacing-2)" }}>
-                      <Badge variant="info" size="sm">Dit voertuig</Badge>
+                      <Badge variant="info" size="sm">{t("thisVehicle")}</Badge>
                     </span>
                   )}
                 </li>
@@ -150,13 +151,10 @@ export function BijtellingExplainer({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-2)", marginBottom: "var(--spacing-2)" }}>
-                  <Badge variant="warning">Youngtimer</Badge>
+                  <Badge variant="warning">{tCompare("youngtimerAlert")}</Badge>
                 </div>
                 <p style={{ margin: 0, fontSize: "var(--text-label-sm-regular-fontSize)" }}>
-                  Dit voertuig is 15+ jaar oud en kwalificeert als youngtimer.
-                  De bijtelling is {formatPercentage(TAX_CONSTANTS.bijtelling.youngtimerReduction, 0)} lager,
-                  wat resulteert in een effectief percentage van{" "}
-                  {formatPercentage(bijtellingPercent, 1)}.
+                  {t("youngtimerNote", { discount: formatPercentage(TAX_CONSTANTS.bijtelling.youngtimerReduction, 0), effective: formatPercentage(bijtellingPercent, 1) })}
                 </p>
               </div>
             )}
@@ -171,26 +169,24 @@ export function BijtellingExplainer({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-2)", marginBottom: "var(--spacing-2)" }}>
-                  <Badge variant="info">Elektrisch voertuig</Badge>
+                  <Badge variant="info">{t("evTitle")}</Badge>
                 </div>
                 <p style={{ margin: 0, fontSize: "var(--text-label-sm-regular-fontSize)" }}>
-                  Elektrische voertuigen profiteren van een verlaagd
-                  bijtellingpercentage van 16%. Let op: dit percentage kan in
-                  toekomstige jaren stijgen.
+                  {t("evNote")}
                 </p>
               </div>
             )}
 
             {/* Link to source */}
             <p style={{ margin: 0, fontSize: "var(--text-label-sm-regular-fontSize)", color: "var(--color-text-subtle-default)" }}>
-              Meer informatie:{" "}
+              {t("moreInfo")}{" "}
               <a
                 href="https://www.belastingdienst.nl/wps/wcm/connect/nl/auto-en-vervoer/content/bijtelling-privgebruik-auto"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "var(--color-action-default)" }}
               >
-                Belastingdienst.nl
+                {t("taxAuthority")}
               </a>
             </p>
           </>

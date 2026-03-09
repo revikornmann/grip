@@ -1,4 +1,10 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 export default function Loading() {
+  const t = useTranslations("loading");
+
   return (
     <div
       style={{ padding: "var(--spacing-8)", textAlign: "center" }}
@@ -6,7 +12,7 @@ export default function Loading() {
       aria-busy="true"
       aria-live="polite"
     >
-      <p style={{ color: "var(--color-text-subtle-default)" }}>Laden...</p>
+      <p style={{ color: "var(--color-text-subtle-default)" }}>{t("text")}</p>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, Badge, Button, Icon, Select, Input } from "muka-ui";
 import type { Trip, TripPurpose, TripCategory } from "@/lib/trips";
 import { TRIP_PURPOSE_LABELS } from "@/lib/trips";
@@ -13,24 +14,25 @@ interface TripListProps {
   loading?: boolean;
 }
 
-const CATEGORY_OPTIONS = [
-  { value: "", label: "Alle categorieën" },
-  { value: "business", label: "Zakelijk" },
-  { value: "private", label: "Privé" },
-];
-
-const MONTH_OPTIONS = [
-  { value: "", label: "Alle maanden" },
-  ...Array.from({ length: 12 }, (_, i) => {
-    const date = new Date(2024, i, 1);
-    return {
-      value: String(i + 1).padStart(2, "0"),
-      label: date.toLocaleDateString("nl-NL", { month: "long" }),
-    };
-  }),
-];
-
 export function TripList({ trips, onEdit, onDelete, loading = false }: TripListProps) {
+  const t = useTranslations("tripList");
+
+  const CATEGORY_OPTIONS = [
+    { value: "", label: t("allCategories") },
+    { value: "business", label: t("business") },
+    { value: "private", label: t("private") },
+  ];
+
+  const MONTH_OPTIONS = [
+    { value: "", label: t("allMonths") },
+    ...Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(2024, i, 1);
+      return {
+        value: String(i + 1).padStart(2, "0"),
+        label: date.toLocaleDateString("nl-NL", { month: "long" }),
+      };
+    }),
+  ];
   const [categoryFilter, setCategoryFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,8 +82,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
         >
           <Icon name="map-pin" size="lg" />
           <p style={{ color: "var(--color-text-subtle-default)" }}>
-            Je hebt nog geen ritten geregistreerd. Voeg je eerste rit toe om te
-            beginnen met bijhouden.
+            {t("emptyMessage")}
           </p>
         </div>
       </Card>
@@ -100,22 +101,22 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
           }}
         >
           <Select
-            label="Categorie"
+            label={t("categoryLabel")}
             options={CATEGORY_OPTIONS}
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
           />
           <Select
-            label="Maand"
+            label={t("monthLabel")}
             options={MONTH_OPTIONS}
             value={monthFilter}
             onChange={(e) => setMonthFilter(e.target.value)}
           />
           <Input
-            label="Zoeken"
+            label={t("searchLabel")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Locatie of notitie"
+            placeholder={t("searchPlaceholder")}
           />
         </div>
       </Card>
@@ -136,7 +137,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
               color: "var(--color-text-subtle-default)",
             }}
           >
-            Totaal
+            {t("total")}
           </p>
           <p
             style={{
@@ -156,7 +157,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
               color: "var(--color-text-subtle-default)",
             }}
           >
-            Zakelijk
+            {t("business")}
           </p>
           <p
             style={{
@@ -177,7 +178,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
               color: "var(--color-text-subtle-default)",
             }}
           >
-            Ritten
+            {t("trips")}
           </p>
           <p
             style={{
@@ -210,7 +211,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
                     size="sm"
                     dot
                   >
-                    {trip.category === "business" ? "Zakelijk" : "Privé"}
+                    {trip.category === "business" ? t("business") : t("private")}
                   </Badge>
                   <span style={{ fontSize: "var(--text-label-sm-regular-fontSize)", color: "var(--color-text-subtle-default)" }}>
                     {formatDate(trip.date)}
@@ -254,7 +255,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
                   size="sm"
                   iconOnly
                   onClick={() => onEdit(trip)}
-                  aria-label="Bewerken"
+                  aria-label={t("editLabel")}
                 >
                   <Icon name="edit-2" size="sm" />
                 </Button>
@@ -263,7 +264,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
                   size="sm"
                   iconOnly
                   onClick={() => onDelete(trip)}
-                  aria-label="Verwijderen"
+                  aria-label={t("deleteLabel")}
                 >
                   <Icon name="trash-2" size="sm" />
                 </Button>
@@ -275,7 +276,7 @@ export function TripList({ trips, onEdit, onDelete, loading = false }: TripListP
         {filteredTrips.length === 0 && (
           <Card>
             <p style={{ margin: 0, textAlign: "center", color: "var(--color-text-subtle-default)" }}>
-              Geen ritten gevonden met deze filters.
+              {t("noResults")}
             </p>
           </Card>
         )}

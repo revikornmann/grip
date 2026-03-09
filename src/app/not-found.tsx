@@ -2,9 +2,11 @@
 
 import { Button } from "muka-ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function NotFound() {
   const router = useRouter();
+  const t = useTranslations("notFound");
 
   return (
     <div
@@ -24,10 +26,10 @@ export default function NotFound() {
           fontSize: "var(--font-size-lg)",
         }}
       >
-        Deze pagina bestaat niet.
+        {t("message")}
       </p>
       <Button variant="primary" onClick={() => router.push("/")}>
-        Naar home
+        {t("goHome")}
       </Button>
     </div>
   );

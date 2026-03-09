@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, Chip, Button, Divider, Label } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import { formatPlateDisplay } from "@/lib/validation";
 import { formatCurrency, formatNumber } from "@/lib/formatting";
@@ -38,6 +39,7 @@ export function GarageCard({
   onRefresh,
   isRefreshing,
 }: GarageCardProps) {
+  const t = useTranslations("garage");
   const displayName =
     vehicle.user?.nickname ||
     `${vehicle.rdw?.merk ?? ""} ${vehicle.rdw?.handelsbenaming ?? ""}`.trim() ||
@@ -85,7 +87,7 @@ export function GarageCard({
           <Chip
             variant={ownershipType === "business" ? "info" : "default"}
           >
-            {ownershipType === "business" ? "Zakelijk" : "Privé"}
+            {ownershipType === "business" ? t("business") : t("private")}
           </Chip>
         </div>
 
@@ -94,16 +96,16 @@ export function GarageCard({
         {/* Key stats */}
         <div>
           <DetailRow
-            label="Aankoopprijs"
+            label={t("purchasePrice")}
             value={formatCurrency(vehicle.user?.purchasePrice ?? 0, 0)}
           />
           <DetailRow
-            label="Jaarkilometers"
+            label={t("annualKm")}
             value={`${formatNumber(vehicle.user?.annualKilometers ?? 0)} km`}
           />
           {(vehicle.user?.businessKilometers ?? 0) > 0 && (
             <DetailRow
-              label="Zakelijke km"
+              label={t("businessKm")}
               value={`${formatNumber(vehicle.user?.businessKilometers ?? 0)} km`}
             />
           )}
@@ -120,10 +122,10 @@ export function GarageCard({
           }}
         >
           <Button variant="secondary" size="sm" onClick={onEdit}>
-            Bewerken
+            {t("edit")}
           </Button>
           <Button variant="secondary" size="sm" onClick={onDuplicate}>
-            Dupliceren
+            {t("duplicate")}
           </Button>
           <Button
             variant="ghost"
@@ -131,10 +133,10 @@ export function GarageCard({
             onClick={onRefresh}
             disabled={isRefreshing}
           >
-            {isRefreshing ? "Vernieuwen..." : "Vernieuwen"}
+            {isRefreshing ? t("refreshing") : t("refresh")}
           </Button>
           <Button variant="ghost" size="sm" onClick={onDelete}>
-            Verwijderen
+            {t("delete")}
           </Button>
         </div>
       </div>

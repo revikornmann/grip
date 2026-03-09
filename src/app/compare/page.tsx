@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Alert, Button, Badge } from "muka-ui";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -16,6 +17,7 @@ import { ComparisonInputs } from "@/components/compare/ComparisonInputs";
 import { BijtellingExplainer } from "@/components/compare/BijtellingExplainer";
 
 export default function ComparePage() {
+  const t = useTranslations("compare");
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const searchParams = useSearchParams();
@@ -93,13 +95,12 @@ export default function ComparePage() {
   if (vehicles.length === 0) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
-        <Alert variant="info" title="Geen voertuigen">
-          Voeg eerst een voertuig toe aan je garage om eigendomsscenarios te
-          vergelijken.
+        <Alert variant="info" title={t("noVehicles")}>
+          {t("noVehiclesDescription")}
         </Alert>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Link href="/lookup">
-            <Button variant="primary">Voertuig opzoeken</Button>
+            <Button variant="primary">{t("lookupButton")}</Button>
           </Link>
         </div>
       </div>
@@ -128,15 +129,13 @@ export default function ComparePage() {
           {(isElectric(selectedVehicle) || isYoungtimer(selectedVehicle)) && (
             <div style={{ display: "flex", gap: "var(--spacing-2)", flexWrap: "wrap" }}>
               {isElectric(selectedVehicle) && (
-                <Alert variant="info" title="Elektrisch voertuig">
-                  Dit voertuig profiteert van verlaagde bijtelling (16%) en
-                  vrijstelling van wegenbelasting.
+                <Alert variant="info" title={t("evAlert")}>
+                  {t("evAlertDescription")}
                 </Alert>
               )}
               {isYoungtimer(selectedVehicle) && (
-                <Alert variant="warning" title="Youngtimer">
-                  Dit voertuig is 15+ jaar oud. De bijtelling is 35% lager dan
-                  het standaardpercentage.
+                <Alert variant="warning" title={t("youngtimerAlert")}>
+                  {t("youngtimerAlertDescription")}
                 </Alert>
               )}
             </div>
@@ -171,10 +170,8 @@ export default function ComparePage() {
           <ComparisonTable result={comparisonResult} />
 
           {/* Disclaimer */}
-          <Alert variant="info" title="Disclaimer">
-            Deze berekening is indicatief. Raadpleeg een boekhouder voor
-            definitief advies over uw specifieke situatie. Belastingregels
-            kunnen wijzigen.
+          <Alert variant="info" title={t("disclaimerTitle")}>
+            {t("disclaimerText")}
           </Alert>
 
           {/* Back to calculator CTA */}
@@ -186,7 +183,7 @@ export default function ComparePage() {
             }}
           >
             <Link href={`/calculator?vehicle=${selectedId}`}>
-              <Button variant="secondary">Terug naar kostencalculator</Button>
+              <Button variant="secondary">{t("backToCalculator")}</Button>
             </Link>
           </div>
         </>

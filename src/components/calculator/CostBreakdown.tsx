@@ -10,6 +10,7 @@ import {
   TableCell,
   TableHeaderCell,
 } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { CostBreakdown as CostBreakdownType } from "@/lib/calculator";
 import { formatCurrency } from "@/lib/formatting";
 
@@ -27,35 +28,37 @@ interface CostRow {
 }
 
 export function CostBreakdown({ breakdown, ownershipType }: CostBreakdownProps) {
+  const t = useTranslations("costs");
+
   const rows: CostRow[] = [
     // Running costs
     {
-      label: "Brandstof / Laden",
+      label: t("fuelCharging"),
       annual: breakdown.running.fuel,
       monthly: breakdown.running.fuel / 12,
       category: "running",
     },
     {
-      label: "Verzekering",
+      label: t("insurance"),
       annual: breakdown.running.insurance,
       monthly: breakdown.running.insurance / 12,
       category: "running",
     },
     {
-      label: "Wegenbelasting (MRB)",
+      label: t("roadTaxMrb"),
       annual: breakdown.running.roadTax,
       monthly: breakdown.running.roadTax / 12,
       category: "running",
     },
     {
-      label: "Onderhoud",
+      label: t("maintenance"),
       annual: breakdown.running.maintenance,
       monthly: breakdown.running.maintenance / 12,
       category: "running",
     },
     // Ownership costs
     {
-      label: "Afschrijving",
+      label: t("depreciation"),
       annual: breakdown.ownership.depreciation,
       monthly: breakdown.ownership.depreciation / 12,
       category: "ownership",
@@ -66,7 +69,7 @@ export function CostBreakdown({ breakdown, ownershipType }: CostBreakdownProps) 
   if (ownershipType === "business") {
     if (breakdown.tax.bijtelling > 0) {
       rows.push({
-        label: "Bijtelling (belasting)",
+        label: t("bijtellingTax"),
         annual: breakdown.tax.bijtelling,
         monthly: breakdown.tax.bijtelling / 12,
         category: "tax",
@@ -75,7 +78,7 @@ export function CostBreakdown({ breakdown, ownershipType }: CostBreakdownProps) 
     }
     if (breakdown.tax.btwAftrek < 0) {
       rows.push({
-        label: "BTW aftrek",
+        label: t("vatDeduction"),
         annual: breakdown.tax.btwAftrek,
         monthly: breakdown.tax.btwAftrek / 12,
         category: "tax",
@@ -95,19 +98,19 @@ export function CostBreakdown({ breakdown, ownershipType }: CostBreakdownProps) 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h3 style={{ margin: 0, fontSize: "var(--text-heading-sm-semibold-fontSize)" }}>
-            Kostenoverzicht
+            {t("overview")}
           </h3>
           <Badge variant={ownershipType === "business" ? "info" : "neutral"}>
-            {ownershipType === "business" ? "Zakelijk" : "Privé"}
+            {ownershipType === "business" ? t("business") : t("private")}
           </Badge>
         </div>
 
         <Table size="sm">
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Kostenpost</TableHeaderCell>
-              <TableHeaderCell align="right">Per maand</TableHeaderCell>
-              <TableHeaderCell align="right">Per jaar</TableHeaderCell>
+              <TableHeaderCell>{t("costItem")}</TableHeaderCell>
+              <TableHeaderCell align="right">{t("perMonth")}</TableHeaderCell>
+              <TableHeaderCell align="right">{t("perYear")}</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -125,7 +128,7 @@ export function CostBreakdown({ breakdown, ownershipType }: CostBreakdownProps) 
             {/* Running subtotal */}
             <TableRow>
               <TableCell>
-                <strong>Subtotaal variabele kosten</strong>
+                <strong>{t("subtotalVariable")}</strong>
               </TableCell>
               <TableCell align="right">
                 <strong>{formatCurrency(runningTotal / 12, 0)}</strong>
@@ -199,7 +202,7 @@ export function CostBreakdown({ breakdown, ownershipType }: CostBreakdownProps) 
             {/* Total */}
             <TableRow>
               <TableCell>
-                <strong>Totale kosten</strong>
+                <strong>{t("totalCosts")}</strong>
               </TableCell>
               <TableCell align="right">
                 <strong>{formatCurrency(breakdown.totals.monthly, 0)}</strong>

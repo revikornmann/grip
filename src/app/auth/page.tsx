@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
+import { useTranslations } from "next-intl";
 import { Card, Button, Alert, Icon } from "muka-ui";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { createClient } from "@/lib/supabase";
@@ -11,6 +12,7 @@ function AuthContent() {
   const { user, loading } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const t = useTranslations("auth");
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,11 +39,11 @@ function AuthContent() {
       });
 
       if (authError) {
-        setError("Inloggen mislukt, probeer opnieuw");
+        setError(t("loginFailed"));
         setAuthLoading(false);
       }
     } catch {
-      setError("Inloggen mislukt, probeer opnieuw");
+      setError(t("loginFailed"));
       setAuthLoading(false);
     }
   };
@@ -88,7 +90,7 @@ function AuthContent() {
                 margin: 0,
               }}
             >
-              Inloggen of account aanmaken
+              {t("title")}
             </h1>
             <p
               style={{
@@ -97,7 +99,7 @@ function AuthContent() {
                 margin: 0,
               }}
             >
-              Log in om je garage op te slaan en op elk apparaat te gebruiken
+              {t("subtitle")}
             </p>
           </div>
 
@@ -109,7 +111,7 @@ function AuthContent() {
             disabled={authLoading}
             fullWidth
           >
-            {authLoading ? "Bezig met inloggen..." : "Inloggen met Google"}
+            {authLoading ? t("loggingIn") : t("loginWithGoogle")}
           </Button>
 
           <p
@@ -119,7 +121,7 @@ function AuthContent() {
               margin: 0,
             }}
           >
-            Je garage blijft ook zonder account beschikbaar via lokale opslag
+            {t("localStorageNote")}
           </p>
         </div>
       </Card>

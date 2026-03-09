@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Select, Dialog, Button, Alert, Toast, Icon } from "muka-ui";
+import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import {
   getGarage,
@@ -21,12 +22,6 @@ import { VehicleFormModal } from "@/components/garage/VehicleFormModal";
 const PENDING_VEHICLE_KEY = "pendingVehicle";
 
 type SortKey = "addedAt" | "name" | "price";
-
-const SORT_OPTIONS = [
-  { value: "addedAt", label: "Datum toegevoegd" },
-  { value: "name", label: "Merk / Model" },
-  { value: "price", label: "Prijs" },
-];
 
 function sortVehicles(
   vehicles: GarageVehicle[],
@@ -53,6 +48,7 @@ function sortVehicles(
 }
 
 export default function GaragePage() {
+  const t = useTranslations("garage");
   const { user, migrationResult } = useAuth();
   const userId = user?.id ?? null;
   const pendingProcessed = useRef(false);
@@ -60,6 +56,12 @@ export default function GaragePage() {
   const [vehicles, setVehicles] = useState<GarageVehicle[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("addedAt");
   const [garageLoading, setGarageLoading] = useState(true);
+
+  const SORT_OPTIONS = [
+    { value: "addedAt", label: t("sortDateAdded") },
+    { value: "name", label: t("sortMakeModel") },
+    { value: "price", label: t("sortPrice") },
+  ];
 
   // Form modal state
   const [formOpen, setFormOpen] = useState(false);
@@ -110,14 +112,14 @@ export default function GaragePage() {
       const { rdw, user: userData } = JSON.parse(raw);
       addVehicle(rdw, userData, userId).then(() => {
         reload().then(() => {
-          setToastMessage("Voertuig toegevoegd aan garage");
+          setToastMessage(t("addedToGarage"));
           setToastOpen(true);
         });
       });
     } catch {
       // Invalid or missing pending data
     }
-  }, [userId, garageLoading, reload]);
+  }, [userId, garageLoading, reload, t]);
 
   // Show migration toast
   useEffect(() => {
@@ -125,20 +127,20 @@ export default function GaragePage() {
 
     if (migrationResult.failed > 0 && migrationResult.migrated > 0) {
       setToastMessage(
-        `${migrationResult.migrated} voertuig(en) overgezet, ${migrationResult.failed} mislukt — probeer later opnieuw`
+        t("migrationPartial", { migrated: migrationResult.migrated, failed: migrationResult.failed })
       );
       setToastVariant("warning");
       setToastOpen(true);
     } else if (migrationResult.failed > 0) {
-      setToastMessage("Overzetten van voertuigen mislukt — probeer later opnieuw");
+      setToastMessage(t("migrationFailed"));
       setToastVariant("warning");
       setToastOpen(true);
     } else if (migrationResult.migrated > 0) {
-      setToastMessage("Je bestaande voertuigen zijn overgezet naar je account");
+      setToastMessage(t("migrationSuccess"));
       setToastVariant("success");
       setToastOpen(true);
     }
-  }, [migrationResult]);
+  }, [migrationResult, t]);
 
   const showToast = (message: string, variant: "success" | "warning" = "success") => {
     setToastMessage(message);
@@ -159,16 +161,16 @@ export default function GaragePage() {
     try {
       if (editingVehicle) {
         await updateVehicle(editingVehicle.id, user, userId);
-        showToast("Voertuig bijgewerkt");
+        showToast(t("updated"));
       } else {
         await addVehicle(rdw, user, userId);
-        showToast("Voertuig toegevoegd aan garage");
+        showToast(t("addedToGarage"));
       }
       setFormOpen(false);
       setEditingVehicle(undefined);
       await reload();
     } catch {
-      showToast("Er is iets misgegaan — probeer het opnieuw");
+      showToast(t("somethingWrong"));
     }
   };
 
@@ -183,12 +185,12 @@ export default function GaragePage() {
       const copy = await duplicateVehicle(vehicle.id, userId);
       if (copy) {
         showToast(
-          `${vehicle.rdw.merk} ${vehicle.rdw.handelsbenaming} gedupliceerd`,
+          t("duplicated", { name: `${vehicle.rdw.merk} ${vehicle.rdw.handelsbenaming}` }),
         );
         await reload();
       }
     } catch {
-      showToast("Dupliceren mislukt — probeer het opnieuw");
+      showToast(t("duplicateFailed"));
     }
   };
 
@@ -202,12 +204,12 @@ export default function GaragePage() {
     if (!deletingVehicle) return;
     try {
       await removeVehicle(deletingVehicle.id, userId);
-      showToast("Voertuig verwijderd");
+      showToast(t("deleted"));
       setDeleteOpen(false);
       setDeletingVehicle(undefined);
       await reload();
     } catch {
-      showToast("Verwijderen mislukt — probeer het opnieuw");
+      showToast(t("deleteFailed"));
     }
   };
 
@@ -222,10 +224,10 @@ export default function GaragePage() {
     try {
       const result = await lookupVehicle(vehicle.rdw.kenteken);
       await updateVehicleRdw(vehicle.id, vehicleToRdw(result), userId);
-      showToast("RDW gegevens bijgewerkt");
+      showToast(t("rdwUpdated"));
       await reload();
     } catch {
-      showToast("Vernieuwen mislukt — probeer het later opnieuw");
+      showToast(t("refreshFailed"));
     } finally {
       setRefreshingId(null);
     }
@@ -253,7 +255,7 @@ export default function GaragePage() {
               options={SORT_OPTIONS}
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
-              label="Sorteren"
+              label={t("sortLabel")}
             />
           </div>
         </div>
@@ -297,14 +299,14 @@ export default function GaragePage() {
         open={deleteOpen}
         onClose={handleDeleteClose}
         size="sm"
-        title="Voertuig verwijderen"
+        title={t("deleteTitle")}
         trailing={
           <Button
             variant="ghost"
             size="sm"
             iconOnly
             onClick={handleDeleteClose}
-            aria-label="Sluiten"
+            aria-label={t("close")}
           >
             <Icon name="x" size="sm" />
           </Button>
@@ -312,20 +314,18 @@ export default function GaragePage() {
         footerActions={
           <>
             <Button variant="secondary" onClick={handleDeleteClose}>
-              Annuleren
+              {t("cancel")}
             </Button>
             <Button variant="primary" onClick={handleDeleteConfirm}>
-              Verwijderen
+              {t("delete")}
             </Button>
           </>
         }
       >
         <Alert variant="warning">
-          Weet je zeker dat je{" "}
-          <strong>
-            {deletingVehicle?.rdw.merk} {deletingVehicle?.rdw.handelsbenaming}
-          </strong>{" "}
-          wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
+          {t("deleteConfirm", {
+            name: `${deletingVehicle?.rdw.merk} ${deletingVehicle?.rdw.handelsbenaming}`,
+          })}
         </Alert>
       </Dialog>
 

@@ -269,7 +269,7 @@ interface GarageVehicle {
 
 ### Storage Schema
 ```typescript
-// Local storage key: 'tax-calculator:garage'
+// Local storage key: 'grip:garage'
 interface GarageStorage {
   version: 1;
   vehicles: GarageVehicle[];

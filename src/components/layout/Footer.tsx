@@ -1,8 +1,11 @@
 "use client";
 
 import { Divider, Container, Section } from "muka-ui";
+import { useTranslations } from "next-intl";
 
 export function Footer() {
+  const t = useTranslations("footer");
+
   return (
     <footer>
       <Divider />
@@ -11,23 +14,23 @@ export function Footer() {
           <div className="app-footer__inner">
             <div className="app-footer__links">
               <a href="/privacy" className="footer-link">
-                Privacy
+                {t("privacy")}
               </a>
               <span className="app-footer__divider-vertical">
                 <Divider orientation="vertical" />
               </span>
               <a href="/about" className="footer-link">
-                Over ons
+                {t("about")}
               </a>
               <span className="app-footer__divider-vertical">
                 <Divider orientation="vertical" />
               </span>
               <a href="/feedback" className="footer-link">
-                Feedback
+                {t("feedback")}
               </a>
             </div>
             <p className="app-footer__tagline">
-              Voertuig belasting optimalisatie voor ZZP&apos;ers
+              {t("tagline")}
             </p>
           </div>
         </Container>

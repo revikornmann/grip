@@ -106,6 +106,15 @@ a {
   display: none;
 }
 
+/* ===== Settings Dialog ===== */
+.settings-dialog .muka-dialog__surface {
+  background-color: var(--color-surface-level2);
+}
+
+.settings-nav-transition {
+  height: 100%;
+}
+
 /* ===== Responsive: 768px+ ===== */
 @media (min-width: 768px) {
   .app-footer__links {
