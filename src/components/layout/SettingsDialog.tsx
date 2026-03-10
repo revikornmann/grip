@@ -404,11 +404,11 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
       open={open}
       onClose={onClose}
       title={titles[activeView]}
-      size="sm"
+      size="lg"
       modal={false}
+      surfaceLevel={2}
       leading={leading}
       trailing={trailing}
-      className="settings-dialog"
     >
       <NavigationTransition
         activeView={renderView()}

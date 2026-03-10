@@ -107,10 +107,6 @@ a {
 }
 
 /* ===== Settings Dialog ===== */
-.settings-dialog .muka-dialog__surface {
-  background-color: var(--color-surface-level2);
-}
-
 .settings-nav-transition {
   height: 100%;
 }
