@@ -9,19 +9,12 @@ import React, {
   useMemo,
 } from "react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase";
-import { migrateLocalToSupabase } from "@/lib/migration";
 import type { AuthUser } from "@/types/auth";
 import type { User, SupabaseClient } from "@supabase/supabase-js";
-
-interface MigrationResult {
-  migrated: number;
-  failed: number;
-}
 
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
-  migrationResult: MigrationResult | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -53,10 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(!!supabase);
-  const [migrationResult, setMigrationResult] =
-    useState<MigrationResult | null>(null);
 
-  // Check existing session on mount
   useEffect(() => {
     if (!supabase) return;
 
@@ -67,22 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const mappedUser = session?.user ? mapUser(session.user) : null;
-      setUser(mappedUser);
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ? mapUser(session.user) : null);
       setLoading(false);
-
-      // Run migration on sign-in
-      if (event === "SIGNED_IN" && session?.user) {
-        try {
-          const result = await migrateLocalToSupabase(session.user.id);
-          if (result.migrated > 0 || result.failed > 0) {
-            setMigrationResult(result);
-          }
-        } catch {
-          // Migration failure is non-critical
-        }
-      }
     });
 
     return () => subscription.unsubscribe();
@@ -110,9 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   return (
-    <AuthContext.Provider
-      value={{ user, loading, migrationResult, signIn, signOut }}
-    >
+    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

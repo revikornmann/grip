@@ -7,8 +7,8 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
 
 export const metadata: Metadata = {
-  title: "Grip - Dutch ZZP Vehicle Tax Optimization",
-  description: "Vehicle tax optimization tool for Dutch ZZP professionals",
+  title: "Grip — Motorcycle garage",
+  description: "Manage your motorcycles, track maintenance, and ask an AI mechanic anything.",
 };
 
 const themeScript = `

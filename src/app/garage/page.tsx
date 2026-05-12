@@ -49,7 +49,7 @@ function sortVehicles(
 
 export default function GaragePage() {
   const t = useTranslations("garage");
-  const { user, migrationResult } = useAuth();
+  const { user } = useAuth();
   const userId = user?.id ?? null;
   const pendingProcessed = useRef(false);
 
@@ -120,27 +120,6 @@ export default function GaragePage() {
       // Invalid or missing pending data
     }
   }, [userId, garageLoading, reload, t]);
-
-  // Show migration toast
-  useEffect(() => {
-    if (!migrationResult) return;
-
-    if (migrationResult.failed > 0 && migrationResult.migrated > 0) {
-      setToastMessage(
-        t("migrationPartial", { migrated: migrationResult.migrated, failed: migrationResult.failed })
-      );
-      setToastVariant("warning");
-      setToastOpen(true);
-    } else if (migrationResult.failed > 0) {
-      setToastMessage(t("migrationFailed"));
-      setToastVariant("warning");
-      setToastOpen(true);
-    } else if (migrationResult.migrated > 0) {
-      setToastMessage(t("migrationSuccess"));
-      setToastVariant("success");
-      setToastOpen(true);
-    }
-  }, [migrationResult, t]);
 
   const showToast = (message: string, variant: "success" | "warning" = "success") => {
     setToastMessage(message);

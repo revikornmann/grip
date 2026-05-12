@@ -18,8 +18,6 @@ const ROUTE_CONFIG: Record<
 > = {
   "/": { titleKey: "home", level: "top" },
   "/garage": { titleKey: "garage", level: "top" },
-  "/calculator": { titleKey: "calculator", level: "top" },
-  "/compare": { titleKey: "compare", level: "top" },
   "/lookup": { titleKey: "lookup", level: "sub", backTo: "/" },
   "/auth": { titleKey: "auth", level: "sub", backTo: "/" },
 };
