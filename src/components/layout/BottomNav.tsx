@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 
 const NAV_ITEMS: { href: string; labelKey: string; iconName: IconName }[] = [
   { href: "/", labelKey: "bottomHome", iconName: "home" },
-  { href: "/garage", labelKey: "bottomGarage", iconName: "car" },
+  { href: "/garage", labelKey: "bottomGarage", iconName: "motorbike" },
 ];
 
 export function BottomNav() {

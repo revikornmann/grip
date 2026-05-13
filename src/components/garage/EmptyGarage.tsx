@@ -1,11 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Card, Button } from "muka-ui";
 import { useTranslations } from "next-intl";
 
-export function EmptyGarage() {
-  const router = useRouter();
+interface Props {
+  onAdd: () => void;
+}
+
+export function EmptyGarage({ onAdd }: Props) {
   const t = useTranslations("garage");
 
   return (
@@ -38,11 +40,8 @@ export function EmptyGarage() {
             >
               {t("emptyDescription")}
             </p>
-            <Button
-              variant="primary"
-              onClick={() => router.push("/lookup")}
-            >
-              {t("lookupButton")}
+            <Button variant="primary" onClick={onAdd}>
+              {t("addButton")}
             </Button>
           </div>
         </Card>

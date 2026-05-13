@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "muka-ui/styles/index.css";
 import { TopNav, BottomNav, Footer, MainContent } from "@/components/layout";
@@ -9,6 +9,16 @@ import { LocaleProvider } from "@/components/LocaleProvider";
 export const metadata: Metadata = {
   title: "Grip — Motorcycle garage",
   description: "Manage your motorcycles, track maintenance, and ask an AI mechanic anything.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
 };
 
 const themeScript = `

@@ -1,26 +1,16 @@
-export interface GarageVehicleRow {
+export interface MotorcycleRow {
   id: string;
   user_id: string;
-  added_at: string;
-
-  // RDW data
-  kenteken: string;
-  merk: string | null;
-  handelsbenaming: string | null;
-  brandstof_omschrijving: string | null;
-  co2_uitstoot_gecombineerd: number | null;
-  datum_eerste_toelating: string | null;
-  catalogusprijs: number | null;
-  bruto_bpm: number | null;
-
-  // User-supplied data
-  purchase_price: number;
-  annual_kilometers: number;
-  business_kilometers: number;
-  ownership_type: "private" | "business";
   nickname: string | null;
-  notes: string | null;
-
+  make: string;
+  model: string;
+  year: number | null;
+  vin: string | null;
+  license_plate: string | null;
+  rdw_snapshot: Record<string, unknown> | null;
+  mileage_km: number | null;
+  photo_url: string | null;
+  is_archived: boolean;
   created_at: string;
   updated_at: string;
 }
