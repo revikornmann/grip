@@ -78,6 +78,8 @@ export function AddMotorcycleDialog({
       title={t("title")}
       mobileLeadingLabel={t("cancel")}
       onMobileLeadingClick={handleClose}
+      mobileTrailingLabel={saving ? t("saving") : t("save")}
+      onMobileTrailingClick={handleSave}
       footerActions={
         <>
           <Button
