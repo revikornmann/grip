@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sheet, Input, Button, Alert } from "muka-ui";
+import { Dialog, Input, Button, Alert } from "muka-ui";
 import { useTranslations } from "next-intl";
 import { createMotorcycle } from "@/lib/motorcycles";
 
@@ -12,7 +12,7 @@ interface Props {
   onCreated: () => void;
 }
 
-export function AddMotorcycleSheet({
+export function AddMotorcycleDialog({
   open,
   onOpenChange,
   userId,
@@ -35,6 +35,12 @@ export function AddMotorcycleSheet({
     setMileage("");
     setError(null);
     setSaving(false);
+  };
+
+  const handleClose = () => {
+    if (saving) return;
+    reset();
+    onOpenChange(false);
   };
 
   const handleSave = async () => {
@@ -64,33 +70,40 @@ export function AddMotorcycleSheet({
   };
 
   return (
-    <Sheet
+    <Dialog
       open={open}
-      onOpenChange={(o) => {
-        if (!o) reset();
-        onOpenChange(o);
-      }}
-      snapPoints={[0.6, 0.95]}
+      onClose={handleClose}
+      size="lg"
+      modal
       title={t("title")}
+      mobileLeadingLabel={t("cancel")}
+      onMobileLeadingClick={handleClose}
+      footerActions={
+        <>
+          <Button
+            variant="secondary"
+            onClick={handleClose}
+            disabled={saving}
+          >
+            {t("cancel")}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? t("saving") : t("save")}
+          </Button>
+        </>
+      }
     >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           gap: "var(--spacing-4)",
-          padding: "var(--spacing-4) var(--spacing-4) var(--spacing-6)",
         }}
       >
-        <h2
-          style={{
-            fontSize: "var(--font-size-lg)",
-            fontWeight: "var(--font-weight-semibold)",
-            margin: 0,
-          }}
-        >
-          {t("title")}
-        </h2>
-
         {error && <Alert variant="error">{error}</Alert>}
 
         <Input
@@ -135,32 +148,7 @@ export function AddMotorcycleSheet({
           helperText={t("optional")}
           fullWidth
         />
-
-        <div
-          style={{
-            display: "flex",
-            gap: "var(--spacing-3)",
-            marginTop: "var(--spacing-2)",
-          }}
-        >
-          <Button
-            variant="secondary"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
-            fullWidth
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={saving}
-            fullWidth
-          >
-            {saving ? t("saving") : t("save")}
-          </Button>
-        </div>
       </div>
-    </Sheet>
+    </Dialog>
   );
 }

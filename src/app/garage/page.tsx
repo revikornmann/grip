@@ -19,7 +19,7 @@ import {
 } from "@/lib/motorcycles";
 import type { Motorcycle } from "@/types/motorcycle";
 import { EmptyGarage } from "@/components/garage/EmptyGarage";
-import { AddMotorcycleSheet } from "@/components/garage/AddMotorcycleSheet";
+import { AddMotorcycleDialog } from "@/components/garage/AddMotorcycleDialog";
 
 function motorcycleCaption(m: Motorcycle): string | undefined {
   const parts: string[] = [];
@@ -145,7 +145,7 @@ export default function GaragePage() {
         onClick={() => setSheetOpen(true)}
       />
 
-      <AddMotorcycleSheet
+      <AddMotorcycleDialog
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         userId={user.id}
