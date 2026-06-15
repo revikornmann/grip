@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "muka-ui";
+import { Button } from "@revikornmann/muka-ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 

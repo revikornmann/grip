@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Button } from "muka-ui";
+import { Card, Button } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 interface Props {

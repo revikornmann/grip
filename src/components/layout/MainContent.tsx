@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Container, Section } from "muka-ui";
+import { Container, Section } from "@revikornmann/muka-ui";
 
 interface MainContentProps {
   children: ReactNode;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Button, Alert } from "muka-ui";
+import { Card, Button, Alert } from "@revikornmann/muka-ui";
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 

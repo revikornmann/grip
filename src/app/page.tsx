@@ -12,7 +12,7 @@ import {
   Icon,
   Toast,
   type SelectOption,
-} from "muka-ui";
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import {
   listMakes,

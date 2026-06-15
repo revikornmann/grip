@@ -1,6 +1,6 @@
 "use client";
 
-import { Toggle } from "muka-ui";
+import { Toggle } from "@revikornmann/muka-ui";
 import { useTheme } from "./ThemeProvider";
 
 export function ThemeToggle() {

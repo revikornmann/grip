@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyState, Icon } from "muka-ui";
+import { EmptyState, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 export default function AssistantPage() {

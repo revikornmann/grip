@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import "muka-ui/styles/index.css";
+import "@revikornmann/muka-ui/styles/index.css";
 import { AppShell } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";

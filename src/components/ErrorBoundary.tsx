@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card, Button, Alert } from "muka-ui";
+import { Card, Button, Alert } from "@revikornmann/muka-ui";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;

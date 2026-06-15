@@ -20,7 +20,7 @@ import {
   TabList,
   Tab,
   type IconName,
-} from "muka-ui";
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type {
   MotorcycleSpecs,

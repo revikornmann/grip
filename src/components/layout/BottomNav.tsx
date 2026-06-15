@@ -1,8 +1,8 @@
 "use client";
 
-import type { IconName } from "muka-ui";
+import type { IconName } from "@revikornmann/muka-ui";
 import { usePathname, useRouter } from "next/navigation";
-import { BottomBar, BottomBarTab, Icon } from "muka-ui";
+import { BottomBar, BottomBarTab, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 const NAV_ITEMS: { href: string; labelKey: string; iconName: IconName }[] = [
