@@ -3,9 +3,9 @@
 import React, {
   createContext,
   useContext,
-  useState,
   useEffect,
   useCallback,
+  useSyncExternalStore,
 } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { storage } from "@/lib/storage";
@@ -22,6 +22,30 @@ const messagesMap: Record<Locale, typeof nlMessages> = {
   en: enMessages,
 };
 
+// Custom event fired when the locale changes, so useSyncExternalStore re-reads.
+const LOCALE_EVENT = "grip:locale-change";
+
+function subscribe(callback: () => void): () => void {
+  window.addEventListener(LOCALE_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(LOCALE_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function getLocaleSnapshot(): Locale {
+  const stored = storage.get<Locale>(LOCALE_STORAGE_KEY);
+  return stored === "nl" || stored === "en" ? stored : defaultLocale;
+}
+
+// During SSR and the initial hydration render, React uses the server snapshot —
+// always the default — so server HTML and first client render agree. After
+// hydration it switches to the stored value, with no hydration mismatch.
+function getServerLocaleSnapshot(): Locale {
+  return defaultLocale;
+}
+
 interface LocaleContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
@@ -35,23 +59,21 @@ export function useLocale() {
   return ctx;
 }
 
-function getInitialLocale(): Locale {
-  if (typeof window === "undefined") return defaultLocale;
-  const stored = storage.get<Locale>(LOCALE_STORAGE_KEY);
-  return stored === "nl" || stored === "en" ? stored : defaultLocale;
-}
-
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
+  const locale = useSyncExternalStore(
+    subscribe,
+    getLocaleSnapshot,
+    getServerLocaleSnapshot,
+  );
 
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
     storage.set(LOCALE_STORAGE_KEY, newLocale);
     document.documentElement.lang = newLocale;
+    window.dispatchEvent(new Event(LOCALE_EVENT));
   }, []);
 
   return (

@@ -44,6 +44,7 @@
   },
   "search": {
     "searchPlaceholder": "Search",
+    "recentTitle": "Recent searches",
     "plateTitle": "Search by license plate",
     "plateLabel": "License plate",
     "platePlaceholder": "S-049-NP",
@@ -127,6 +128,7 @@
     "deleteFailed": "Delete failed — please try again",
     "back": "Back",
     "notFound": "Motorcycle not found",
+    "specifications": "Specifications",
     "noSpecs": "No technical specifications available for this motorcycle yet.",
     "mileageLabel": "Mileage",
     "kilometersUnit": "km",
@@ -138,14 +140,14 @@
     "identification": "Identification",
     "engine": "Engine",
     "electrical": "Electrical",
-    "engineOutput": "Performance — engine output",
+    "engineOutput": "Performance",
     "drivetrain": "Drivetrain",
     "chassis": "Chassis & suspension",
     "brakes": "Brakes",
     "wheelsTyres": "Wheels & tyres",
     "dimensions": "Dimensions & weight",
     "fuelEconomy": "Fuel & economy",
-    "measuredPerformance": "Performance — measured"
+    "torqueSpecs": "Torque specs"
   },
   "motorcycleForm": {
     "title": "Add motorcycle",

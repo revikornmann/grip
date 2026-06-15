@@ -26,6 +26,9 @@ export interface MotorcycleSpecRow {
   label: string;
   value: string;
   hint?: string;
+  /** Optional subgroup, used to split long lists (e.g. torque specs) into
+   *  expandable subcategories like "Engine", "Brakes", "Final drive". */
+  group?: string;
 }
 
 export type MotorcycleSpecCategory =
@@ -39,7 +42,7 @@ export type MotorcycleSpecCategory =
   | "wheelsTyres"
   | "dimensions"
   | "fuelEconomy"
-  | "measuredPerformance";
+  | "torqueSpecs";
 
 export type MotorcycleSpecs = Partial<
   Record<MotorcycleSpecCategory, MotorcycleSpecRow[]>

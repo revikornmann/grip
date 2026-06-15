@@ -63,7 +63,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.auth
           .signInAnonymously()
           .then(({ data, error }) => {
-            if (error) console.error("Anonymous sign-in failed", error.message);
+            if (error) {
+              // Anonymous sign-ins may be disabled on the project. That's not
+              // fatal — the user can still browse once signed in with Google —
+              // so degrade quietly instead of throwing a console error.
+              console.warn(
+                "Guest (anonymous) session unavailable:",
+                error.message,
+              );
+            }
             setUser(data?.user ? mapUser(data.user) : null);
           })
           .finally(() => setLoading(false));

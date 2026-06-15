@@ -122,3 +122,24 @@ a {
     display: block;
   }
 }
+
+/* ===== Spec category tab bar ===== */
+/* Single horizontal scroll container: center the tabs when they fit, scroll
+   from the start when they overflow. Neutralises muka-ui's own mobile scroll so
+   there's one scroller to drive when auto-centering the active tab. */
+.grip-tab-scroll {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.grip-tab-scroll::-webkit-scrollbar {
+  display: none;
+}
+.grip-tab-scroll > .grip-tab-scroll__inner {
+  margin-inline: auto;
+}
+.grip-tab-scroll .muka-tabs__list {
+  overflow: visible;
+  max-width: none;
+}

@@ -6,6 +6,7 @@ import { Button, Toast } from "muka-ui";
 import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
 import { getMotorcycleModel, createMotorcycle } from "@/lib/motorcycles";
+import { addRecentSearch } from "@/lib/recentSearches";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
 import type { MotorcycleModel } from "@/types/motorcycle";
 
@@ -38,7 +39,15 @@ export default function ModelPreviewPage() {
         const mm = await getMotorcycleModel(id);
         if (cancelled) return;
         if (!mm) setError(t("notFound"));
-        else setModel(mm);
+        else {
+          setModel(mm);
+          addRecentSearch({
+            id: mm.id,
+            make: mm.make,
+            model: mm.model,
+            year: mm.year,
+          });
+        }
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : t("loadFailed"));

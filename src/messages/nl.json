@@ -44,6 +44,7 @@
   },
   "search": {
     "searchPlaceholder": "Zoeken",
+    "recentTitle": "Recente zoekopdrachten",
     "plateTitle": "Zoek op kenteken",
     "plateLabel": "Kenteken",
     "platePlaceholder": "S-049-NP",
@@ -127,6 +128,7 @@
     "deleteFailed": "Verwijderen mislukt — probeer het opnieuw",
     "back": "Terug",
     "notFound": "Motor niet gevonden",
+    "specifications": "Specificaties",
     "noSpecs": "Nog geen technische specificaties beschikbaar voor deze motor.",
     "mileageLabel": "Kilometerstand",
     "kilometersUnit": "km",
@@ -138,14 +140,14 @@
     "identification": "Identificatie",
     "engine": "Motor",
     "electrical": "Elektrisch",
-    "engineOutput": "Prestaties — motorvermogen",
+    "engineOutput": "Prestaties",
     "drivetrain": "Aandrijving",
     "chassis": "Chassis & vering",
     "brakes": "Remmen",
     "wheelsTyres": "Wielen & banden",
     "dimensions": "Afmetingen & gewicht",
     "fuelEconomy": "Brandstof & verbruik",
-    "measuredPerformance": "Prestaties — gemeten"
+    "torqueSpecs": "Aanhaalmomenten"
   },
   "motorcycleForm": {
     "title": "Motor toevoegen",
