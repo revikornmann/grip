@@ -6,11 +6,13 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## Critical Architectural Constraint: Muka UI Only
 
-**This app is a proof-of-concept for the Muka UI design system. ALL UI components must come from muka-ui — no exceptions.**
+**This app is a proof-of-concept for the Muka UI design system. ALL UI components must come from Muka UI — no exceptions.**
+
+Muka UI is consumed as the published, scoped package **`@revikornmann/muka-ui`** (a pinned GitHub dependency — see `package.json`). The bare `muka-ui` name on npm is an unrelated package; never use it.
 
 ### What this means
 
-- Import components exclusively from `'muka-ui'`
+- Import components exclusively from `'@revikornmann/muka-ui'`
 - Use Muka UI CSS custom properties (tokens) for any layout or spacing
 - Check [storybook.mukaui.com](https://storybook.mukaui.com) for available components
 - If a component doesn't exist in Muka UI, it must be built there first
@@ -26,17 +28,17 @@ This file provides guidance to Claude Code when working with code in this reposi
 ### When a needed component doesn't exist
 
 1. **Stop** — the feature is blocked
-2. **Create a story** in the muka-ui backlog for the missing component
-3. **Build the component** in `/Users/revikornmann/conductor/workspaces/muka-ui/florence`
-4. **Verify** it appears in Storybook at localhost:6006
-5. **Rebuild muka-ui** with `npm run build`
+2. **Create a story** in the Muka UI backlog (Linear team Muka UI) for the missing component
+3. **Build the component** in the muka repo (`github.com/revikornmann/muka`) and verify it in Storybook
+4. **Merge to `main`** — CI builds and commits `dist/` on push (see Linear MUK-41)
+5. **Bump the pinned ref** of `@revikornmann/muka-ui` in this repo's `package.json` to the new commit, then `npm install`
 6. **Continue** with the Grip feature
 
 ### Acceptable styling patterns
 
 ```tsx
-// GOOD: Import components from muka-ui
-import { Button, Card, Input } from 'muka-ui';
+// GOOD: Import components from Muka UI
+import { Button, Card, Input } from '@revikornmann/muka-ui';
 
 // GOOD: Use token values for layout
 <div style={{
@@ -82,25 +84,18 @@ npm run build    # Production build
 npm run lint     # ESLint check
 ```
 
-### Working with muka-ui
+### Working with Muka UI
 
-Both projects should be running during development:
+Muka UI is consumed as the pinned GitHub dependency `@revikornmann/muka-ui` (committed `dist/`, no build step at install). To pick up changes made in the muka repo:
 
 ```bash
-# Terminal 1: Muka UI Storybook
-cd /Users/revikornmann/conductor/workspaces/muka-ui/florence
-npm run dev
-
-# Terminal 2: Grip
-cd /Users/revikornmann/conductor/workspaces/grip/delhi
+# 1. Merge the change to muka's main (CI commits dist/ — see Linear MUK-41)
+# 2. In this repo, bump the pinned commit in package.json, then:
+npm install
 npm run dev
 ```
 
-After changes to muka-ui:
-```bash
-cd /Users/revikornmann/conductor/workspaces/muka-ui/florence
-npm run build
-```
+To develop a Muka UI component against Grip locally before it lands, use `npm link` against a local muka checkout temporarily — but the committed dependency must always point at a real `github:revikornmann/muka#<commit>` ref so clean installs (CI / Vercel) succeed.
 
 ---
 
@@ -136,7 +131,7 @@ src/
 
 ## Available Muka UI Components
 
-Muka UI is linked to this project via `npm link` for local development. Check the running Storybook at `http://localhost:6006` to verify current component availability.
+Muka UI is consumed via the pinned `@revikornmann/muka-ui` GitHub dependency. Check the Storybook at `http://localhost:6006` (or [storybook.mukaui.com](https://storybook.mukaui.com)) to verify current component availability.
 
 Mobile P0 components landed for this pivot: `Sheet`, `Spinner`, `SpecList`, `FAB`, `ActionSheet`, `SearchInput`, `Combobox`, `SwipeActions`, `PullToRefresh`, plus a 6-piece chat family.
 

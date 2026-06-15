@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { useTranslations } from "next-intl";
-import { Card, Button, Alert, Icon } from "muka-ui";
+import { Card, Button, Alert, Icon } from "@revikornmann/muka-ui";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { createClient } from "@/lib/supabase";
 

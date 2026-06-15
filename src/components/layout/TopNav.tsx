@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { TopBar, Button, Icon } from "muka-ui";
+import { TopBar, Button, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 /**

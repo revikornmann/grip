@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { View, Button, Icon, RadioTile, Container } from "muka-ui";
+import { View, Button, Icon, RadioTile, Container } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 export interface SettingsOption<T extends string> {

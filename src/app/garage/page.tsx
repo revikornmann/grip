@@ -10,7 +10,7 @@ import {
   Icon,
   Toast,
   Spinner,
-} from "muka-ui";
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
 import {

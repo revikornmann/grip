@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Card, ListItem, Button, Icon } from "muka-ui";
+import { Card, ListItem, Button, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";

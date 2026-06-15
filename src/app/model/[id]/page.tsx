@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button, Toast } from "muka-ui";
+import { Button, Toast } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
 import { getMotorcycleModel, createMotorcycle } from "@/lib/motorcycles";
