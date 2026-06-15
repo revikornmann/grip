@@ -211,12 +211,6 @@
     "loginWithGoogle": "Sign in with Google",
     "localStorageNote": "Your garage is also available without an account via local storage"
   },
-  "footer": {
-    "privacy": "Privacy",
-    "about": "About us",
-    "feedback": "Feedback",
-    "tagline": "Your motorcycle garage in one app"
-  },
   "common": {
     "business": "Business",
     "private": "Private",

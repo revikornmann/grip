@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { View, Button, Icon, RadioTile } from "muka-ui";
+import { View, Button, Icon, RadioTile, Container } from "muka-ui";
 import { useTranslations } from "next-intl";
 
 export interface SettingsOption<T extends string> {
@@ -50,25 +50,28 @@ export function SettingsOptionView<T extends string>({
   );
 
   return (
-    <View level="sub" surfaceLevel={2} title={title} leading={back}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--spacing-4)",
-          padding: "var(--spacing-6) var(--spacing-4)",
-        }}
-      >
-        {options.map((option) => (
-          <RadioTile
-            key={option.value}
-            name={name}
-            value={option.value}
-            label={option.label}
-            checked={selected === option.value}
-            onChange={() => onSelect(option.value)}
-          />
-        ))}
+    <View level="sub" surfaceLevel={3} title={title} leading={back}>
+      <div style={{ padding: "var(--spacing-6) var(--spacing-4)" }}>
+        <Container maxWidth="large" gap="none">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-4)",
+            }}
+          >
+            {options.map((option) => (
+              <RadioTile
+                key={option.value}
+                name={name}
+                value={option.value}
+                label={option.label}
+                checked={selected === option.value}
+                onChange={() => onSelect(option.value)}
+              />
+            ))}
+          </div>
+        </Container>
       </div>
     </View>
   );

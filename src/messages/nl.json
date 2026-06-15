@@ -211,12 +211,6 @@
     "loginWithGoogle": "Inloggen met Google",
     "localStorageNote": "Je garage blijft ook zonder account beschikbaar via lokale opslag"
   },
-  "footer": {
-    "privacy": "Privacy",
-    "about": "Over ons",
-    "feedback": "Feedback",
-    "tagline": "Jouw motorgarage in één app"
-  },
   "common": {
     "business": "Zakelijk",
     "private": "Privé",

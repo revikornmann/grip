@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { TopNav } from "./TopNav";
 import { BottomNav } from "./BottomNav";
-import { Footer } from "./Footer";
 import { MainContent } from "./MainContent";
 import { isSubLevelRoute } from "@/lib/routes";
 
@@ -27,7 +26,6 @@ export function AppShell({ children }: Props) {
       </div>
       <main className="app-main">
         <MainContent>{children}</MainContent>
-        <Footer />
       </main>
       <BottomNav />
     </div>

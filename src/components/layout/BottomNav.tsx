@@ -8,8 +8,8 @@ import { useTranslations } from "next-intl";
 const NAV_ITEMS: { href: string; labelKey: string; iconName: IconName }[] = [
   { href: "/", labelKey: "bottomSearch", iconName: "search" },
   { href: "/garage", labelKey: "bottomGarage", iconName: "motorbike" },
-  { href: "/assistant", labelKey: "bottomAssistant", iconName: "chat-1" },
-  { href: "/settings", labelKey: "bottomSettings", iconName: "settings" },
+  { href: "/assistant", labelKey: "bottomAssistant", iconName: "chat1" },
+  { href: "/settings", labelKey: "bottomSettings", iconName: "settings4" },
 ];
 
 export function BottomNav() {
