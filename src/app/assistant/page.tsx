@@ -7,11 +7,12 @@ export default function AssistantPage() {
   const t = useTranslations("assistant");
 
   return (
-    <div style={{ paddingTop: "var(--spacing-8)" }}>
+    <div className="assistant-coming-soon" style={{ paddingTop: "var(--spacing-8)" }}>
       <EmptyState
+        size="sm"
         title={t("comingSoonTitle")}
         description={t("comingSoonBody")}
-        icon={<Icon name="chat-1" size="lg" />}
+        icon={<Icon name="chat1" size="lg" />}
       />
     </div>
   );

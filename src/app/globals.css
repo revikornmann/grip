@@ -65,62 +65,16 @@ a {
   pointer-events: auto;
 }
 
-/* ===== Footer ===== */
-.app-footer__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
-.app-footer__links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
-.footer-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: var(--button-padding-md-y) var(--button-padding-md-x);
-  border-radius: var(--button-radius-md);
-  font-size: var(--font-size-sm);
-  color: var(--button-color-ghost-foreground-default);
-  transition: color 0.15s ease;
-}
-
-.footer-link:hover {
-  color: var(--button-color-ghost-foreground-hover);
-}
-
-.app-footer__tagline {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted-default);
-}
-
-/* Hide vertical dividers on mobile */
-.app-footer__divider-vertical {
-  display: none;
-}
-
 /* ===== Settings Dialog ===== */
 .settings-nav-transition {
   height: 100%;
 }
 
-/* ===== Responsive: 768px+ ===== */
-@media (min-width: 768px) {
-  .app-footer__links {
-    flex-direction: row;
-    gap: 0;
-  }
-
-  .app-footer__divider-vertical {
-    display: block;
-  }
+/* ===== Assistant coming-soon ===== */
+/* Show the EmptyState body in the default text color rather than the muted
+   description color. */
+.assistant-coming-soon {
+  --emptystate-description-color: var(--color-text-default-default);
 }
 
 /* ===== Spec category tab bar ===== */

@@ -17,11 +17,14 @@
     "title": "Instellingen & info",
     "display": "WEERGAVE",
     "language": "Taal",
+    "units": "Eenheden",
+    "unitsMetric": "Metrisch",
+    "unitsImperial": "Imperiaal",
     "themeMode": "Light/Dark mode",
     "themeModeAuto": "Automatisch",
     "themeModeLight": "Light mode",
     "themeModeDark": "Dark mode",
-    "aboutApp": "OVER GRIP APP",
+    "aboutApp": "OVER DEZE APP",
     "howItWorks": "Hoe werkt Grip?",
     "howItWorksCaption": "Wie, wat en waarom",
     "feedback": "Geef feedback",
@@ -36,7 +39,9 @@
     "settingsLabel": "Instellingen",
     "aboutTitle": "Hoe werkt Grip?",
     "aboutText": "Grip is een motorgarage-app: beheer je motoren, houd onderhoud bij en stel vragen aan een AI-monteur.",
-    "footer": "Grip App is gemaakt door Revi Körnmann m.b.v. Claude Code en Muka UI: een multi-brand, in-house Design System van UX Delta B.V."
+    "footer": "Grip App is gemaakt door Revi Körnmann m.b.v. Claude Code en Muka UI: een multi-brand, in-house Design System van UX Delta B.V.",
+    "aboutMadeBy": "Ontworpen en ontwikkeld door <b>Revi Körnmann</b> o.b.v. <b>Muka UI</b> Design System",
+    "aboutLink": "www.kornmann.com"
   },
   "home": {
     "subtitle": "Beheer je motoren, houd onderhoud bij en stel vragen aan een AI-monteur.",
@@ -132,6 +137,7 @@
     "noSpecs": "Nog geen technische specificaties beschikbaar voor deze motor.",
     "mileageLabel": "Kilometerstand",
     "kilometersUnit": "km",
+    "milesUnit": "mi",
     "addToGarage": "Toevoegen aan garage",
     "adding": "Toevoegen…",
     "addFailed": "Toevoegen mislukt — probeer het opnieuw"
@@ -204,12 +210,6 @@
     "loggingIn": "Bezig met inloggen...",
     "loginWithGoogle": "Inloggen met Google",
     "localStorageNote": "Je garage blijft ook zonder account beschikbaar via lokale opslag"
-  },
-  "footer": {
-    "privacy": "Privacy",
-    "about": "Over ons",
-    "feedback": "Feedback",
-    "tagline": "Jouw motorgarage in één app"
   },
   "common": {
     "business": "Zakelijk",

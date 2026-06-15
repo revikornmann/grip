@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
+import { UnitsProvider } from "@/components/UnitsProvider";
 
 export const metadata: Metadata = {
   title: "Grip — Motorcycle garage",
@@ -63,11 +64,13 @@ export default function RootLayout({
       </head>
       <body>
         <LocaleProvider>
-          <ThemeProvider>
-            <AuthProvider>
-              <AppShell>{children}</AppShell>
-            </AuthProvider>
-          </ThemeProvider>
+          <UnitsProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <AppShell>{children}</AppShell>
+              </AuthProvider>
+            </ThemeProvider>
+          </UnitsProvider>
         </LocaleProvider>
       </body>
     </html>
