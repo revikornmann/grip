@@ -22,6 +22,8 @@ import {
   type IconName,
 } from "muka-ui";
 import { useTranslations } from "next-intl";
+import { useUnits } from "@/components/UnitsProvider";
+import { convertSpecs, kmToMiles } from "@/lib/unitConversion";
 import type {
   MotorcycleSpecs,
   MotorcycleSpecCategory,
@@ -146,11 +148,19 @@ export function MotorcycleDetail({
   const t = useTranslations("garage");
   const tNav = useTranslations("nav");
   const tCat = useTranslations("specCategories");
+  const { units } = useUnits();
+
+  // Spec values are stored in metric; convert to the chosen unit system for
+  // display. Metric is the identity case, so this is a no-op cost-wise.
+  const displaySpecs = useMemo(
+    () => convertSpecs(specs, units),
+    [specs, units],
+  );
 
   const categories = useMemo(
     () =>
-      SPEC_CATEGORY_ORDER.filter((c) => (specs[c]?.length ?? 0) > 0),
-    [specs],
+      SPEC_CATEGORY_ORDER.filter((c) => (displaySpecs[c]?.length ?? 0) > 0),
+    [displaySpecs],
   );
 
   const [activeTab, setActiveTab] = useState<string>("");
@@ -325,8 +335,10 @@ export function MotorcycleDetail({
                   color: "var(--color-text-subtle-default)",
                 }}
               >
-                {t("mileageLabel")}: {mileageKm.toLocaleString()}{" "}
-                {t("kilometersUnit")}
+                {t("mileageLabel")}:{" "}
+                {units === "imperial"
+                  ? `${kmToMiles(mileageKm).toLocaleString()} ${t("milesUnit")}`
+                  : `${mileageKm.toLocaleString()} ${t("kilometersUnit")}`}
               </p>
             )}
           </div>
@@ -475,7 +487,7 @@ export function MotorcycleDetail({
                           {tCat(c)}
                         </h2>
                       </div>
-                      {specs[c]!.some((row) => row.group) ? (
+                      {displaySpecs[c]!.some((row) => row.group) ? (
                         // Long lists (torque specs) split into expandable subgroups.
                         <div
                           style={{
@@ -483,7 +495,7 @@ export function MotorcycleDetail({
                             flexDirection: "column",
                           }}
                         >
-                          {groupRows(specs[c]!).map(([group, rows], gi) => {
+                          {groupRows(displaySpecs[c]!).map(([group, rows], gi) => {
                             const key = `${c}:${group}`;
                             const open = openGroups[key] ?? false;
                             return (
@@ -561,7 +573,7 @@ export function MotorcycleDetail({
                           })}
                         </div>
                       ) : (
-                        <SpecTable rows={specs[c]!} />
+                        <SpecTable rows={displaySpecs[c]!} />
                       )}
                     </section>
                   </Fragment>
