@@ -16,6 +16,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  upgradeToGoogle: (returnTo?: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -35,6 +36,7 @@ function mapUser(supabaseUser: User): AuthUser {
     displayName:
       meta?.full_name ?? meta?.name ?? supabaseUser.email ?? "Gebruiker",
     avatarUrl: meta?.avatar_url ?? meta?.picture,
+    isAnonymous: supabaseUser.is_anonymous ?? false,
   };
 }
 
@@ -51,13 +53,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!supabase) return;
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ? mapUser(session.user) : null);
-      setLoading(false);
+      if (session?.user) {
+        setUser(mapUser(session.user));
+        setLoading(false);
+      } else {
+        // No session — establish an anonymous one so the user can use the app
+        // (browse, add motorcycles) without Google login. Anonymous users get an
+        // `authenticated` JWT, so RLS and all motorcycle CRUD keep working.
+        supabase.auth
+          .signInAnonymously()
+          .then(({ data, error }) => {
+            if (error) console.error("Anonymous sign-in failed", error.message);
+            setUser(data?.user ? mapUser(data.user) : null);
+          })
+          .finally(() => setLoading(false));
+      }
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        // After a Google sign-out, drop back to an anonymous session so the app
+        // stays usable without a redirect to login.
+        supabase.auth.signInAnonymously().then(({ data }) => {
+          setUser(data?.user ? mapUser(data.user) : null);
+        });
+        return;
+      }
       setUser(session?.user ? mapUser(session.user) : null);
       setLoading(false);
     });
@@ -77,6 +100,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, [supabase]);
 
+  const upgradeToGoogle = useCallback(
+    async (returnTo = "/settings") => {
+      if (!supabase) return;
+      // Link a Google identity to the current anonymous user. linkIdentity keeps
+      // the same user id, so the guest's garage carries over after sign-in.
+      await supabase.auth.linkIdentity({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?returnTo=${encodeURIComponent(returnTo)}`,
+        },
+      });
+    },
+    [supabase],
+  );
+
   const signOut = useCallback(async () => {
     console.log("signOut called");
     setUser(null);
@@ -87,7 +125,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, loading, signIn, upgradeToGoogle, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

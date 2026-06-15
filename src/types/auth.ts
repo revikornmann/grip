@@ -3,6 +3,7 @@ export interface AuthUser {
   email: string;
   displayName: string;
   avatarUrl?: string;
+  isAnonymous: boolean;
 }
 
 export interface AuthState {

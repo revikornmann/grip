@@ -1,12 +1,17 @@
 {
   "nav": {
     "home": "Grip",
+    "search": "Zoeken",
     "garage": "Mijn garage",
+    "assistant": "Assistent",
+    "settings": "Instellingen",
     "lookup": "Kenteken opzoeken",
     "auth": "Inloggen",
     "back": "Terug",
-    "bottomHome": "Home",
-    "bottomGarage": "Garage"
+    "bottomSearch": "Zoeken",
+    "bottomGarage": "Garage",
+    "bottomAssistant": "Assistent",
+    "bottomSettings": "Instellingen"
   },
   "settings": {
     "title": "Instellingen & info",
@@ -25,6 +30,8 @@
     "loggedInAs": "Ingelogd als",
     "logout": "Uitloggen",
     "login": "Inloggen",
+    "guestNote": "Je gebruikt Grip als gast. Log in om je garage veilig te stellen en op elk apparaat te gebruiken.",
+    "signInGoogle": "Inloggen met Google",
     "close": "Sluiten",
     "settingsLabel": "Instellingen",
     "aboutTitle": "Hoe werkt Grip?",
@@ -34,6 +41,26 @@
   "home": {
     "subtitle": "Beheer je motoren, houd onderhoud bij en stel vragen aan een AI-monteur.",
     "garageButton": "Naar mijn garage"
+  },
+  "search": {
+    "searchPlaceholder": "Zoeken",
+    "plateTitle": "Zoek op kenteken",
+    "plateLabel": "Kenteken",
+    "platePlaceholder": "S-049-NP",
+    "plateSearch": "Zoek",
+    "searching": "Zoeken…",
+    "enterPlate": "Voer een kenteken in",
+    "noMotorcycleData": "Geen motorgegevens gevonden voor dit kenteken",
+    "orSelect": "Of selecteer je motor",
+    "make": "Merk",
+    "model": "Model",
+    "year": "Jaar",
+    "selectPlaceholder": "Selecteer…",
+    "loadFailed": "Laden mislukt — probeer het opnieuw"
+  },
+  "assistant": {
+    "comingSoonTitle": "Assistent komt eraan",
+    "comingSoonBody": "Stel een AI-monteur alles over je motor — onderhoud, problemen oplossen en meer. Deze functie is in ontwikkeling."
   },
   "error": {
     "title": "Er is iets misgegaan",
@@ -97,7 +124,28 @@
     "archiveFailed": "Archiveren mislukt — probeer het opnieuw",
     "delete": "Verwijderen",
     "deleted": "Verwijderd",
-    "deleteFailed": "Verwijderen mislukt — probeer het opnieuw"
+    "deleteFailed": "Verwijderen mislukt — probeer het opnieuw",
+    "back": "Terug",
+    "notFound": "Motor niet gevonden",
+    "noSpecs": "Nog geen technische specificaties beschikbaar voor deze motor.",
+    "mileageLabel": "Kilometerstand",
+    "kilometersUnit": "km",
+    "addToGarage": "Toevoegen aan garage",
+    "adding": "Toevoegen…",
+    "addFailed": "Toevoegen mislukt — probeer het opnieuw"
+  },
+  "specCategories": {
+    "identification": "Identificatie",
+    "engine": "Motor",
+    "electrical": "Elektrisch",
+    "engineOutput": "Prestaties — motorvermogen",
+    "drivetrain": "Aandrijving",
+    "chassis": "Chassis & vering",
+    "brakes": "Remmen",
+    "wheelsTyres": "Wielen & banden",
+    "dimensions": "Afmetingen & gewicht",
+    "fuelEconomy": "Brandstof & verbruik",
+    "measuredPerformance": "Prestaties — gemeten"
   },
   "motorcycleForm": {
     "title": "Motor toevoegen",

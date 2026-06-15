@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "muka-ui/styles/index.css";
-import { TopNav, BottomNav, Footer, MainContent } from "@/components/layout";
+import { AppShell } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
@@ -65,16 +65,7 @@ export default function RootLayout({
         <LocaleProvider>
           <ThemeProvider>
             <AuthProvider>
-              <div className="app-layout">
-                <div className="app-topnav">
-                  <TopNav />
-                </div>
-                <main className="app-main">
-                  <MainContent>{children}</MainContent>
-                  <Footer />
-                </main>
-                <BottomNav />
-              </div>
+              <AppShell>{children}</AppShell>
             </AuthProvider>
           </ThemeProvider>
         </LocaleProvider>

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 /**
- * Hook that redirects to /auth if the user is not logged in.
- * Returns { user, loading } so the consuming component can show a loading state.
+ * Hook that exposes the current auth state.
+ *
+ * With anonymous auth enabled, the AuthProvider always establishes a session
+ * (anonymous or Google), so there is no redirect to /auth — the hook simply
+ * surfaces { user, loading } and the consuming page waits for `loading`.
  *
  * Usage:
  *   const { user, loading } = useRequireAuth();
@@ -14,14 +15,5 @@ import { useAuth } from "@/components/auth/AuthProvider";
  */
 export function useRequireAuth() {
   const { user, loading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace(`/auth?returnTo=${encodeURIComponent(pathname)}`);
-    }
-  }, [user, loading, router, pathname]);
-
   return { user, loading };
 }

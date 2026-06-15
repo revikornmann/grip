@@ -1,12 +1,17 @@
 {
   "nav": {
     "home": "Grip",
+    "search": "Search",
     "garage": "My garage",
+    "assistant": "Assistant",
+    "settings": "Settings",
     "lookup": "License plate lookup",
     "auth": "Sign in",
     "back": "Back",
-    "bottomHome": "Home",
-    "bottomGarage": "Garage"
+    "bottomSearch": "Search",
+    "bottomGarage": "Garage",
+    "bottomAssistant": "Assistant",
+    "bottomSettings": "Settings"
   },
   "settings": {
     "title": "Settings & info",
@@ -25,6 +30,8 @@
     "loggedInAs": "Logged in as",
     "logout": "Sign out",
     "login": "Sign in",
+    "guestNote": "You're using Grip as a guest. Sign in to back up your garage and use it on any device.",
+    "signInGoogle": "Sign in with Google",
     "close": "Close",
     "settingsLabel": "Settings",
     "aboutTitle": "How does Grip work?",
@@ -34,6 +41,26 @@
   "home": {
     "subtitle": "Manage your motorcycles, track maintenance, and ask an AI mechanic anything.",
     "garageButton": "Go to my garage"
+  },
+  "search": {
+    "searchPlaceholder": "Search",
+    "plateTitle": "Search by license plate",
+    "plateLabel": "License plate",
+    "platePlaceholder": "S-049-NP",
+    "plateSearch": "Search",
+    "searching": "Searching…",
+    "enterPlate": "Enter a license plate",
+    "noMotorcycleData": "No motorcycle data found for this plate",
+    "orSelect": "Or select your motorcycle",
+    "make": "Make",
+    "model": "Model",
+    "year": "Year",
+    "selectPlaceholder": "Select…",
+    "loadFailed": "Couldn't load — please try again"
+  },
+  "assistant": {
+    "comingSoonTitle": "Assistant coming soon",
+    "comingSoonBody": "Ask an AI mechanic anything about your motorcycle — maintenance, troubleshooting, and more. This feature is on its way."
   },
   "error": {
     "title": "Something went wrong",
@@ -97,7 +124,28 @@
     "archiveFailed": "Archive failed — please try again",
     "delete": "Delete",
     "deleted": "Deleted",
-    "deleteFailed": "Delete failed — please try again"
+    "deleteFailed": "Delete failed — please try again",
+    "back": "Back",
+    "notFound": "Motorcycle not found",
+    "noSpecs": "No technical specifications available for this motorcycle yet.",
+    "mileageLabel": "Mileage",
+    "kilometersUnit": "km",
+    "addToGarage": "Add to garage",
+    "adding": "Adding…",
+    "addFailed": "Couldn't add — please try again"
+  },
+  "specCategories": {
+    "identification": "Identification",
+    "engine": "Engine",
+    "electrical": "Electrical",
+    "engineOutput": "Performance — engine output",
+    "drivetrain": "Drivetrain",
+    "chassis": "Chassis & suspension",
+    "brakes": "Brakes",
+    "wheelsTyres": "Wheels & tyres",
+    "dimensions": "Dimensions & weight",
+    "fuelEconomy": "Fuel & economy",
+    "measuredPerformance": "Performance — measured"
   },
   "motorcycleForm": {
     "title": "Add motorcycle",

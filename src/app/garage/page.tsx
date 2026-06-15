@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   PullToRefresh,
   ListItem,
@@ -14,12 +15,18 @@ import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
 import {
   listMotorcycles,
+  createMotorcycle,
   archiveMotorcycle,
   deleteMotorcycle,
 } from "@/lib/motorcycles";
+import { storage } from "@/lib/storage";
 import type { Motorcycle } from "@/types/motorcycle";
 import { EmptyGarage } from "@/components/garage/EmptyGarage";
 import { AddMotorcycleDialog } from "@/components/garage/AddMotorcycleDialog";
+
+// Demo seed: drop a BMW R 1100GS (1998) into a brand-new, empty garage once per
+// browser. The flag keeps it from reappearing after the user deletes it.
+const DEMO_SEED_KEY = "demo-seeded";
 
 function motorcycleCaption(m: Motorcycle): string | undefined {
   const parts: string[] = [];
@@ -35,6 +42,7 @@ function motorcycleLabel(m: Motorcycle): string {
 
 export default function GaragePage() {
   const t = useTranslations("garage");
+  const router = useRouter();
   const { user, loading } = useRequireAuth();
 
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
@@ -55,7 +63,19 @@ export default function GaragePage() {
   const reload = useCallback(async () => {
     if (!user?.id) return;
     try {
-      const data = await listMotorcycles(user.id);
+      let data = await listMotorcycles(user.id);
+      if (data.length === 0 && !storage.get<boolean>(DEMO_SEED_KEY)) {
+        try {
+          await createMotorcycle(
+            { make: "BMW", model: "R 1100GS", year: 1998, mileageKm: 64000 },
+            user.id,
+          );
+          storage.set(DEMO_SEED_KEY, true);
+          data = await listMotorcycles(user.id);
+        } catch {
+          // Seeding is best-effort — never block the garage on it.
+        }
+      }
       setMotorcycles(data);
     } catch {
       showToast(t("loadFailed"), "warning");
@@ -132,6 +152,7 @@ export default function GaragePage() {
                     leadingIcon={<Icon name="motorbike" />}
                     showChevron
                     showDivider
+                    onClick={() => router.push(`/garage/${m.id}`)}
                   />
                 </SwipeActions>
               </li>
