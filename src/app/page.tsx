@@ -8,13 +8,27 @@ import {
   Input,
   Button,
   Select,
+  ListItem,
+  Icon,
   Toast,
   type SelectOption,
 } from "muka-ui";
 import { useTranslations } from "next-intl";
-import { listMakes, listModels, listYears, findModelId } from "@/lib/catalog";
+import {
+  listMakes,
+  listModels,
+  listYears,
+  findModelId,
+  listRecentModels,
+} from "@/lib/catalog";
 import { findMotorcycleModel } from "@/lib/motorcycles";
+import {
+  getRecentSearches,
+  seedRecentSearches,
+  type RecentSearch,
+} from "@/lib/recentSearches";
 import { lookupVehicle, RDWError } from "@/lib/rdw";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 function toOptions(values: string[]): SelectOption[] {
   return values.map((v) => ({ value: v, label: v }));
@@ -23,6 +37,7 @@ function toOptions(values: string[]): SelectOption[] {
 export default function SearchPage() {
   const t = useTranslations("search");
   const router = useRouter();
+  const { user } = useAuth();
 
   const [query, setQuery] = useState("");
   const [plate, setPlate] = useState("");
@@ -35,6 +50,8 @@ export default function SearchPage() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
 
+  const [recent, setRecent] = useState<RecentSearch[]>([]);
+
   const [toastMsg, setToastMsg] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
 
@@ -43,11 +60,32 @@ export default function SearchPage() {
     setToastOpen(true);
   };
 
+  // The catalog tables are readable only by an authenticated session, so wait
+  // for AuthProvider to establish one (anonymous or Google) before querying.
   useEffect(() => {
+    if (!user) return;
     listMakes()
       .then(setMakes)
       .catch(() => showToast(t("loadFailed")));
-  }, [t]);
+  }, [user, t]);
+
+  // Show any stored recent searches immediately (no auth needed for localStorage).
+  useEffect(() => {
+    const stored = getRecentSearches();
+    if (stored.length > 0) setRecent(stored);
+  }, []);
+
+  // First-time fallback: once authenticated, seed from the most recent catalog
+  // entries so the section isn't empty before the user has previewed anything.
+  useEffect(() => {
+    if (!user) return;
+    if (getRecentSearches().length > 0) return;
+    listRecentModels()
+      .then((models) => setRecent(seedRecentSearches(models)))
+      .catch(() => {
+        /* leave the section empty if the catalog can't be read */
+      });
+  }, [user]);
 
   useEffect(() => {
     setModel("");
@@ -126,6 +164,33 @@ export default function SearchPage() {
         onChange={setQuery}
         placeholder={t("searchPlaceholder")}
       />
+
+      {recent.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--spacing-3)",
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: "var(--font-size-lg)" }}>
+            {t("recentTitle")}
+          </h2>
+          <Card padding="none">
+            {recent.map((r, i) => (
+              <ListItem
+                key={r.id}
+                label={`${r.make} ${r.model}`}
+                caption={String(r.year)}
+                leadingIcon={<Icon name="motorbike" />}
+                showChevron
+                showDivider={i < recent.length - 1}
+                onClick={() => router.push(`/model/${r.id}`)}
+              />
+            ))}
+          </Card>
+        </div>
+      )}
 
       <Card padding="lg">
         <div

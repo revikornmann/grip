@@ -45,6 +45,29 @@ export async function listYears(
   return Array.from(new Set(years));
 }
 
+/**
+ * Most recently added catalog models, used to seed the Search screen's "Recent
+ * searches" section before the user has previewed anything of their own.
+ */
+export async function listRecentModels(
+  limit = 5,
+): Promise<{ id: string; make: string; model: string; year: number }[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("motorcycle_models")
+    .select("id, make, model, year")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+  }[];
+}
+
 export async function findModelId(
   make: string,
   model: string,
