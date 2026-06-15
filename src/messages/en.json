@@ -17,11 +17,14 @@
     "title": "Settings & info",
     "display": "DISPLAY",
     "language": "Language",
+    "units": "Units",
+    "unitsMetric": "Metric",
+    "unitsImperial": "Imperial",
     "themeMode": "Light/Dark mode",
     "themeModeAuto": "Automatic",
     "themeModeLight": "Light mode",
     "themeModeDark": "Dark mode",
-    "aboutApp": "ABOUT GRIP APP",
+    "aboutApp": "ABOUT THIS APP",
     "howItWorks": "How does Grip work?",
     "howItWorksCaption": "Who, what and why",
     "feedback": "Give feedback",
@@ -36,7 +39,9 @@
     "settingsLabel": "Settings",
     "aboutTitle": "How does Grip work?",
     "aboutText": "Grip is a motorcycle garage app: manage your bikes, track maintenance, and ask an AI mechanic anything.",
-    "footer": "Grip App is made by Revi Körnmann using Claude Code and Muka UI: a multi-brand, in-house Design System by UX Delta B.V."
+    "footer": "Grip App is made by Revi Körnmann using Claude Code and Muka UI: a multi-brand, in-house Design System by UX Delta B.V.",
+    "aboutMadeBy": "Designed and developed by <b>Revi Körnmann</b> using the <b>Muka UI</b> Design System",
+    "aboutLink": "www.kornmann.com"
   },
   "home": {
     "subtitle": "Manage your motorcycles, track maintenance, and ask an AI mechanic anything.",
@@ -132,6 +137,7 @@
     "noSpecs": "No technical specifications available for this motorcycle yet.",
     "mileageLabel": "Mileage",
     "kilometersUnit": "km",
+    "milesUnit": "mi",
     "addToGarage": "Add to garage",
     "adding": "Adding…",
     "addFailed": "Couldn't add — please try again"

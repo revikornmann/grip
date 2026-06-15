@@ -1,20 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import {
-  Card,
-  ListItem,
-  Button,
-  Icon,
-  Divider,
-  ActionSheet,
-} from "muka-ui";
+import { useRouter } from "next/navigation";
+import { Card, ListItem, Button, Icon } from "muka-ui";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLocale } from "@/components/LocaleProvider";
-import { localeLabels, type Locale } from "@/i18n/config";
+import { useUnits } from "@/components/UnitsProvider";
+import { localeLabels } from "@/i18n/config";
+import { unitsLabelKeys } from "@/lib/units";
 import type { Theme } from "@/lib/theme";
 
 const THEME_MODE_LABELS: Record<Theme, string> = {
@@ -41,14 +36,43 @@ function SectionHeader({ children }: { children: string }) {
   );
 }
 
+/** Grip app-icon tile shown in the About section. */
+function AppIcon() {
+  return (
+    <div
+      style={{
+        width: "64px",
+        height: "64px",
+        borderRadius: "var(--radius-xl)",
+        background: "var(--color-surface-inverse)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+      aria-hidden
+    >
+      <span
+        style={{
+          fontWeight: "var(--font-weight-bold, 700)",
+          fontSize: "var(--font-size-2xl)",
+          color: "var(--color-text-default-inverse)",
+          lineHeight: 1,
+        }}
+      >
+        G
+      </span>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const t = useTranslations("settings");
+  const router = useRouter();
   const { user, upgradeToGoogle, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
-  const { locale, setLocale } = useLocale();
-
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [themeOpen, setThemeOpen] = useState(false);
+  const { theme } = useTheme();
+  const { locale } = useLocale();
+  const { units } = useUnits();
 
   const isSignedIn = !!user && !user.isAnonymous;
 
@@ -68,7 +92,14 @@ export default function SettingsPage() {
           caption={localeLabels[locale]}
           leadingIcon={<Icon name="translate" size="md" />}
           showChevron
-          onClick={() => setLanguageOpen(true)}
+          onClick={() => router.push("/settings/language")}
+        />
+        <ListItem
+          label={t("units")}
+          caption={t(unitsLabelKeys[units])}
+          leadingIcon={<Icon name="ruler" size="md" />}
+          showChevron
+          onClick={() => router.push("/settings/units")}
         />
         <ListItem
           label={t("themeMode")}
@@ -76,7 +107,7 @@ export default function SettingsPage() {
           leadingIcon={<Icon name="contrast" size="md" />}
           showChevron
           showDivider={false}
-          onClick={() => setThemeOpen(true)}
+          onClick={() => router.push("/settings/theme")}
         />
       </Card>
 
@@ -182,50 +213,53 @@ export default function SettingsPage() {
 
       {/* ABOUT */}
       <SectionHeader>{t("aboutApp")}</SectionHeader>
-      <Divider />
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          gap: "var(--spacing-3)",
-          padding: "var(--spacing-4)",
+          gap: "var(--spacing-4)",
+          padding: "var(--spacing-2) var(--spacing-1)",
         }}
       >
-        <p
+        <AppIcon />
+        <div
           style={{
-            fontSize: "var(--font-size-xs)",
-            color: "var(--color-text-muted-default)",
-            textAlign: "center",
-            margin: 0,
-            lineHeight: 1.5,
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--spacing-1)",
           }}
         >
-          {t("footer")}
-        </p>
+          <p
+            style={{
+              fontSize: "var(--font-size-sm)",
+              color: "var(--color-text-subtle-default)",
+              margin: 0,
+              lineHeight: 1.5,
+            }}
+          >
+            {t.rich("aboutMadeBy", {
+              b: (chunks) => (
+                <strong style={{ color: "var(--color-text-default-default)" }}>
+                  {chunks}
+                </strong>
+              ),
+            })}
+          </p>
+          <a
+            href="https://www.kornmann.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: "var(--font-size-sm)",
+              fontWeight: "var(--font-weight-semibold)",
+              color: "var(--color-text-action-default)",
+              textDecoration: "none",
+            }}
+          >
+            {t("aboutLink")}
+          </a>
+        </div>
       </div>
-
-      <ActionSheet
-        open={languageOpen}
-        onOpenChange={setLanguageOpen}
-        title={t("language")}
-        actions={(Object.keys(localeLabels) as Locale[]).map((l) => ({
-          label: localeLabels[l],
-          icon: locale === l ? <Icon name="check" /> : undefined,
-          onClick: () => setLocale(l),
-        }))}
-      />
-
-      <ActionSheet
-        open={themeOpen}
-        onOpenChange={setThemeOpen}
-        title={t("themeMode")}
-        actions={(["system", "light", "dark"] as Theme[]).map((mode) => ({
-          label: t(THEME_MODE_LABELS[mode]),
-          icon: theme === mode ? <Icon name="check" /> : undefined,
-          onClick: () => setTheme(mode),
-        }))}
-      />
     </div>
   );
 }
