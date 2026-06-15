@@ -6,8 +6,10 @@ import { BottomBar, BottomBarTab, Icon } from "muka-ui";
 import { useTranslations } from "next-intl";
 
 const NAV_ITEMS: { href: string; labelKey: string; iconName: IconName }[] = [
-  { href: "/", labelKey: "bottomHome", iconName: "home" },
+  { href: "/", labelKey: "bottomSearch", iconName: "search" },
   { href: "/garage", labelKey: "bottomGarage", iconName: "motorbike" },
+  { href: "/assistant", labelKey: "bottomAssistant", iconName: "chat-1" },
+  { href: "/settings", labelKey: "bottomSettings", iconName: "settings" },
 ];
 
 export function BottomNav() {
