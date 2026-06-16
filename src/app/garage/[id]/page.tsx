@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Button, Dialog, Icon, Toast } from "@revikornmann/muka-ui";
 import { useRequireAuth } from "@/lib/auth";
-import { getMotorcycle, getMotorcycleModel } from "@/lib/motorcycles";
+import {
+  getMotorcycle,
+  getMotorcycleModel,
+  deleteMotorcycle,
+} from "@/lib/motorcycles";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
 import type { Motorcycle, MotorcycleSpecs } from "@/types/motorcycle";
 
@@ -13,11 +18,14 @@ function headline(m: Motorcycle): string {
   return m.year ? `${base} (${m.year})` : base;
 }
 
-export default function MotorcycleDetailPage() {
+function MotorcycleDetailContent() {
   const t = useTranslations("garage");
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const id = params?.id;
+  const justAdded = searchParams.get("added") === "1";
+  const alreadyExisted = searchParams.get("exists") === "1";
 
   const { user, loading: authLoading } = useRequireAuth();
 
@@ -25,6 +33,13 @@ export default function MotorcycleDetailPage() {
   const [specs, setSpecs] = useState<MotorcycleSpecs>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState("");
+  const [toastVariant, setToastVariant] = useState<
+    "success" | "warning" | "info"
+  >("success");
+  const [toastOpen, setToastOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
     if (!user?.id || !id) return;
@@ -59,17 +74,111 @@ export default function MotorcycleDetailPage() {
     };
   }, [user?.id, id, t]);
 
+  // Confirm a just-added motorcycle, then drop the ?added flag so a refresh
+  // doesn't replay the toast.
+  useEffect(() => {
+    if ((!justAdded && !alreadyExisted) || !motorcycle) return;
+    const name = `${motorcycle.make} ${motorcycle.model}`.trim();
+    if (alreadyExisted) {
+      setToastMsg(t("alreadyInGarage", { name }));
+      setToastVariant("info");
+    } else {
+      setToastMsg(t("addedToGarage", { name }));
+      setToastVariant("success");
+    }
+    setToastOpen(true);
+    router.replace(`/garage/${id}`, { scroll: false });
+  }, [justAdded, alreadyExisted, motorcycle, id, router, t]);
+
+  const handleRemove = async () => {
+    if (!id) return;
+    setRemoving(true);
+    try {
+      await deleteMotorcycle(id);
+      router.replace("/garage");
+    } catch {
+      setRemoving(false);
+      setConfirmOpen(false);
+      setToastMsg(t("removeFailed"));
+      setToastVariant("warning");
+      setToastOpen(true);
+    }
+  };
+
   if (authLoading || !user) return null;
 
   return (
-    <MotorcycleDetail
-      title={motorcycle ? headline(motorcycle) : ""}
-      subtitle={motorcycle?.nickname?.trim() || null}
-      mileageKm={motorcycle?.mileageKm ?? null}
-      specs={specs}
-      loading={loading}
-      error={error}
-      onBack={() => router.push("/garage")}
-    />
+    <>
+      <MotorcycleDetail
+        title={motorcycle ? headline(motorcycle) : ""}
+        subtitle={motorcycle?.nickname?.trim() || null}
+        mileageKm={motorcycle?.mileageKm ?? null}
+        specs={specs}
+        loading={loading}
+        error={error}
+        onBack={() => router.push("/garage")}
+        endSlot={
+          motorcycle ? (
+            <Button
+              variant="ghost"
+              fullWidth
+              iconLeft={<Icon name="delete-bin" />}
+              onClick={() => setConfirmOpen(true)}
+            >
+              {t("removeFromGarage")}
+            </Button>
+          ) : null
+        }
+      />
+
+      <Dialog
+        open={confirmOpen}
+        onClose={() => (removing ? undefined : setConfirmOpen(false))}
+        size="sm"
+        mobileHeight="half"
+        title={
+          motorcycle
+            ? t("removeConfirmTitle", {
+                name: `${motorcycle.make} ${motorcycle.model}`.trim(),
+              })
+            : ""
+        }
+        footerActions={
+          <>
+            <Button variant="primary" onClick={handleRemove} disabled={removing}>
+              {t("remove")}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setConfirmOpen(false)}
+              disabled={removing}
+            >
+              {t("keep")}
+            </Button>
+          </>
+        }
+      >
+        <p style={{ margin: 0, color: "var(--color-text-subtle-default)" }}>
+          {t("removeConfirmBody")}
+        </p>
+      </Dialog>
+
+      <Toast
+        variant={toastVariant}
+        open={toastOpen}
+        onClose={() => setToastOpen(false)}
+        duration={3000}
+      >
+        {toastMsg}
+      </Toast>
+    </>
+  );
+}
+
+export default function MotorcycleDetailPage() {
+  return (
+    <Suspense>
+      <MotorcycleDetailContent />
+    </Suspense>
   );
 }

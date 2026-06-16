@@ -113,28 +113,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!supabase) return;
       const redirectTo = `${window.location.origin}/auth/callback?returnTo=${encodeURIComponent(returnTo)}`;
 
-      // Prefer linking the Google identity to the current anonymous user:
-      // linkIdentity keeps the same user id, so the guest's garage carries over.
-      // This only works when "Allow manual linking" is enabled on the Supabase
-      // project AND there is an anonymous session to link onto. When either is
-      // missing, linkIdentity returns an error without redirecting — so we fall
-      // back to a normal OAuth sign-in, which always initiates the redirect.
-      const {
-        data: { user: current },
-      } = await supabase.auth.getUser();
-
-      if (current?.is_anonymous) {
-        const { error } = await supabase.auth.linkIdentity({
-          provider: "google",
-          options: { redirectTo },
-        });
-        if (!error) return; // redirect to Google is underway
-        console.warn(
-          "linkIdentity unavailable, falling back to sign-in:",
-          error.message,
-        );
-      }
-
+      // Sign in straight with Google. We deliberately do NOT linkIdentity the
+      // anonymous guest onto the Google account: the garage requires a real
+      // account, so there is no guest data worth carrying over, and linking
+      // fails anyway when the Google identity already belongs to an existing
+      // user ("422: Identity is already linked to another user") or when the
+      // project has manual linking disabled. A plain OAuth sign-in always
+      // establishes the Google session and replaces the anonymous one.
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo },

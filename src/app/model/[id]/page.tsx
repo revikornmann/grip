@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Toast } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
-import { useRequireAuth } from "@/lib/auth";
-import { getMotorcycleModel, createMotorcycle } from "@/lib/motorcycles";
+import { useAuth } from "@/components/auth/AuthProvider";
+import {
+  getMotorcycleModel,
+  createMotorcycle,
+  findGarageMotorcycleByModel,
+} from "@/lib/motorcycles";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
 import type { MotorcycleModel } from "@/types/motorcycle";
@@ -20,7 +24,8 @@ export default function ModelPreviewPage() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
 
-  const { user, loading: authLoading } = useRequireAuth();
+  const { user, upgradeToGoogle } = useAuth();
+  const isSignedIn = !!user && !user.isAnonymous;
 
   const [model, setModel] = useState<MotorcycleModel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,17 +66,29 @@ export default function ModelPreviewPage() {
     };
   }, [id, t]);
 
-  if (authLoading || !user) return null;
-
   const handleAdd = async () => {
-    if (!model || !user) return;
+    if (!model) return;
+    // Saving to the garage needs a real account — guests sign in first and
+    // land back on this page to finish adding.
+    if (!isSignedIn || !user) {
+      upgradeToGoogle(`/model/${id}`);
+      return;
+    }
     setSaving(true);
     try {
+      // A model can live in the garage only once. If it is already there, go to
+      // the existing entry and let it explain — don't create a duplicate.
+      const existing = await findGarageMotorcycleByModel(user.id, model.id);
+      if (existing) {
+        router.replace(`/garage/${existing.id}?exists=1`);
+        return;
+      }
       const created = await createMotorcycle(
         { make: model.make, model: model.model, year: model.year },
         user.id,
       );
-      router.replace(`/garage/${created.id}`);
+      // ?added=1 tells the garage detail page to surface a confirmation toast.
+      router.replace(`/garage/${created.id}?added=1`);
     } catch (e) {
       setToastMsg(e instanceof Error ? e.message : t("addFailed"));
       setToastOpen(true);
@@ -88,7 +105,11 @@ export default function ModelPreviewPage() {
           onClick={handleAdd}
           disabled={saving}
         >
-          {saving ? t("adding") : t("addToGarage")}
+          {saving
+            ? t("adding")
+            : isSignedIn
+              ? t("addToGarage")
+              : t("signInToAdd")}
         </Button>
       </div>
     ) : undefined;

@@ -132,6 +132,9 @@ interface Props {
   error?: string | null;
   /** Sticky footer slot, e.g. an "Add to garage" button on the catalog preview. */
   footer?: ReactNode;
+  /** Inline content rendered at the very bottom of the scroll area, below every
+   *  spec section (e.g. a "Remove from garage" action). */
+  endSlot?: ReactNode;
   onBack: () => void;
 }
 
@@ -143,6 +146,7 @@ export function MotorcycleDetail({
   loading = false,
   error = null,
   footer,
+  endSlot,
   onBack,
 }: Props) {
   const t = useTranslations("garage");
@@ -580,6 +584,18 @@ export function MotorcycleDetail({
                 ))}
               </div>
             </>
+          )}
+
+          {endSlot && (
+            <div
+              style={{
+                padding: "0 var(--spacing-6) var(--spacing-8)",
+                maxWidth: "720px",
+                margin: "0 auto",
+              }}
+            >
+              {endSlot}
+            </div>
           )}
         </div>
       )}
