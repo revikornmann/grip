@@ -111,14 +111,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const upgradeToGoogle = useCallback(
     async (returnTo = "/settings") => {
       if (!supabase) return;
-      // Link a Google identity to the current anonymous user. linkIdentity keeps
-      // the same user id, so the guest's garage carries over after sign-in.
-      await supabase.auth.linkIdentity({
+      const redirectTo = `${window.location.origin}/auth/callback?returnTo=${encodeURIComponent(returnTo)}`;
+
+      // Prefer linking the Google identity to the current anonymous user:
+      // linkIdentity keeps the same user id, so the guest's garage carries over.
+      // This only works when "Allow manual linking" is enabled on the Supabase
+      // project AND there is an anonymous session to link onto. When either is
+      // missing, linkIdentity returns an error without redirecting — so we fall
+      // back to a normal OAuth sign-in, which always initiates the redirect.
+      const {
+        data: { user: current },
+      } = await supabase.auth.getUser();
+
+      if (current?.is_anonymous) {
+        const { error } = await supabase.auth.linkIdentity({
+          provider: "google",
+          options: { redirectTo },
+        });
+        if (!error) return; // redirect to Google is underway
+        console.warn(
+          "linkIdentity unavailable, falling back to sign-in:",
+          error.message,
+        );
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?returnTo=${encodeURIComponent(returnTo)}`,
-        },
+        options: { redirectTo },
       });
+      if (error) console.error("Google sign-in failed:", error.message);
     },
     [supabase],
   );
