@@ -60,6 +60,30 @@ export async function getMotorcycle(id: string): Promise<Motorcycle | null> {
   return data ? rowToMotorcycle(data as MotorcycleRow) : null;
 }
 
+/**
+ * Find an active garage motorcycle for this user that references a given catalog
+ * model. Used to keep a model addable only once — a hit means it is already in
+ * the garage, so we redirect to it instead of creating a duplicate.
+ */
+export async function findGarageMotorcycleByModel(
+  userId: string,
+  modelId: string,
+): Promise<Motorcycle | null> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("motorcycles")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("model_id", modelId)
+    .eq("is_archived", false)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return data ? rowToMotorcycle(data as MotorcycleRow) : null;
+}
+
 export async function getMotorcycleModel(
   id: string,
 ): Promise<MotorcycleModel | null> {

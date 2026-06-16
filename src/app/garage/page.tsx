@@ -6,27 +6,20 @@ import {
   PullToRefresh,
   ListItem,
   SwipeActions,
-  FAB,
   Icon,
   Toast,
   Spinner,
+  EmptyState,
 } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
-import { useRequireAuth } from "@/lib/auth";
+import { useAuth } from "@/components/auth/AuthProvider";
 import {
   listMotorcycles,
-  createMotorcycle,
   archiveMotorcycle,
   deleteMotorcycle,
 } from "@/lib/motorcycles";
-import { storage } from "@/lib/storage";
 import type { Motorcycle } from "@/types/motorcycle";
 import { EmptyGarage } from "@/components/garage/EmptyGarage";
-import { AddMotorcycleDialog } from "@/components/garage/AddMotorcycleDialog";
-
-// Demo seed: drop a BMW R 1100GS (1998) into a brand-new, empty garage once per
-// browser. The flag keeps it from reappearing after the user deletes it.
-const DEMO_SEED_KEY = "demo-seeded";
 
 function motorcycleCaption(m: Motorcycle): string | undefined {
   const parts: string[] = [];
@@ -43,11 +36,12 @@ function motorcycleLabel(m: Motorcycle): string {
 export default function GaragePage() {
   const t = useTranslations("garage");
   const router = useRouter();
-  const { user, loading } = useRequireAuth();
+  const { user, loading, upgradeToGoogle } = useAuth();
+
+  const isSignedIn = !!user && !user.isAnonymous;
 
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastVariant, setToastVariant] = useState<"success" | "warning">(
     "success",
@@ -63,19 +57,7 @@ export default function GaragePage() {
   const reload = useCallback(async () => {
     if (!user?.id) return;
     try {
-      let data = await listMotorcycles(user.id);
-      if (data.length === 0 && !storage.get<boolean>(DEMO_SEED_KEY)) {
-        try {
-          await createMotorcycle(
-            { make: "BMW", model: "R 1100GS", year: 1998, mileageKm: 64000 },
-            user.id,
-          );
-          storage.set(DEMO_SEED_KEY, true);
-          data = await listMotorcycles(user.id);
-        } catch {
-          // Seeding is best-effort — never block the garage on it.
-        }
-      }
+      const data = await listMotorcycles(user.id);
       setMotorcycles(data);
     } catch {
       showToast(t("loadFailed"), "warning");
@@ -85,10 +67,30 @@ export default function GaragePage() {
   }, [user?.id, t]);
 
   useEffect(() => {
-    if (user?.id) reload();
-  }, [user?.id, reload]);
+    if (isSignedIn && user?.id) reload();
+  }, [isSignedIn, user?.id, reload]);
 
-  if (loading || !user) return null;
+  if (loading) return null;
+
+  // Garage is gated behind a real (Google) account — anyone without one (no
+  // session, or an anonymous guest session) must sign in first.
+  if (!isSignedIn) {
+    return (
+      <div style={{ paddingTop: "var(--spacing-8)" }}>
+        <EmptyState
+          size="sm"
+          title={t("loginTitle")}
+          description={t("loginDescription")}
+          icon={<Icon name="motorbike" size="lg" />}
+          primaryAction={{
+            label: t("loginButton"),
+            icon: <Icon name="google" />,
+            onClick: () => upgradeToGoogle("/garage"),
+          }}
+        />
+      </div>
+    );
+  }
 
   const isEmpty = !pageLoading && motorcycles.length === 0;
 
@@ -105,7 +107,7 @@ export default function GaragePage() {
           <Spinner />
         </div>
       ) : isEmpty ? (
-        <EmptyGarage onAdd={() => setSheetOpen(true)} />
+        <EmptyGarage onSearch={() => router.push("/")} />
       ) : (
         <PullToRefresh onRefresh={reload}>
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -160,22 +162,6 @@ export default function GaragePage() {
           </ul>
         </PullToRefresh>
       )}
-
-      <FAB
-        icon={<Icon name="add" />}
-        onClick={() => setSheetOpen(true)}
-      />
-
-      <AddMotorcycleDialog
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        userId={user.id}
-        onCreated={() => {
-          setSheetOpen(false);
-          reload();
-          showToast(t("added"));
-        }}
-      />
 
       <Toast
         variant={toastVariant}

@@ -51,7 +51,22 @@ export function TopNav() {
       </Button>
     ) : undefined;
 
+  // Garage gets a top-right "add" shortcut (replacing the old FAB) that drops
+  // the user onto the search screen to find a motorcycle to add.
+  const trailing =
+    pathname === "/garage" ? (
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
+        aria-label={t("addMotorcycle")}
+        onClick={() => router.push("/")}
+      >
+        <Icon name="add" size="md" />
+      </Button>
+    ) : undefined;
+
   const title = config.titleKey ? t(config.titleKey) : "";
 
-  return <TopBar title={title} leading={leading} />;
+  return <TopBar title={title} leading={leading} trailing={trailing} />;
 }
