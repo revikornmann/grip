@@ -8,7 +8,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 **This app is a proof-of-concept for the Muka UI design system. ALL UI components must come from Muka UI — no exceptions.**
 
-Muka UI is consumed as the published, scoped package **`@revikornmann/muka-ui`** (a pinned GitHub dependency — see `package.json`). The bare `muka-ui` name on npm is an unrelated package; never use it.
+Muka UI is consumed as the scoped package **`@revikornmann/muka-ui`** — a GitHub dependency tracking `#main` and auto-bumped by CI (see `package.json` and `.github/workflows/update-muka.yml`). The bare `muka-ui` name on npm is an unrelated package; never use it.
 
 ### What this means
 
@@ -30,8 +30,8 @@ Muka UI is consumed as the published, scoped package **`@revikornmann/muka-ui`**
 1. **Stop** — the feature is blocked
 2. **Create a story** in the Muka UI backlog (Linear team Muka UI) for the missing component
 3. **Build the component** in the muka repo (`github.com/revikornmann/muka`) and verify it in Storybook
-4. **Merge to `main`** — CI builds and commits `dist/` on push (see Linear MUK-41)
-5. **Bump the pinned ref** of `@revikornmann/muka-ui` in this repo's `package.json` to the new commit, then `npm install`
+4. **Merge to `main`** — CI builds and commits `dist/` on push (see Linear MUK-41), then dispatches `muka-released` to this repo
+5. **Auto-bump** — the `update-muka` workflow re-resolves `#main` and commits the new lockfile here, which redeploys via Vercel (no manual step). To pull it immediately, run the `Update muka-ui` workflow manually (Actions → Run workflow)
 6. **Continue** with the Grip feature
 
 ### Acceptable styling patterns
@@ -86,16 +86,18 @@ npm run lint     # ESLint check
 
 ### Working with Muka UI
 
-Muka UI is consumed as the pinned GitHub dependency `@revikornmann/muka-ui` (committed `dist/`, no build step at install). To pick up changes made in the muka repo:
+Muka UI is consumed as the GitHub dependency `@revikornmann/muka-ui` tracking `#main` (committed `dist/`, no build step at install). Propagation is automatic:
 
-```bash
-# 1. Merge the change to muka's main (CI commits dist/ — see Linear MUK-41)
-# 2. In this repo, bump the pinned commit in package.json, then:
-npm install
-npm run dev
+```text
+muka main: merge → CI commits dist/ → dispatches `muka-released`
+grip:      update-muka workflow re-resolves #main → commits new package-lock.json → Vercel deploys
 ```
 
-To develop a Muka UI component against Grip locally before it lands, use `npm link` against a local muka checkout temporarily — but the committed dependency must always point at a real `github:revikornmann/muka#<commit>` ref so clean installs (CI / Vercel) succeed.
+`package.json` points at `github:revikornmann/muka#main`; the exact resolved SHA lives in the committed `package-lock.json`, which the workflow advances. This keeps Vercel's `npm ci` reproducible while still following main.
+
+- **Pull a muka change now (don't wait for the next release):** Actions → "Update muka-ui" → Run workflow.
+- **Local dev against an unlanded component:** `npm link` a local muka checkout temporarily — but never commit a `link:`/`file:` spec; the committed dependency must stay a real `github:revikornmann/muka#…` ref so clean installs (CI / Vercel) succeed.
+- **Setup note:** cross-repo dispatch requires the `CONSUMER_DISPATCH_TOKEN` PAT secret in the muka repo (Contents: write on this repo).
 
 ---
 
