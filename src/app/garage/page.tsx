@@ -6,13 +6,13 @@ import {
   PullToRefresh,
   ListItem,
   SwipeActions,
-  FAB,
   Icon,
   Toast,
   Spinner,
+  EmptyState,
 } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
-import { useRequireAuth } from "@/lib/auth";
+import { useAuth } from "@/components/auth/AuthProvider";
 import {
   listMotorcycles,
   archiveMotorcycle,
@@ -36,7 +36,9 @@ function motorcycleLabel(m: Motorcycle): string {
 export default function GaragePage() {
   const t = useTranslations("garage");
   const router = useRouter();
-  const { user, loading } = useRequireAuth();
+  const { user, loading, upgradeToGoogle } = useAuth();
+
+  const isSignedIn = !!user && !user.isAnonymous;
 
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
@@ -65,14 +67,30 @@ export default function GaragePage() {
   }, [user?.id, t]);
 
   useEffect(() => {
-    if (user?.id) reload();
-  }, [user?.id, reload]);
+    if (isSignedIn && user?.id) reload();
+  }, [isSignedIn, user?.id, reload]);
 
-  // Bikes are added by finding them in the catalog (search → model → add to
-  // garage), so the "add" affordance navigates to the search screen.
-  const goToSearch = () => router.push("/");
+  if (loading) return null;
 
-  if (loading || !user) return null;
+  // Garage is gated behind a real (Google) account — anyone without one (no
+  // session, or an anonymous guest session) must sign in first.
+  if (!isSignedIn) {
+    return (
+      <div style={{ paddingTop: "var(--spacing-8)" }}>
+        <EmptyState
+          size="sm"
+          title={t("loginTitle")}
+          description={t("loginDescription")}
+          icon={<Icon name="motorbike" size="lg" />}
+          primaryAction={{
+            label: t("loginButton"),
+            icon: <Icon name="google" />,
+            onClick: () => upgradeToGoogle("/garage"),
+          }}
+        />
+      </div>
+    );
+  }
 
   const isEmpty = !pageLoading && motorcycles.length === 0;
 
@@ -89,7 +107,7 @@ export default function GaragePage() {
           <Spinner />
         </div>
       ) : isEmpty ? (
-        <EmptyGarage onAdd={goToSearch} />
+        <EmptyGarage onSearch={() => router.push("/")} />
       ) : (
         <PullToRefresh onRefresh={reload}>
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -144,8 +162,6 @@ export default function GaragePage() {
           </ul>
         </PullToRefresh>
       )}
-
-      <FAB icon={<Icon name="add" />} onClick={goToSearch} />
 
       <Toast
         variant={toastVariant}
