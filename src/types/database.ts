@@ -10,6 +10,8 @@ export interface MotorcycleRow {
   year: number | null;
   vin: string | null;
   license_plate: string | null;
+  /** @deprecated Dormant legacy column from the removed RDW plate lookup.
+   *  Retained (not dropped) to avoid a destructive migration; unused by the app. */
   rdw_snapshot: Record<string, unknown> | null;
   mileage_km: number | null;
   photo_url: string | null;
@@ -26,6 +28,16 @@ export interface MotorcycleModelRow {
   slug: string;
   normalized_key: string;
   specs: MotorcycleSpecs;
+  /** Provenance of the spec data. NULL = identity-only row, specs not yet filled. */
+  source: "nhtsa" | "car2db" | "wikidata" | "ai" | "manual" | "mixed" | null;
+  /** When specs were populated; NULL = identity-only (skeleton) row pending fill. */
+  specs_filled_at: string | null;
+  /** Lazy spec-generation state. NULL = not requested, then pending → ready | failed. */
+  specs_status: "pending" | "ready" | "failed" | null;
+  /** True when specs come from a sourced/verified provider rather than AI estimation. */
+  verified: boolean;
+  /** Future-proofing for cars/trucks; motorcycles only for now. */
+  vehicle_type: string;
   created_at: string;
   updated_at: string;
 }

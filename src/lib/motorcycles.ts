@@ -32,6 +32,10 @@ function rowToMotorcycleModel(row: MotorcycleModelRow): MotorcycleModel {
     year: row.year,
     slug: row.slug,
     specs: row.specs ?? {},
+    source: row.source ?? null,
+    verified: row.verified ?? false,
+    specsFilledAt: row.specs_filled_at ?? null,
+    specsStatus: row.specs_status ?? null,
   };
 }
 
