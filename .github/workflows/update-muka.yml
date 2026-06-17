@@ -1,0 +1,61 @@
+name: Update muka-ui
+
+# Auto-follows the muka-ui design system. The muka repo
+# (revikornmann/muka) fires a `muka-released` repository_dispatch whenever it
+# commits a new dist/ to its main. This workflow re-resolves
+# `github:revikornmann/muka#main`, and if the resolved commit changed, commits
+# the bumped package.json + package-lock.json to main. That push triggers a
+# Vercel deploy, so production picks up the new design system automatically.
+#
+# `npm ci` (used by Vercel) stays reproducible because the exact resolved SHA is
+# always recorded in the committed package-lock.json.
+
+on:
+  repository_dispatch:
+    types: [muka-released]
+  workflow_dispatch:
+
+concurrency:
+  group: update-muka
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      HUSKY: '0'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Prefer HTTPS for GitHub git fetches
+        # The lockfile resolves muka via git+ssh; the runner has no ssh key, so
+        # rewrite ssh → https for the public repo fetch.
+        run: |
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve muka-ui to latest main
+        run: npm install github:revikornmann/muka#main
+
+      - name: Commit & push if muka-ui changed
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "muka-ui already at latest main — nothing to do."
+            exit 0
+          fi
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add package.json package-lock.json
+          git commit -m "chore(deps): bump @revikornmann/muka-ui to latest main
+
+          Triggered by: ${{ github.event_name }} (source_sha: ${{ github.event.client_payload.source_sha || 'n/a' }})"
+          git push origin HEAD:main
