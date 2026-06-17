@@ -187,7 +187,13 @@ function buildDisplayModel(parts) {
     seen.add(key);
     kept.push(norm);
   }
-  return kept.join(" ");
+  // Car2DB splits some models (model "MT" + serie "-07"); collapse the stray
+  // space before a hyphen ("MT -07" → "MT-07") and any double spaces.
+  return kept
+    .join(" ")
+    .replace(/\s+-/g, "-")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 // ---------- load ----------
