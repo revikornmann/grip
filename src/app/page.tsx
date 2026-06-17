@@ -1,41 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import {
-  SearchInput,
   Card,
   Select,
   ListItem,
-  Icon,
   Toast,
   type SelectOption,
 } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
-import {
-  listMakes,
-  listModels,
-  listYears,
-  findModelId,
-  listRecentModels,
-} from "@/lib/catalog";
-import {
-  getRecentSearches,
-  seedRecentSearches,
-  type RecentSearch,
-} from "@/lib/recentSearches";
+import { listMakes, listModels, listYears, findModelId } from "@/lib/catalog";
+import { useRecentSearches } from "@/lib/useRecentSearches";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 function toOptions(values: string[]): SelectOption[] {
   return values.map((v) => ({ value: v, label: v }));
 }
 
+const overlineStyle: CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--alias-font-brand-family)",
+  fontWeight: 600,
+  fontSize: "var(--font-size-md)",
+  lineHeight: 1,
+  textTransform: "uppercase",
+  color: "var(--color-text-subtle-default)",
+};
+
 export default function SearchPage() {
   const t = useTranslations("search");
   const router = useRouter();
   const { user } = useAuth();
-
-  const [query, setQuery] = useState("");
+  const recent = useRecentSearches(5);
 
   const [makes, setMakes] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
@@ -43,8 +40,6 @@ export default function SearchPage() {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
-
-  const [recent, setRecent] = useState<RecentSearch[]>([]);
 
   const [toastMsg, setToastMsg] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
@@ -62,24 +57,6 @@ export default function SearchPage() {
       .then(setMakes)
       .catch(() => showToast(t("loadFailed")));
   }, [user, t]);
-
-  // Show any stored recent searches immediately (no auth needed for localStorage).
-  useEffect(() => {
-    const stored = getRecentSearches();
-    if (stored.length > 0) setRecent(stored);
-  }, []);
-
-  // First-time fallback: once authenticated, seed from the most recent catalog
-  // entries so the section isn't empty before the user has previewed anything.
-  useEffect(() => {
-    if (!user) return;
-    if (getRecentSearches().length > 0) return;
-    listRecentModels()
-      .then((models) => setRecent(seedRecentSearches(models)))
-      .catch(() => {
-        /* leave the section empty if the catalog can't be read */
-      });
-  }, [user]);
 
   useEffect(() => {
     setModel("");
@@ -122,33 +99,72 @@ export default function SearchPage() {
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "var(--spacing-5)",
+        gap: "var(--spacing-8)",
       }}
     >
-      <SearchInput
-        value={query}
-        onChange={setQuery}
-        placeholder={t("searchPlaceholder")}
-      />
+      {/* Or select your motorcycle */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--spacing-6)",
+        }}
+      >
+        <h2 style={overlineStyle}>{t("selectTitle")}</h2>
+        <Card padding="lg">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--spacing-4)",
+            }}
+          >
+            <Select
+              label={t("make")}
+              placeholder={t("selectPlaceholder")}
+              options={toOptions(makes)}
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              fullWidth
+            />
+            <Select
+              label={t("model")}
+              placeholder={t("selectPlaceholder")}
+              options={toOptions(models)}
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              disabled={!make}
+              fullWidth
+            />
+            <Select
+              label={t("year")}
+              placeholder={t("selectPlaceholder")}
+              options={toOptions(years.map(String))}
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              disabled={!model}
+              fullWidth
+            />
+          </div>
+        </Card>
+      </div>
 
+      {/* Recent searches */}
       {recent.length > 0 && (
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "var(--spacing-3)",
+            gap: "var(--spacing-6)",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "var(--font-size-lg)" }}>
-            {t("recentTitle")}
-          </h2>
+          <h2 style={overlineStyle}>{t("recentTitle")}</h2>
           <Card padding="none">
             {recent.map((r, i) => (
               <ListItem
                 key={r.id}
                 label={`${r.make} ${r.model}`}
                 caption={String(r.year)}
-                leadingIcon={<Icon name="motorbike" />}
                 showChevron
                 showDivider={i < recent.length - 1}
                 onClick={() => router.push(`/model/${r.id}`)}
@@ -157,43 +173,6 @@ export default function SearchPage() {
           </Card>
         </div>
       )}
-
-      <Card padding="lg">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--spacing-4)",
-          }}
-        >
-          <Select
-            label={t("make")}
-            placeholder={t("selectPlaceholder")}
-            options={toOptions(makes)}
-            value={make}
-            onChange={(e) => setMake(e.target.value)}
-            fullWidth
-          />
-          <Select
-            label={t("model")}
-            placeholder={t("selectPlaceholder")}
-            options={toOptions(models)}
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            disabled={!make}
-            fullWidth
-          />
-          <Select
-            label={t("year")}
-            placeholder={t("selectPlaceholder")}
-            options={toOptions(years.map(String))}
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            disabled={!model}
-            fullWidth
-          />
-        </div>
-      </Card>
 
       <Toast
         variant="warning"

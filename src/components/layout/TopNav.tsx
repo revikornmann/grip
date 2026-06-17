@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { TopBar, Button, Icon } from "@revikornmann/muka-ui";
+import { TopBar, Button, Icon, SearchInput } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
+import { useSearch } from "@/components/search/SearchContext";
 
 /**
  * Route configuration for the top-level TopBar (title + optional back button).
@@ -36,6 +37,8 @@ export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations("nav");
+  const tSearch = useTranslations("search");
+  const { openSearch } = useSearch();
   const config = getRouteConfig(pathname);
 
   const leading =
@@ -68,5 +71,38 @@ export function TopNav() {
 
   const title = config.titleKey ? t(config.titleKey) : "";
 
-  return <TopBar title={title} leading={leading} trailing={trailing} />;
+  // The Search screen carries a search field in the control bar. It acts as a
+  // button: tapping it opens the full-screen search overlay (focus / typing
+  // states) rather than editing in place.
+  const controlBar =
+    pathname === "/" ? (
+      <div
+        className="search-trigger"
+        role="button"
+        tabIndex={0}
+        aria-label={tSearch("searchPlaceholder")}
+        onClick={openSearch}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openSearch();
+          }
+        }}
+      >
+        <SearchInput
+          value=""
+          onChange={() => {}}
+          placeholder={tSearch("searchPlaceholder")}
+        />
+      </div>
+    ) : undefined;
+
+  return (
+    <TopBar
+      title={title}
+      leading={leading}
+      trailing={trailing}
+      controlBar={controlBar}
+    />
+  );
 }

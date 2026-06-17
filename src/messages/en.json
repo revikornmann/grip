@@ -49,6 +49,7 @@
   },
   "search": {
     "searchPlaceholder": "Search",
+    "selectTitle": "Or select your motorcycle",
     "recentTitle": "Recent searches",
     "make": "Make",
     "model": "Model",
@@ -83,7 +84,7 @@
     "loginButton": "Sign in with Google",
     "loadFailed": "Couldn't load your garage — pull to refresh",
     "added": "Motorcycle added",
-    "addedToGarage": "{name} added to your garage",
+    "addedToGarage": "{name} parked in your garage",
     "alreadyInGarage": "This {name} was already in your garage",
     "archive": "Archive",
     "archived": "Archived",
@@ -109,7 +110,9 @@
     "kilometersUnit": "km",
     "milesUnit": "mi",
     "addToGarage": "Add to garage",
-    "signInToAdd": "Sign in to add to garage",
+    "loginToSaveTitle": "Save to your garage",
+    "loginToSaveBody": "Log in with Google to save in your garage.",
+    "loginWithGoogle": "Log in with Google",
     "adding": "Adding…",
     "addFailed": "Couldn't add — please try again"
   },
