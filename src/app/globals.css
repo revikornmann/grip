@@ -65,6 +65,58 @@ a {
   pointer-events: auto;
 }
 
+/* ===== Search overlay (focus / typing states) ===== */
+/* Fixed full-screen layer so it covers the floating BottomNav, matching the
+   sub-level View in the design. */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-level3);
+  overflow: hidden;
+}
+
+.search-overlay__bar {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.search-overlay__body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== Search top-bar trigger ===== */
+/* The home Search field is a button that opens the overlay; the inner
+   SearchInput is display-only (no focus, no keyboard) in this state. */
+.search-trigger {
+  width: 100%;
+  cursor: text;
+}
+
+.search-trigger > * {
+  pointer-events: none;
+}
+
+/* ===== Login-to-save dialog ===== */
+/* The button group is horizontal on desktop and stacked on mobile. Muka only
+   stacks dialog action footers on mobile for its auto-detected "no inputs"
+   case, which this dialog doesn't match, so scope the mobile stacking here. */
+@media (max-width: 1023px) {
+  .grip-login-dialog .muka-bottombar--actions .muka-bottombar__content {
+    flex-direction: column;
+  }
+
+  .grip-login-dialog .muka-bottombar--actions .muka-bottombar__content > * {
+    width: 100%;
+  }
+}
+
 /* ===== Settings Dialog ===== */
 .settings-nav-transition {
   height: 100%;

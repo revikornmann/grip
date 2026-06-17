@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Button, Toast } from "@revikornmann/muka-ui";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { BottomBar, Button, Dialog, Toast } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { createMotorcycle, findGarageMotorcycleByModel } from "@/lib/motorcycles";
@@ -15,17 +15,22 @@ function headline(m: MotorcycleModel): string {
   return `${m.make} ${m.model} (${m.year})`.trim();
 }
 
-export default function ModelPreviewPage() {
+function ModelPreviewContent() {
   const t = useTranslations("garage");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const id = params?.id;
+  // Set on the post-login return URL so we can finish the add the user started.
+  const wantsAdd = searchParams.get("add") === "1";
 
   const { user, upgradeToGoogle } = useAuth();
   const isSignedIn = !!user && !user.isAnonymous;
   const { model, loading, generating, errorCode } = useModelSpecs(id);
 
   const [saving, setSaving] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
 
@@ -47,14 +52,9 @@ export default function ModelPreviewPage() {
   const pageError =
     errorCode === "notFound" || errorCode === "loadFailed" ? t(errorCode) : null;
 
-  const handleAdd = async () => {
-    if (!model) return;
-    // Saving to the garage needs a real account — guests sign in first and
-    // land back on this page to finish adding.
-    if (!isSignedIn || !user) {
-      upgradeToGoogle(`/model/${id}`);
-      return;
-    }
+  // Add the model to the garage. Caller guarantees a real (non-guest) session.
+  const addToGarage = useCallback(async () => {
+    if (!model || !user) return;
     setSaving(true);
     try {
       // A model can live in the garage only once. If it is already there, go to
@@ -75,24 +75,47 @@ export default function ModelPreviewPage() {
       setToastOpen(true);
       setSaving(false);
     }
+  }, [model, user, router, t]);
+
+  const handleAdd = () => {
+    if (!model) return;
+    // Guests must sign in first — prompt with the login dialog rather than
+    // redirecting straight to Google.
+    if (!isSignedIn || !user) {
+      setLoginOpen(true);
+      return;
+    }
+    addToGarage();
   };
+
+  const handleLogin = () => {
+    // Come back to this model with the add flag so the bike lands in the garage
+    // automatically once the Google session is established.
+    upgradeToGoogle(`/model/${id}?add=1`);
+  };
+
+  // Finish the add the user kicked off before logging in: once the Google
+  // session and the model are both ready, park it and head to the garage.
+  const autoAdded = useRef(false);
+  useEffect(() => {
+    if (!wantsAdd || !isSignedIn || !user || !model || saving) return;
+    if (autoAdded.current) return;
+    autoAdded.current = true;
+    addToGarage();
+  }, [wantsAdd, isSignedIn, user, model, saving, addToGarage]);
 
   const footer =
     model && !loading && !pageError ? (
-      <div style={{ padding: "var(--spacing-4)" }}>
+      <BottomBar variant="actions" floating>
         <Button
           variant="primary"
           fullWidth
           onClick={handleAdd}
           disabled={saving}
         >
-          {saving
-            ? t("adding")
-            : isSignedIn
-              ? t("addToGarage")
-              : t("signInToAdd")}
+          {saving ? t("adding") : t("addToGarage")}
         </Button>
-      </div>
+      </BottomBar>
     ) : undefined;
 
   return (
@@ -106,6 +129,31 @@ export default function ModelPreviewPage() {
         footer={footer}
         onBack={() => router.push("/")}
       />
+
+      <Dialog
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        modal={false}
+        size="sm"
+        mobileHeight="half"
+        className="grip-login-dialog"
+        title={t("loginToSaveTitle")}
+        footerActions={
+          <>
+            <Button variant="primary" onClick={handleLogin}>
+              {t("loginWithGoogle")}
+            </Button>
+            <Button variant="tertiary" onClick={() => setLoginOpen(false)}>
+              {tCommon("cancel")}
+            </Button>
+          </>
+        }
+      >
+        <p style={{ margin: 0, color: "var(--color-text-subtle-default)" }}>
+          {t("loginToSaveBody")}
+        </p>
+      </Dialog>
+
       <Toast
         variant="warning"
         open={toastOpen}
@@ -115,5 +163,13 @@ export default function ModelPreviewPage() {
         {toastMsg}
       </Toast>
     </>
+  );
+}
+
+export default function ModelPreviewPage() {
+  return (
+    <Suspense>
+      <ModelPreviewContent />
+    </Suspense>
   );
 }

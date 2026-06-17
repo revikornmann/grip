@@ -13,7 +13,7 @@ export interface RecentSearch {
 }
 
 const KEY = "recent-searches";
-const MAX = 8;
+const MAX = 10;
 
 export function getRecentSearches(): RecentSearch[] {
   return storage.get<RecentSearch[]>(KEY) ?? [];

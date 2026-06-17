@@ -49,6 +49,7 @@
   },
   "search": {
     "searchPlaceholder": "Zoeken",
+    "selectTitle": "Of selecteer je motor",
     "recentTitle": "Recente zoekopdrachten",
     "make": "Merk",
     "model": "Model",
@@ -83,7 +84,7 @@
     "loginButton": "Inloggen met Google",
     "loadFailed": "Garage laden mislukt — trek omlaag om opnieuw te proberen",
     "added": "Motor toegevoegd",
-    "addedToGarage": "{name} toegevoegd aan je garage",
+    "addedToGarage": "{name} geparkeerd in je garage",
     "alreadyInGarage": "Deze {name} stond al in je garage",
     "archive": "Archiveren",
     "archived": "Gearchiveerd",
@@ -109,7 +110,9 @@
     "kilometersUnit": "km",
     "milesUnit": "mi",
     "addToGarage": "Toevoegen aan garage",
-    "signInToAdd": "Inloggen om toe te voegen",
+    "loginToSaveTitle": "Opslaan in je garage",
+    "loginToSaveBody": "Log in met Google om op te slaan in je garage.",
+    "loginWithGoogle": "Inloggen met Google",
     "adding": "Toevoegen…",
     "addFailed": "Toevoegen mislukt — probeer het opnieuw"
   },
