@@ -129,6 +129,8 @@ interface Props {
   mileageKm?: number | null;
   specs: MotorcycleSpecs;
   loading?: boolean;
+  /** Specs are being generated in the background — show a loading empty state. */
+  generating?: boolean;
   error?: string | null;
   /** Sticky footer slot, e.g. an "Add to garage" button on the catalog preview. */
   footer?: ReactNode;
@@ -141,6 +143,7 @@ export function MotorcycleDetail({
   mileageKm,
   specs,
   loading = false,
+  generating = false,
   error = null,
   footer,
   onBack,
@@ -160,6 +163,16 @@ export function MotorcycleDetail({
   const categories = useMemo(
     () =>
       SPEC_CATEGORY_ORDER.filter((c) => (displaySpecs[c]?.length ?? 0) > 0),
+    [displaySpecs],
+  );
+
+  // Disclose AI-estimated specs: true when any row was generated (source "ai")
+  // rather than sourced from a verified provider.
+  const aiGenerated = useMemo(
+    () =>
+      Object.values(displaySpecs).some((rows) =>
+        rows?.some((r) => r.source === "ai"),
+      ),
     [displaySpecs],
   );
 
@@ -344,11 +357,50 @@ export function MotorcycleDetail({
           </div>
 
           {categories.length === 0 ? (
-            <div style={{ padding: "0 var(--spacing-6) var(--spacing-6)" }}>
-              <Alert variant="info">{t("noSpecs")}</Alert>
-            </div>
+            generating ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "var(--spacing-4)",
+                  textAlign: "center",
+                  padding: "var(--spacing-8) var(--spacing-6)",
+                }}
+              >
+                <Spinner />
+                <p style={{ margin: 0, fontWeight: "var(--font-weight-semibold)" }}>
+                  {t("generatingSpecs")}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "var(--color-text-subtle-default)",
+                    fontSize: "var(--font-size-sm)",
+                    maxWidth: "360px",
+                  }}
+                >
+                  {t("generatingSpecsHint")}
+                </p>
+              </div>
+            ) : (
+              <div style={{ padding: "0 var(--spacing-6) var(--spacing-6)" }}>
+                <Alert variant="info">{t("noSpecs")}</Alert>
+              </div>
+            )
           ) : (
             <>
+              {aiGenerated && (
+                <div
+                  style={{
+                    padding: "0 var(--spacing-6) var(--spacing-4)",
+                    maxWidth: "720px",
+                    margin: "0 auto",
+                  }}
+                >
+                  <Alert variant="info">{t("aiSpecsNotice")}</Alert>
+                </div>
+              )}
               {/* Specifications heading + category tiles (anchor links) */}
               <div
                 style={{

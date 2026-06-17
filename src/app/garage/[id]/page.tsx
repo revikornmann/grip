@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
-import { getMotorcycle, getMotorcycleModel } from "@/lib/motorcycles";
+import { getMotorcycle } from "@/lib/motorcycles";
+import { useModelSpecs } from "@/lib/useModelSpecs";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
-import type { Motorcycle, MotorcycleSpecs } from "@/types/motorcycle";
+import type { Motorcycle } from "@/types/motorcycle";
 
 function headline(m: Motorcycle): string {
   const base = `${m.make} ${m.model}`.trim();
@@ -22,7 +23,6 @@ export default function MotorcycleDetailPage() {
   const { user, loading: authLoading } = useRequireAuth();
 
   const [motorcycle, setMotorcycle] = useState<Motorcycle | null>(null);
-  const [specs, setSpecs] = useState<MotorcycleSpecs>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,10 +41,6 @@ export default function MotorcycleDetailPage() {
           return;
         }
         setMotorcycle(m);
-        if (m.modelId) {
-          const mm = await getMotorcycleModel(m.modelId);
-          if (!cancelled && mm) setSpecs(mm.specs);
-        }
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : t("loadFailed"));
@@ -59,6 +55,9 @@ export default function MotorcycleDetailPage() {
     };
   }, [user?.id, id, t]);
 
+  // Specs (and on-demand generation) come from the linked catalogue model.
+  const { model, generating } = useModelSpecs(motorcycle?.modelId ?? undefined);
+
   if (authLoading || !user) return null;
 
   return (
@@ -66,8 +65,9 @@ export default function MotorcycleDetailPage() {
       title={motorcycle ? headline(motorcycle) : ""}
       subtitle={motorcycle?.nickname?.trim() || null}
       mileageKm={motorcycle?.mileageKm ?? null}
-      specs={specs}
+      specs={model?.specs ?? {}}
       loading={loading}
+      generating={generating}
       error={error}
       onBack={() => router.push("/garage")}
     />

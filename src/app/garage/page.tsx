@@ -15,18 +15,11 @@ import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
 import {
   listMotorcycles,
-  createMotorcycle,
   archiveMotorcycle,
   deleteMotorcycle,
 } from "@/lib/motorcycles";
-import { storage } from "@/lib/storage";
 import type { Motorcycle } from "@/types/motorcycle";
 import { EmptyGarage } from "@/components/garage/EmptyGarage";
-import { AddMotorcycleDialog } from "@/components/garage/AddMotorcycleDialog";
-
-// Demo seed: drop a BMW R 1100GS (1998) into a brand-new, empty garage once per
-// browser. The flag keeps it from reappearing after the user deletes it.
-const DEMO_SEED_KEY = "demo-seeded";
 
 function motorcycleCaption(m: Motorcycle): string | undefined {
   const parts: string[] = [];
@@ -47,7 +40,6 @@ export default function GaragePage() {
 
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastVariant, setToastVariant] = useState<"success" | "warning">(
     "success",
@@ -63,19 +55,7 @@ export default function GaragePage() {
   const reload = useCallback(async () => {
     if (!user?.id) return;
     try {
-      let data = await listMotorcycles(user.id);
-      if (data.length === 0 && !storage.get<boolean>(DEMO_SEED_KEY)) {
-        try {
-          await createMotorcycle(
-            { make: "BMW", model: "R 1100GS", year: 1998, mileageKm: 64000 },
-            user.id,
-          );
-          storage.set(DEMO_SEED_KEY, true);
-          data = await listMotorcycles(user.id);
-        } catch {
-          // Seeding is best-effort — never block the garage on it.
-        }
-      }
+      const data = await listMotorcycles(user.id);
       setMotorcycles(data);
     } catch {
       showToast(t("loadFailed"), "warning");
@@ -87,6 +67,10 @@ export default function GaragePage() {
   useEffect(() => {
     if (user?.id) reload();
   }, [user?.id, reload]);
+
+  // Bikes are added by finding them in the catalog (search → model → add to
+  // garage), so the "add" affordance navigates to the search screen.
+  const goToSearch = () => router.push("/");
 
   if (loading || !user) return null;
 
@@ -105,7 +89,7 @@ export default function GaragePage() {
           <Spinner />
         </div>
       ) : isEmpty ? (
-        <EmptyGarage onAdd={() => setSheetOpen(true)} />
+        <EmptyGarage onAdd={goToSearch} />
       ) : (
         <PullToRefresh onRefresh={reload}>
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -161,21 +145,7 @@ export default function GaragePage() {
         </PullToRefresh>
       )}
 
-      <FAB
-        icon={<Icon name="add" />}
-        onClick={() => setSheetOpen(true)}
-      />
-
-      <AddMotorcycleDialog
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        userId={user.id}
-        onCreated={() => {
-          setSheetOpen(false);
-          reload();
-          showToast(t("added"));
-        }}
-      />
+      <FAB icon={<Icon name="add" />} onClick={goToSearch} />
 
       <Toast
         variant={toastVariant}

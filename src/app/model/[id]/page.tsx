@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Button, Toast } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/auth";
-import { getMotorcycleModel, createMotorcycle } from "@/lib/motorcycles";
+import { createMotorcycle } from "@/lib/motorcycles";
+import { useModelSpecs } from "@/lib/useModelSpecs";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
 import type { MotorcycleModel } from "@/types/motorcycle";
@@ -21,47 +22,30 @@ export default function ModelPreviewPage() {
   const id = params?.id;
 
   const { user, loading: authLoading } = useRequireAuth();
+  const { model, loading, generating, errorCode } = useModelSpecs(id);
 
-  const [model, setModel] = useState<MotorcycleModel | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
 
+  // Record the bike in recent searches once it has loaded (id/make/model/year
+  // are stable across spec-generation polling, so this runs once per model).
   useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const mm = await getMotorcycleModel(id);
-        if (cancelled) return;
-        if (!mm) setError(t("notFound"));
-        else {
-          setModel(mm);
-          addRecentSearch({
-            id: mm.id,
-            make: mm.make,
-            model: mm.model,
-            year: mm.year,
-          });
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : t("loadFailed"));
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [id, t]);
+    if (!model) return;
+    addRecentSearch({
+      id: model.id,
+      make: model.make,
+      model: model.model,
+      year: model.year,
+    });
+  }, [model?.id, model?.make, model?.model, model?.year]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (authLoading || !user) return null;
+
+  // notFound / loadFailed are page-level; a failed spec generation is not — the
+  // bike still renders (it just falls back to the "no specs" state).
+  const pageError =
+    errorCode === "notFound" || errorCode === "loadFailed" ? t(errorCode) : null;
 
   const handleAdd = async () => {
     if (!model || !user) return;
@@ -80,7 +64,7 @@ export default function ModelPreviewPage() {
   };
 
   const footer =
-    model && !loading && !error ? (
+    model && !loading && !pageError ? (
       <div style={{ padding: "var(--spacing-4)" }}>
         <Button
           variant="primary"
@@ -99,7 +83,8 @@ export default function ModelPreviewPage() {
         title={model ? headline(model) : ""}
         specs={model?.specs ?? {}}
         loading={loading}
-        error={error}
+        generating={generating}
+        error={pageError}
         footer={footer}
         onBack={() => router.push("/")}
       />

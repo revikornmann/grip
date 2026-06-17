@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   SearchInput,
   Card,
-  Input,
-  Button,
   Select,
   ListItem,
   Icon,
@@ -21,13 +19,11 @@ import {
   findModelId,
   listRecentModels,
 } from "@/lib/catalog";
-import { findMotorcycleModel } from "@/lib/motorcycles";
 import {
   getRecentSearches,
   seedRecentSearches,
   type RecentSearch,
 } from "@/lib/recentSearches";
-import { lookupVehicle, RDWError } from "@/lib/rdw";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 function toOptions(values: string[]): SelectOption[] {
@@ -40,8 +36,6 @@ export default function SearchPage() {
   const { user } = useAuth();
 
   const [query, setQuery] = useState("");
-  const [plate, setPlate] = useState("");
-  const [plateLoading, setPlateLoading] = useState(false);
 
   const [makes, setMakes] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
@@ -123,34 +117,6 @@ export default function SearchPage() {
     };
   }, [make, model, year, router, t]);
 
-  const handlePlateSearch = async () => {
-    if (!plate.trim()) {
-      showToast(t("enterPlate"));
-      return;
-    }
-    setPlateLoading(true);
-    try {
-      const vehicle = await lookupVehicle(plate);
-      const regYear = vehicle.firstRegistrationDate
-        ? Number(vehicle.firstRegistrationDate.slice(0, 4))
-        : null;
-      const match = await findMotorcycleModel(
-        vehicle.make,
-        vehicle.model,
-        regYear,
-      );
-      if (match) {
-        router.push(`/model/${match.id}`);
-      } else {
-        showToast(t("noMotorcycleData"));
-      }
-    } catch (e) {
-      showToast(e instanceof RDWError ? e.message : t("loadFailed"));
-    } finally {
-      setPlateLoading(false);
-    }
-  };
-
   return (
     <div
       style={{
@@ -191,58 +157,6 @@ export default function SearchPage() {
           </Card>
         </div>
       )}
-
-      <Card padding="lg">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--spacing-4)",
-          }}
-        >
-          <h2 style={{ margin: 0, fontSize: "var(--font-size-lg)" }}>
-            {t("plateTitle")}
-          </h2>
-          <div
-            style={{
-              display: "flex",
-              gap: "var(--spacing-3)",
-              alignItems: "flex-end",
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <Input
-                value={plate}
-                onChange={(e) => setPlate(e.target.value.toUpperCase())}
-                placeholder={t("platePlaceholder")}
-                aria-label={t("plateLabel")}
-                fullWidth
-              />
-            </div>
-            <Button
-              variant="primary"
-              onClick={handlePlateSearch}
-              disabled={plateLoading}
-            >
-              {plateLoading ? t("searching") : t("plateSearch")}
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      <p
-        style={{
-          margin: 0,
-          padding: "0 var(--spacing-1)",
-          fontSize: "var(--font-size-xs)",
-          fontWeight: "var(--font-weight-semibold)",
-          letterSpacing: "0.05em",
-          textTransform: "uppercase",
-          color: "var(--color-text-subtle-default)",
-        }}
-      >
-        {t("orSelect")}
-      </p>
 
       <Card padding="lg">
         <div
