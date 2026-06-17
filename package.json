@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@revikornmann/muka-ui": "github:revikornmann/muka#5376a31c1ae08d4f77a0657c9e3e57fe1b74d1c8",
+    "@revikornmann/muka-ui": "github:revikornmann/muka#main",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "next": "16.1.6",
