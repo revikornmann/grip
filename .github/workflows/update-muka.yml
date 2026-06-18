@@ -58,4 +58,18 @@ jobs:
           git commit -m "chore(deps): bump @revikornmann/muka-ui to latest main
 
           Triggered by: ${{ github.event_name }} (source_sha: ${{ github.event.client_payload.source_sha || 'n/a' }})"
-          git push origin HEAD:main
+          # Safety net against push races: if main advanced between checkout
+          # and push (e.g. a PR merged concurrently), rebase the bump onto it
+          # and retry. The bump only touches package.json/lock, so a rebase is
+          # conflict-safe in practice.
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push attempt ${attempt} rejected - fetching and rebasing onto origin/main."
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; exit 1; }
+          done
+          echo "::error::Failed to push after 5 attempts." >&2
+          exit 1
