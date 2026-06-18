@@ -5,27 +5,30 @@ import { createClient } from "@/lib/supabase";
  * Search start screen to populate the Make / Model / Year selects.
  */
 
+/**
+ * Distinct makes / models are computed server-side via RPCs rather than by
+ * selecting every row and deduping in the client. Supabase caps responses at
+ * 1000 rows, so the old `select(...).order("make")` approach returned only the
+ * first ~10 makes (all starting with "A") and truncated model lists for large
+ * makes (Honda alone has ~3900 rows). The `list_motorcycle_*` functions return
+ * already-distinct, ordered values.
+ */
 export async function listMakes(): Promise<string[]> {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from("motorcycle_models")
-    .select("make")
-    .order("make", { ascending: true });
+  const { data, error } = await supabase.rpc("list_motorcycle_makes");
 
   if (error) throw new Error(error.message);
-  return uniqueStrings((data ?? []).map((r) => r.make as string));
+  return (data ?? []) as string[];
 }
 
 export async function listModels(make: string): Promise<string[]> {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from("motorcycle_models")
-    .select("model")
-    .eq("make", make)
-    .order("model", { ascending: true });
+  const { data, error } = await supabase.rpc("list_motorcycle_models", {
+    p_make: make,
+  });
 
   if (error) throw new Error(error.message);
-  return uniqueStrings((data ?? []).map((r) => r.model as string));
+  return (data ?? []) as string[];
 }
 
 export async function listYears(
@@ -142,8 +145,4 @@ export async function findModelId(
 
   if (error) throw new Error(error.message);
   return data ? (data.id as string) : null;
-}
-
-function uniqueStrings(values: string[]): string[] {
-  return Array.from(new Set(values));
 }
