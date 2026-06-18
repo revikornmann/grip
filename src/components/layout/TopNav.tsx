@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { TopBar, Button, Icon, SearchInput } from "@revikornmann/muka-ui";
+import {
+  TopBar,
+  ControlBar,
+  Button,
+  Icon,
+  SearchInput,
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useSearch } from "@/components/search/SearchContext";
 
@@ -76,25 +82,27 @@ export function TopNav() {
   // states) rather than editing in place.
   const controlBar =
     pathname === "/" ? (
-      <div
-        className="search-trigger"
-        role="button"
-        tabIndex={0}
-        aria-label={tSearch("searchPlaceholder")}
-        onClick={openSearch}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openSearch();
-          }
-        }}
-      >
-        <SearchInput
-          value=""
-          onChange={() => {}}
-          placeholder={tSearch("searchPlaceholder")}
-        />
-      </div>
+      <ControlBar>
+        <div
+          className="search-trigger"
+          role="button"
+          tabIndex={0}
+          aria-label={tSearch("searchPlaceholder")}
+          onClick={openSearch}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openSearch();
+            }
+          }}
+        >
+          <SearchInput
+            value=""
+            onChange={() => {}}
+            placeholder={tSearch("searchPlaceholder")}
+          />
+        </div>
+      </ControlBar>
     ) : undefined;
 
   return (

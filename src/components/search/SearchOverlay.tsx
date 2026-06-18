@@ -4,6 +4,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import {
   TopBar,
+  ControlBar,
   SearchInput,
   Button,
   Icon,
@@ -111,16 +112,18 @@ export function SearchOverlay({ onClose }: Props) {
           title={tNav("search")}
           leading={back}
           controlBar={
-            <SearchInput
-              value={query}
-              onChange={setQuery}
-              placeholder={t("searchPlaceholder")}
-              autoFocus
-              loading={loading}
-              onSubmit={() => {
-                if (results[0]) openModel(results[0].id);
-              }}
-            />
+            <ControlBar>
+              <SearchInput
+                value={query}
+                onChange={setQuery}
+                placeholder={t("searchPlaceholder")}
+                autoFocus
+                loading={loading}
+                onSubmit={() => {
+                  if (results[0]) openModel(results[0].id);
+                }}
+              />
+            </ControlBar>
           }
         />
       </div>
