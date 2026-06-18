@@ -2,13 +2,21 @@ name: Update muka-ui
 
 # Auto-follows the muka-ui design system. The muka repo
 # (revikornmann/muka) fires a `muka-released` repository_dispatch whenever it
-# commits a new dist/ to its main. This workflow re-resolves
-# `github:revikornmann/muka#main`, and if the resolved commit changed, commits
-# the bumped package.json + package-lock.json to main. That push triggers a
-# Vercel deploy, so production picks up the new design system automatically.
+# commits a new dist/ to its main. This workflow resolves muka's main to its
+# exact commit SHA and pins it into BOTH package.json and package-lock.json; if
+# the SHA changed it commits the bump to main, which triggers a Vercel deploy so
+# production picks up the new design system automatically.
+#
+# Why pin the exact SHA in package.json (not the moving `#main` ref): the
+# dependency stays @revikornmann/muka-ui@0.1.0 across every release, so a spec of
+# `#main` looks identical from release to release even as the resolved SHA
+# advances. That lets Vercel's build cache (npm git-dep cache + Next.js webpack
+# cache) keep serving the previously-compiled muka — production renders stale
+# components despite a healthy bump. Writing the SHA into package.json changes
+# the dependency's identity on every release, reliably busting those caches.
 #
 # `npm ci` (used by Vercel) stays reproducible because the exact resolved SHA is
-# always recorded in the committed package-lock.json.
+# always recorded in both package.json and the committed package-lock.json.
 
 on:
   repository_dispatch:
@@ -43,8 +51,14 @@ jobs:
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
           git config --global url."https://github.com/".insteadOf "git@github.com:"
 
-      - name: Re-resolve muka-ui to latest main
-        run: npm install github:revikornmann/muka#main
+      - name: Re-resolve muka-ui to latest main and pin exact SHA
+        # Resolve main → commit SHA and install by that SHA, so package.json is
+        # pinned to `#<sha>` (not the moving `#main`). See the header comment for
+        # why this matters for Vercel cache invalidation.
+        run: |
+          SHA="$(git ls-remote https://github.com/revikornmann/muka.git refs/heads/main | cut -f1)"
+          echo "Latest muka main: $SHA"
+          npm install "github:revikornmann/muka#$SHA"
 
       - name: Commit & push if muka-ui changed
         run: |
