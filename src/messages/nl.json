@@ -17,6 +17,7 @@
     "title": "Instellingen & info",
     "display": "WEERGAVE",
     "language": "Taal",
+    "region": "Regio",
     "units": "Eenheden",
     "unitsMetric": "Metrisch",
     "unitsImperial": "Imperiaal",
@@ -48,14 +49,28 @@
     "garageButton": "Naar mijn garage"
   },
   "search": {
-    "searchPlaceholder": "Zoeken",
+    "searchPlaceholder": "Zoek op merk, model of jaar",
     "selectTitle": "Of selecteer je motor",
-    "recentTitle": "Recente zoekopdrachten",
+    "recentTitle": "Recent bekeken",
+    "popularBrandsTitle": "Populaire merken in {region}",
+    "browseAllTitle": "Alle motoren",
+    "popularModelsTitle": "Populaire modellen",
+    "allModelsTitle": "Alle modellen",
     "make": "Merk",
     "model": "Model",
     "year": "Jaar",
     "selectPlaceholder": "Selecteer…",
     "loadFailed": "Laden mislukt — probeer het opnieuw"
+  },
+  "region": {
+    "europe": "Europa",
+    "china": "China",
+    "india": "India",
+    "indonesia": "Indonesië",
+    "japan": "Japan",
+    "unitedStates": "Verenigde Staten",
+    "vietnam": "Vietnam",
+    "latinAmerica": "Latijns-Amerika"
   },
   "assistant": {
     "comingSoonTitle": "Assistent komt eraan",

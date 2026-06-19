@@ -14,6 +14,7 @@ import {
 } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { searchModels } from "@/lib/catalog";
+import { prettifyMake } from "@/lib/makes";
 import { useRecentSearches } from "@/lib/useRecentSearches";
 
 interface Props {
@@ -145,7 +146,7 @@ export function SearchOverlay({ onClose }: Props) {
                       {recent.map((r, i) => (
                         <ListItem
                           key={r.id}
-                          label={`${r.make} ${r.model}`}
+                          label={`${prettifyMake(r.make)} ${r.model}`}
                           caption={String(r.year)}
                           showChevron
                           showDivider={i < recent.length - 1}
@@ -160,7 +161,7 @@ export function SearchOverlay({ onClose }: Props) {
                     {results.map((r) => (
                       <ListItem
                         key={`${r.make}-${r.model}`}
-                        label={`${r.make} ${r.model}`}
+                        label={`${prettifyMake(r.make)} ${r.model}`}
                         onClick={() => openModel(r.id)}
                       />
                     ))}

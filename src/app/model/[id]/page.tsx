@@ -9,10 +9,11 @@ import { createMotorcycle, findGarageMotorcycleByModel } from "@/lib/motorcycles
 import { useModelSpecs } from "@/lib/useModelSpecs";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
+import { prettifyMake } from "@/lib/makes";
 import type { MotorcycleModel } from "@/types/motorcycle";
 
 function headline(m: MotorcycleModel): string {
-  return `${m.make} ${m.model} (${m.year})`.trim();
+  return `${prettifyMake(m.make)} ${m.model} (${m.year})`.trim();
 }
 
 function ModelPreviewContent() {

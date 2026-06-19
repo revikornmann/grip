@@ -26,6 +26,50 @@ a {
   text-decoration: none;
 }
 
+/* ===== View transitions (top ⇄ sub slide) ===== */
+/* Each navigation remounts a .app-transition wrapper (keyed on pathname), so the
+   enter-animation replays. Direction is set by the shell: forward slides in from
+   the right (going deeper), back slides in from the left (going up). The wrapper
+   is a full-screen layer; body's overflow-x:hidden clips the off-screen start. */
+.app-transition {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+}
+
+.app-transition--forward {
+  animation: app-slide-in-right 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.app-transition--back {
+  animation: app-slide-in-left 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes app-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes app-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-transition--forward,
+  .app-transition--back {
+    animation: none;
+  }
+}
+
 /* ===== App Layout (Figma View pattern) ===== */
 .app-layout {
   display: flex;

@@ -8,8 +8,10 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLocale } from "@/components/LocaleProvider";
 import { useUnits } from "@/components/UnitsProvider";
+import { useRegion } from "@/components/RegionProvider";
 import { localeLabels } from "@/i18n/config";
 import { unitsLabelKeys } from "@/lib/units";
+import { regionLabelKeys } from "@/lib/regions";
 import type { Theme } from "@/lib/theme";
 
 const THEME_MODE_LABELS: Record<Theme, string> = {
@@ -68,11 +70,13 @@ function AppIcon() {
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
+  const tRegion = useTranslations("region");
   const router = useRouter();
   const { user, upgradeToGoogle, signOut } = useAuth();
   const { theme } = useTheme();
   const { locale } = useLocale();
   const { units } = useUnits();
+  const { region } = useRegion();
 
   const isSignedIn = !!user && !user.isAnonymous;
 
@@ -93,6 +97,13 @@ export default function SettingsPage() {
           leadingIcon={<Icon name="translate" size="md" />}
           showChevron
           onClick={() => router.push("/settings/language")}
+        />
+        <ListItem
+          label={t("region")}
+          caption={tRegion(regionLabelKeys[region])}
+          leadingIcon={<Icon name="road-map" size="md" />}
+          showChevron
+          onClick={() => router.push("/settings/region")}
         />
         <ListItem
           label={t("units")}
