@@ -41,3 +41,17 @@ export interface MotorcycleModelRow {
   created_at: string;
   updated_at: string;
 }
+
+/** Per-locale translation of a model's canonical (English) specs. The English
+ *  form lives in `motorcycle_models.specs`; rows here mirror it with only the
+ *  worded fields (label/group/hint) translated — values and `source` preserved. */
+export interface MotorcycleModelSpecTranslationRow {
+  model_id: string;
+  locale: string;
+  /** Translated specs; NULL while a translation is pending or has failed. */
+  specs: MotorcycleSpecs | null;
+  /** Lazy translation state: pending → ready | failed. */
+  status: "pending" | "ready" | "failed";
+  created_at: string;
+  updated_at: string;
+}

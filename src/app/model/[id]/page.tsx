@@ -28,7 +28,7 @@ function ModelPreviewContent() {
 
   const { user, upgradeToGoogle } = useAuth();
   const isSignedIn = !!user && !user.isAnonymous;
-  const { model, loading, generating, errorCode } = useModelSpecs(id);
+  const { model, specs, loading, generating, errorCode } = useModelSpecs(id);
 
   const [saving, setSaving] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -123,7 +123,7 @@ function ModelPreviewContent() {
     <>
       <MotorcycleDetail
         title={model ? headline(model) : ""}
-        specs={model?.specs ?? {}}
+        specs={specs}
         loading={loading}
         generating={generating}
         error={pageError}
