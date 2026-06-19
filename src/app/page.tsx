@@ -13,9 +13,17 @@ import { useTranslations } from "next-intl";
 import { listMakes, listModels, listYears, findModelId } from "@/lib/catalog";
 import { useRecentSearches } from "@/lib/useRecentSearches";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useRegion } from "@/components/RegionProvider";
+import { popularBrandsForRegion, regionLabelKeys } from "@/lib/regions";
+import { prettifyMake } from "@/lib/makes";
 
 function toOptions(values: string[]): SelectOption[] {
   return values.map((v) => ({ value: v, label: v }));
+}
+
+/** Make options keep the raw catalog value but show a prettified label. */
+function toMakeOptions(values: string[]): SelectOption[] {
+  return values.map((v) => ({ value: v, label: prettifyMake(v) }));
 }
 
 const overlineStyle: CSSProperties = {
@@ -30,8 +38,10 @@ const overlineStyle: CSSProperties = {
 
 export default function SearchPage() {
   const t = useTranslations("search");
+  const tRegion = useTranslations("region");
   const router = useRouter();
   const { user } = useAuth();
+  const { region } = useRegion();
   const recent = useRecentSearches(5);
 
   const [makes, setMakes] = useState<string[]>([]);
@@ -94,6 +104,8 @@ export default function SearchPage() {
     };
   }, [make, model, year, router, t]);
 
+  const popularBrands = popularBrandsForRegion(region, makes);
+
   return (
     <div
       style={{
@@ -102,7 +114,60 @@ export default function SearchPage() {
         gap: "var(--spacing-8)",
       }}
     >
-      {/* Or select your motorcycle */}
+      {/* Recently viewed */}
+      {recent.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--spacing-6)",
+          }}
+        >
+          <h2 style={overlineStyle}>{t("recentTitle")}</h2>
+          <Card padding="none">
+            {recent.map((r, i) => (
+              <ListItem
+                key={r.id}
+                label={`${prettifyMake(r.make)} ${r.model}`}
+                caption={String(r.year)}
+                showChevron
+                showDivider={i < recent.length - 1}
+                onClick={() => router.push(`/model/${r.id}`)}
+              />
+            ))}
+          </Card>
+        </div>
+      )}
+
+      {/* Popular brands in {region} */}
+      {popularBrands.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--spacing-6)",
+          }}
+        >
+          <h2 style={overlineStyle}>
+            {t("popularBrandsTitle", { region: tRegion(regionLabelKeys[region]) })}
+          </h2>
+          <Card padding="none">
+            {popularBrands.map((brand, i) => (
+              <ListItem
+                key={brand}
+                label={prettifyMake(brand)}
+                showChevron
+                showDivider={i < popularBrands.length - 1}
+                onClick={() =>
+                  router.push(`/brand?make=${encodeURIComponent(brand)}`)
+                }
+              />
+            ))}
+          </Card>
+        </div>
+      )}
+
+      {/* Browse all motorcycles */}
       <div
         style={{
           display: "flex",
@@ -110,7 +175,7 @@ export default function SearchPage() {
           gap: "var(--spacing-6)",
         }}
       >
-        <h2 style={overlineStyle}>{t("selectTitle")}</h2>
+        <h2 style={overlineStyle}>{t("browseAllTitle")}</h2>
         <Card padding="lg">
           <div
             style={{
@@ -122,7 +187,7 @@ export default function SearchPage() {
             <Select
               label={t("make")}
               placeholder={t("selectPlaceholder")}
-              options={toOptions(makes)}
+              options={toMakeOptions(makes)}
               value={make}
               onChange={(e) => setMake(e.target.value)}
               fullWidth
@@ -148,31 +213,6 @@ export default function SearchPage() {
           </div>
         </Card>
       </div>
-
-      {/* Recent searches */}
-      {recent.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--spacing-6)",
-          }}
-        >
-          <h2 style={overlineStyle}>{t("recentTitle")}</h2>
-          <Card padding="none">
-            {recent.map((r, i) => (
-              <ListItem
-                key={r.id}
-                label={`${r.make} ${r.model}`}
-                caption={String(r.year)}
-                showChevron
-                showDivider={i < recent.length - 1}
-                onClick={() => router.push(`/model/${r.id}`)}
-              />
-            ))}
-          </Card>
-        </div>
-      )}
 
       <Toast
         variant="warning"

@@ -8,10 +8,11 @@ import { useRequireAuth } from "@/lib/auth";
 import { getMotorcycle, deleteMotorcycle } from "@/lib/motorcycles";
 import { useModelSpecs } from "@/lib/useModelSpecs";
 import { MotorcycleDetail } from "@/components/garage/MotorcycleDetail";
+import { prettifyMake } from "@/lib/makes";
 import type { Motorcycle } from "@/types/motorcycle";
 
 function headline(m: Motorcycle): string {
-  const base = `${m.make} ${m.model}`.trim();
+  const base = `${prettifyMake(m.make)} ${m.model}`.trim();
   return m.year ? `${base} (${m.year})` : base;
 }
 
@@ -73,7 +74,7 @@ function MotorcycleDetailContent() {
   // doesn't replay the toast.
   useEffect(() => {
     if ((!justAdded && !alreadyExisted) || !motorcycle) return;
-    const name = `${motorcycle.make} ${motorcycle.model}`.trim();
+    const name = `${prettifyMake(motorcycle.make)} ${motorcycle.model}`.trim();
     if (alreadyExisted) {
       setToastMsg(t("alreadyInGarage", { name }));
       setToastVariant("info");
@@ -135,7 +136,7 @@ function MotorcycleDetailContent() {
         title={
           motorcycle
             ? t("removeConfirmTitle", {
-                name: `${motorcycle.make} ${motorcycle.model}`.trim(),
+                name: `${prettifyMake(motorcycle.make)} ${motorcycle.model}`.trim(),
               })
             : ""
         }

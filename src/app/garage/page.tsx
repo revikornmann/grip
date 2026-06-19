@@ -20,6 +20,7 @@ import {
 } from "@/lib/motorcycles";
 import type { Motorcycle } from "@/types/motorcycle";
 import { EmptyGarage } from "@/components/garage/EmptyGarage";
+import { prettifyMake } from "@/lib/makes";
 
 function motorcycleCaption(m: Motorcycle): string | undefined {
   const parts: string[] = [];
@@ -30,7 +31,7 @@ function motorcycleCaption(m: Motorcycle): string | undefined {
 }
 
 function motorcycleLabel(m: Motorcycle): string {
-  return m.nickname?.trim() || `${m.make} ${m.model}`.trim();
+  return m.nickname?.trim() || `${prettifyMake(m.make)} ${m.model}`.trim();
 }
 
 export default function GaragePage() {

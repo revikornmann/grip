@@ -31,6 +31,28 @@ export async function listModels(make: string): Promise<string[]> {
   return (data ?? []) as string[];
 }
 
+/**
+ * Models for a make, ranked by how many catalog rows (year/variant entries) each
+ * has. Used by the brand drill-down to split "popular models" (most catalog
+ * coverage — flagship / long-running models) from the full A–Z list. Ranking and
+ * de-duplication happen server-side (RPC) to sidestep Supabase's 1000-row cap,
+ * which would otherwise truncate large makes like Honda.
+ */
+export async function listModelsRanked(
+  make: string,
+): Promise<{ model: string; count: number }[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("list_motorcycle_models_ranked", {
+    p_make: make,
+  });
+
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as { model: string; cnt: number }[]).map((r) => ({
+    model: r.model,
+    count: r.cnt,
+  }));
+}
+
 export async function listYears(
   make: string,
   model: string,

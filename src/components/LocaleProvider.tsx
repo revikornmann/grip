@@ -11,16 +11,43 @@ import { NextIntlClientProvider } from "next-intl";
 import { storage } from "@/lib/storage";
 import {
   type Locale,
+  locales,
   defaultLocale,
   LOCALE_STORAGE_KEY,
 } from "@/i18n/config";
 import nlMessages from "@/messages/nl.json";
 import enMessages from "@/messages/en.json";
+import deMessages from "@/messages/de.json";
+import frMessages from "@/messages/fr.json";
+import esMessages from "@/messages/es.json";
+import ptMessages from "@/messages/pt.json";
+import idMessages from "@/messages/id.json";
+import viMessages from "@/messages/vi.json";
+import jaMessages from "@/messages/ja.json";
+import zhMessages from "@/messages/zh.json";
+import hiMessages from "@/messages/hi.json";
 
-const messagesMap: Record<Locale, typeof nlMessages> = {
+// Each locale in the picker has a translation file. The AI-generated sets
+// (everything but nl/en) are first-pass and pending review; any locale without
+// an entry here would fall back to English. To add or replace one, drop a
+// `messages/<locale>.json` in and map it below.
+const translated: Partial<Record<Locale, typeof nlMessages>> = {
   nl: nlMessages,
   en: enMessages,
+  de: deMessages,
+  fr: frMessages,
+  es: esMessages,
+  pt: ptMessages,
+  id: idMessages,
+  vi: viMessages,
+  ja: jaMessages,
+  zh: zhMessages,
+  hi: hiMessages,
 };
+
+const messagesMap = Object.fromEntries(
+  locales.map((l) => [l, translated[l] ?? enMessages]),
+) as Record<Locale, typeof nlMessages>;
 
 // Custom event fired when the locale changes, so useSyncExternalStore re-reads.
 const LOCALE_EVENT = "grip:locale-change";
@@ -36,7 +63,7 @@ function subscribe(callback: () => void): () => void {
 
 function getLocaleSnapshot(): Locale {
   const stored = storage.get<Locale>(LOCALE_STORAGE_KEY);
-  return stored === "nl" || stored === "en" ? stored : defaultLocale;
+  return stored && locales.includes(stored) ? stored : defaultLocale;
 }
 
 // During SSR and the initial hydration render, React uses the server snapshot —
