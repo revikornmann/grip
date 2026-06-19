@@ -68,7 +68,7 @@ function MotorcycleDetailContent() {
   }, [user?.id, id, t]);
 
   // Specs (and on-demand generation) come from the linked catalogue model.
-  const { model, generating } = useModelSpecs(motorcycle?.modelId ?? undefined);
+  const { specs, generating } = useModelSpecs(motorcycle?.modelId ?? undefined);
 
   // Confirm a just-added motorcycle, then drop the ?added flag so a refresh
   // doesn't replay the toast.
@@ -109,7 +109,7 @@ function MotorcycleDetailContent() {
         title={motorcycle ? headline(motorcycle) : ""}
         subtitle={motorcycle?.nickname?.trim() || null}
         mileageKm={motorcycle?.mileageKm ?? null}
-        specs={model?.specs ?? {}}
+        specs={specs}
         loading={loading}
         generating={generating}
         error={error}
