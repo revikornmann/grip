@@ -30,11 +30,12 @@ a {
 /* Each navigation remounts a .app-transition wrapper (keyed on pathname), so the
    enter-animation replays. Direction is set by the shell: forward slides in from
    the right (going deeper), back slides in from the left (going up). The wrapper
-   is a full-screen layer; body's overflow-x:hidden clips the off-screen start. */
+   sizes to its inner Muka <View> (which owns the viewport height, adjusted by the
+   AppShell to clear the app bar at the large tier); body's overflow-x:hidden clips
+   the off-screen start of the slide. */
 .app-transition {
   position: relative;
   width: 100%;
-  height: 100dvh;
 }
 
 .app-transition--forward {
@@ -70,47 +71,8 @@ a {
   }
 }
 
-/* ===== App Layout (Figma View pattern) ===== */
-.app-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-.app-topnav {
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.app-main {
-  flex: 1;
-  overflow-y: auto;
-  background: var(--color-surface-level2);
-  -webkit-overflow-scrolling: touch;
-  /* Extra bottom padding for floating BottomNav */
-  padding-bottom: 6rem;
-}
-
-/* ===== Bottom Navigation (fixed floating) ===== */
-.app-bottomnav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.app-bottomnav > * {
-  pointer-events: auto;
-}
-
 /* ===== Search overlay (focus / typing states) ===== */
-/* Fixed full-screen layer so it covers the floating BottomNav, matching the
+/* Fixed full-screen layer so it covers the floating bottom nav, matching the
    sub-level View in the design. */
 .search-overlay {
   position: fixed;

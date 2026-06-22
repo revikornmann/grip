@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { View, Button, Icon, RadioTile, Container } from "@revikornmann/muka-ui";
+import {
+  View,
+  Breadcrumb,
+  Button,
+  Icon,
+  RadioTile,
+  Container,
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 export interface SettingsOption<T extends string> {
@@ -49,8 +56,25 @@ export function SettingsOptionView<T extends string>({
     </Button>
   );
 
+  // Desktop breadcrumb (shown ≥1024px in place of the back button).
+  const breadcrumb = (
+    <Breadcrumb
+      size="sm"
+      items={[
+        { label: tNav("settings"), onClick: () => router.push("/settings") },
+        { label: title },
+      ]}
+    />
+  );
+
   return (
-    <View level="sub" surfaceLevel={3} title={title} leading={back}>
+    <View
+      level="sub"
+      surfaceLevel={3}
+      title={title}
+      leading={back}
+      breadcrumb={breadcrumb}
+    >
       <div style={{ padding: "var(--spacing-6) var(--spacing-4)" }}>
         <Container maxWidth="large" gap="none">
           <div
