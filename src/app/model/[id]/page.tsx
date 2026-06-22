@@ -19,6 +19,7 @@ function headline(m: MotorcycleModel): string {
 function ModelPreviewContent() {
   const t = useTranslations("garage");
   const tCommon = useTranslations("common");
+  const tNav = useTranslations("nav");
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
@@ -128,6 +129,7 @@ function ModelPreviewContent() {
         generating={generating}
         error={pageError}
         footer={footer}
+        breadcrumbLabel={tNav("search")}
         onBack={() => router.push("/")}
       />
 

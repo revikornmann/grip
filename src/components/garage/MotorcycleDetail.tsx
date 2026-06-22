@@ -10,6 +10,7 @@ import {
 } from "react";
 import {
   View,
+  Breadcrumb,
   Button,
   Icon,
   Spinner,
@@ -137,6 +138,10 @@ interface Props {
   /** Inline content rendered at the very bottom of the scroll area, below every
    *  spec section (e.g. a "Remove from garage" action). */
   endSlot?: ReactNode;
+  /** Parent label for the desktop breadcrumb (e.g. "Garage", "Search"). When
+   *  set, the large-tier TopBar shows a `parent › title` breadcrumb (clicking
+   *  the parent runs `onBack`) in place of the back button. */
+  breadcrumbLabel?: string;
   onBack: () => void;
 }
 
@@ -150,6 +155,7 @@ export function MotorcycleDetail({
   error = null,
   footer,
   endSlot,
+  breadcrumbLabel,
   onBack,
 }: Props) {
   const t = useTranslations("garage");
@@ -302,8 +308,24 @@ export function MotorcycleDetail({
     </Button>
   );
 
+  // Desktop breadcrumb (shown ≥1024px in place of the back button). The parent
+  // crumb runs the same `onBack` navigation; the current title is the leaf.
+  const breadcrumb = breadcrumbLabel ? (
+    <Breadcrumb
+      size="sm"
+      items={[{ label: breadcrumbLabel, onClick: onBack }, { label: title }]}
+    />
+  ) : undefined;
+
   return (
-    <View level="sub" surfaceLevel={3} title={title} leading={back} footer={footer}>
+    <View
+      level="sub"
+      surfaceLevel={3}
+      title={title}
+      leading={back}
+      breadcrumb={breadcrumb}
+      footer={footer}
+    >
       {loading ? (
         <div
           style={{

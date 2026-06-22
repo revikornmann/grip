@@ -18,6 +18,7 @@ function headline(m: Motorcycle): string {
 
 function MotorcycleDetailContent() {
   const t = useTranslations("garage");
+  const tNav = useTranslations("nav");
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
@@ -113,6 +114,7 @@ function MotorcycleDetailContent() {
         loading={loading}
         generating={generating}
         error={error}
+        breadcrumbLabel={tNav("garage")}
         onBack={() => router.push("/garage")}
         endSlot={
           motorcycle ? (
