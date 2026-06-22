@@ -11,9 +11,11 @@ import {
   ListItem,
   Section,
   Container,
+  Spinner,
+  Toast,
 } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
-import { searchModels } from "@/lib/catalog";
+import { searchModels, listYears, findModelId } from "@/lib/catalog";
 import { prettifyMake } from "@/lib/makes";
 import { useRecentSearches } from "@/lib/useRecentSearches";
 
@@ -38,8 +40,11 @@ const overlineStyle: CSSProperties = {
  * Full-screen search experience opened from the Search top bar.
  *
  * Empty query → "Recent searches". Typing → live catalog autocomplete. Picking
- * either navigates to the model preview. Rendered as a fixed overlay so it
- * covers the bottom navigation, matching the sub-level view in the design.
+ * a model fills the input with its name and reveals the list of catalog years
+ * for that model; picking a year resolves the specific catalog row and navigates
+ * to the model preview. Recent searches still navigate directly. Rendered as a
+ * fixed overlay so it covers the bottom navigation, matching the sub-level view
+ * in the design.
  */
 export function SearchOverlay({ onClose }: Props) {
   const t = useTranslations("search");
@@ -51,10 +56,23 @@ export function SearchOverlay({ onClose }: Props) {
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Once a model is picked from autocomplete we switch to "year mode": the input
+  // holds the model name and the body lists its catalog years instead of
+  // autocomplete matches. Cleared the moment the user edits the query again.
+  const [picked, setPicked] = useState<{ make: string; model: string } | null>(
+    null,
+  );
+  const [years, setYears] = useState<number[]>([]);
+  const [yearsLoading, setYearsLoading] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const [error, setError] = useState(false);
+
   const trimmed = query.trim();
 
-  // Debounced catalog search while typing.
+  // Debounced catalog search while typing. Suspended in year mode so the picked
+  // model name in the input doesn't re-trigger autocomplete over the year list.
   useEffect(() => {
+    if (picked) return;
     if (trimmed.length === 0) {
       setResults([]);
       setLoading(false);
@@ -78,7 +96,7 @@ export function SearchOverlay({ onClose }: Props) {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [trimmed]);
+  }, [trimmed, picked]);
 
   // Close on Escape (desktop / hardware keyboard).
   useEffect(() => {
@@ -89,9 +107,45 @@ export function SearchOverlay({ onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // Recent searches resolve to a specific catalog row already — go straight to
+  // the preview.
   const openModel = (id: string) => {
     onClose();
     router.push(`/model/${id}`);
+  };
+
+  // Autocomplete pick: fill the input with the model name and load its years.
+  const pickModel = (r: Result) => {
+    setPicked({ make: r.make, model: r.model });
+    setQuery(`${prettifyMake(r.make)} ${r.model}`);
+    setResults([]);
+    setYears([]);
+    setYearsLoading(true);
+    listYears(r.make, r.model)
+      .then((ys) => setYears(ys))
+      .catch(() => setError(true))
+      .finally(() => setYearsLoading(false));
+  };
+
+  // Year pick: resolve the specific catalog row, then hand off to the preview.
+  const openYear = async (year: number) => {
+    if (!picked || resolving) return;
+    setResolving(true);
+    try {
+      const id = await findModelId(picked.make, picked.model, year);
+      if (id) openModel(id);
+      else setError(true);
+    } catch {
+      setError(true);
+    } finally {
+      setResolving(false);
+    }
+  };
+
+  // Any edit to the query leaves year mode and returns to autocomplete.
+  const onQueryChange = (value: string) => {
+    setQuery(value);
+    if (picked) setPicked(null);
   };
 
   const back = (
@@ -116,12 +170,16 @@ export function SearchOverlay({ onClose }: Props) {
             <ControlBar>
               <SearchInput
                 value={query}
-                onChange={setQuery}
+                onChange={onQueryChange}
                 placeholder={t("searchPlaceholder")}
                 autoFocus
-                loading={loading}
+                loading={loading || yearsLoading}
                 onSubmit={() => {
-                  if (results[0]) openModel(results[0].id);
+                  if (picked) {
+                    if (years[0] !== undefined) openYear(years[0]);
+                  } else if (results[0]) {
+                    pickModel(results[0]);
+                  }
                 }}
               />
             </ControlBar>
@@ -132,44 +190,78 @@ export function SearchOverlay({ onClose }: Props) {
       <div className="search-overlay__body">
         <Section padding="default">
           <Container maxWidth="large" gap="default">
-            {trimmed.length === 0
-              ? recent.length > 0 && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "var(--spacing-6)",
-                    }}
-                  >
-                    <h2 style={overlineStyle}>{t("recentTitle")}</h2>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      {recent.map((r, i) => (
-                        <ListItem
-                          key={r.id}
-                          label={`${prettifyMake(r.make)} ${r.model}`}
-                          caption={String(r.year)}
-                          showChevron
-                          showDivider={i < recent.length - 1}
-                          onClick={() => openModel(r.id)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )
-              : results.length > 0 && (
+            {picked ? (
+              yearsLoading ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    padding: "var(--spacing-8)",
+                  }}
+                >
+                  <Spinner />
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {years.map((year) => (
+                    <ListItem
+                      key={year}
+                      label={`${prettifyMake(picked.make)} ${picked.model} ${year}`}
+                      disabled={resolving}
+                      onClick={() => openYear(year)}
+                    />
+                  ))}
+                </div>
+              )
+            ) : trimmed.length === 0 ? (
+              recent.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "var(--spacing-6)",
+                  }}
+                >
+                  <h2 style={overlineStyle}>{t("recentTitle")}</h2>
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    {results.map((r) => (
+                    {recent.map((r, i) => (
                       <ListItem
-                        key={`${r.make}-${r.model}`}
+                        key={r.id}
                         label={`${prettifyMake(r.make)} ${r.model}`}
+                        caption={String(r.year)}
+                        showChevron
+                        showDivider={i < recent.length - 1}
                         onClick={() => openModel(r.id)}
                       />
                     ))}
                   </div>
-                )}
+                </div>
+              )
+            ) : (
+              results.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {results.map((r) => (
+                    <ListItem
+                      key={`${r.make}-${r.model}`}
+                      label={`${prettifyMake(r.make)} ${r.model}`}
+                      onClick={() => pickModel(r)}
+                    />
+                  ))}
+                </div>
+              )
+            )}
           </Container>
         </Section>
       </div>
+
+      <Toast
+        variant="warning"
+        open={error}
+        onClose={() => setError(false)}
+        duration={3000}
+      >
+        {t("loadFailed")}
+      </Toast>
     </div>
   );
 }
