@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   PullToRefresh,
+  Card,
   ListItem,
   SwipeActions,
   Icon,
@@ -25,8 +26,7 @@ import { prettifyMake } from "@/lib/makes";
 function motorcycleCaption(m: Motorcycle): string | undefined {
   const parts: string[] = [];
   if (m.year) parts.push(String(m.year));
-  if (m.mileageKm != null)
-    parts.push(`${m.mileageKm.toLocaleString()} km`);
+  if (m.mileageKm != null) parts.push(`${m.mileageKm.toLocaleString()} km`);
   return parts.length ? parts.join(" · ") : undefined;
 }
 
@@ -49,7 +49,10 @@ export default function GaragePage() {
   );
   const [toastOpen, setToastOpen] = useState(false);
 
-  const showToast = (msg: string, variant: "success" | "warning" = "success") => {
+  const showToast = (
+    msg: string,
+    variant: "success" | "warning" = "success",
+  ) => {
     setToastMsg(msg);
     setToastVariant(variant);
     setToastOpen(true);
@@ -111,56 +114,62 @@ export default function GaragePage() {
         <EmptyGarage onSearch={() => router.push("/")} />
       ) : (
         <PullToRefresh onRefresh={reload}>
-          <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-            {motorcycles.map((m) => (
-              <li key={m.id}>
-                <SwipeActions
-                  leftActions={[
-                    {
-                      label: t("archive"),
-                      color: "neutral",
-                      icon: <Icon name="archive" />,
-                      onClick: async () => {
-                        try {
-                          await archiveMotorcycle(m.id);
-                          showToast(t("archived"));
-                          await reload();
-                        } catch {
-                          showToast(t("archiveFailed"), "warning");
-                        }
-                      },
-                    },
-                  ]}
-                  rightActions={[
-                    {
-                      label: t("delete"),
-                      color: "destructive",
-                      icon: <Icon name="delete-bin" />,
-                      fullSwipe: true,
-                      onClick: async () => {
-                        try {
-                          await deleteMotorcycle(m.id);
-                          showToast(t("deleted"));
-                          await reload();
-                        } catch {
-                          showToast(t("deleteFailed"), "warning");
-                        }
-                      },
-                    },
-                  ]}
-                >
-                  <ListItem
-                    label={motorcycleLabel(m)}
-                    caption={motorcycleCaption(m)}
-                    leadingIcon={<Icon name="motorbike" />}
-                    showChevron
-                    showDivider
-                    onClick={() => router.push(`/garage/${m.id}`)}
-                  />
-                </SwipeActions>
-              </li>
-            ))}
-          </ul>
+          {/* PullToRefresh clips overflow (overflow-x: clip) to contain the
+              pull gesture, which would crop the Card's drop shadow flush to its
+              edges. A small padding buffer gives the shadow room to render. */}
+          <div style={{ padding: "var(--spacing-1) var(--spacing-2)" }}>
+            <Card padding="none">
+              <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                {motorcycles.map((m, i) => (
+                  <li key={m.id}>
+                    <SwipeActions
+                      leftActions={[
+                        {
+                          label: t("archive"),
+                          color: "neutral",
+                          icon: <Icon name="archive" />,
+                          onClick: async () => {
+                            try {
+                              await archiveMotorcycle(m.id);
+                              showToast(t("archived"));
+                              await reload();
+                            } catch {
+                              showToast(t("archiveFailed"), "warning");
+                            }
+                          },
+                        },
+                      ]}
+                      rightActions={[
+                        {
+                          label: t("delete"),
+                          color: "destructive",
+                          icon: <Icon name="delete-bin" />,
+                          fullSwipe: true,
+                          onClick: async () => {
+                            try {
+                              await deleteMotorcycle(m.id);
+                              showToast(t("deleted"));
+                              await reload();
+                            } catch {
+                              showToast(t("deleteFailed"), "warning");
+                            }
+                          },
+                        },
+                      ]}
+                    >
+                      <ListItem
+                        label={motorcycleLabel(m)}
+                        caption={motorcycleCaption(m)}
+                        showChevron
+                        showDivider={i < motorcycles.length - 1}
+                        onClick={() => router.push(`/garage/${m.id}`)}
+                      />
+                    </SwipeActions>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
         </PullToRefresh>
       )}
 
