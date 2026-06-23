@@ -50,6 +50,12 @@ const LANGUAGE_NAMES: Record<string, string> = {
   hi: "Hindi",
 };
 
+// After a failed translation, don't re-call Claude for the same (model, locale)
+// until this cooldown elapses — a permanently-failing translation otherwise burns
+// one API call on every view. Keep in sync with the client guard in
+// `src/lib/useModelSpecs.ts`.
+const FAILED_RETRY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -57,34 +63,24 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// A single spec row. `source` and `value` are NOT requested from the model —
-// they are carried over from the canonical row — so it is only asked to
-// translate label/hint/group. `value` is included so the model has context for
-// the label it is translating.
-const rowSchema = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    label: { type: "string" },
-    value: { type: "string" },
-    hint: { type: "string" },
-    group: { type: "string" },
-  },
-  required: ["label", "value"],
-};
-
-// specs object: every category optional, each an array of rows.
-const specsSchema = {
-  type: "object",
-  additionalProperties: false,
-  properties: Object.fromEntries(
-    SPEC_CATEGORIES.map((c) => [c, { type: "array", items: rowSchema }]),
-  ),
-  required: [],
-};
-
 type Row = Record<string, unknown>;
 type Specs = Record<string, Row[]>;
+
+// Pull the JSON object out of the model's text response. We ask for raw JSON, but
+// strip any stray prose or ```fences``` defensively by taking the outermost
+// braces. (Structured outputs / `output_config.format` are deliberately NOT used
+// here: compiling a grammar for the 11-category specs schema takes longer than the
+// Edge Function's wall-clock budget, so the call gets killed mid-flight and the
+// row is left stuck `pending`. Prompt-driven JSON returns in ~2s, and
+// `mergeTranslation` already falls back to the English row on any shape mismatch.)
+function extractJson(text: string): string {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error("No JSON object found in model response");
+  }
+  return text.slice(start, end + 1);
+}
 
 function systemPrompt(language: string): string {
   return `You are a translator for a motorcycle technical-data UI. You will receive a JSON object of motorcycle specifications grouped into categories, each category an array of rows like { label, value, hint?, group? }.
@@ -96,7 +92,7 @@ Rules:
 - Copy "value" through EXACTLY, byte-for-byte. Never translate, reformat, or convert numbers or unit tokens (cc, kg, Nm, mm, mph, hp, L, bar, °, etc.).
 - In "hint", keep numeric/symbolic tokens such as "@ 9000 rpm" unchanged; translate only surrounding words.
 - Keep the SAME categories, the SAME number of rows per category, and the SAME order. Do not add, remove, reorder, merge, or split rows or categories.
-- Return only the structured data, no commentary.`;
+- Return ONLY a single JSON object mirroring the input shape (same keys, same array lengths). No commentary, no explanation, no markdown code fences.`;
 }
 
 async function translateSpecs(
@@ -107,11 +103,10 @@ async function translateSpecs(
   const message = await anthropic.messages.create({
     model: "claude-opus-4-8",
     max_tokens: 8000,
-    thinking: { type: "adaptive" },
-    output_config: {
-      effort: "medium",
-      format: { type: "json_schema", schema: specsSchema },
-    },
+    // Translation is a low-reasoning task; `low` effort and no extended thinking
+    // keep latency to a couple of seconds (see extractJson for why structured
+    // outputs are avoided).
+    output_config: { effort: "low" },
     system: systemPrompt(language),
     messages: [
       {
@@ -125,9 +120,9 @@ async function translateSpecs(
 
   const textBlock = message.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {
-    throw new Error("No structured output returned from the model");
+    throw new Error("No text returned from the model");
   }
-  return JSON.parse(textBlock.text);
+  return JSON.parse(extractJson(textBlock.text));
 }
 
 // Merge the translated label/hint/group onto the canonical rows, keeping the
@@ -210,13 +205,21 @@ Deno.serve(async (req: Request) => {
   // Already translated, or another invocation is in flight — no-op.
   const { data: existing } = await supabase
     .from("motorcycle_model_spec_translations")
-    .select("status")
+    .select("status, updated_at")
     .eq("model_id", modelId)
     .eq("locale", locale)
     .maybeSingle();
 
   if (existing?.status === "ready") return json({ status: "ready" });
   if (existing?.status === "pending") return json({ status: "pending" });
+
+  // A recent failure is on cooldown — don't re-spend an API call on a translation
+  // that just failed. It self-heals once the cooldown elapses (the client stops
+  // re-triggering within the same window; see `useModelSpecs`).
+  if (existing?.status === "failed" && existing.updated_at) {
+    const sinceMs = Date.now() - Date.parse(existing.updated_at);
+    if (sinceMs < FAILED_RETRY_COOLDOWN_MS) return json({ status: "failed" });
+  }
 
   // Claim it so concurrent viewers don't double-translate.
   await supabase

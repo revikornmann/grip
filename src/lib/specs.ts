@@ -34,6 +34,8 @@ export async function triggerSpecTranslation(
 export interface SpecTranslation {
   specs: MotorcycleSpecs | null;
   status: "pending" | "ready" | "failed";
+  /** When the row last changed — used to cooldown failed-translation retries. */
+  updatedAt: string | null;
 }
 
 /**
@@ -47,13 +49,20 @@ export async function getSpecTranslation(
   const supabase = createClient();
   const { data, error } = await supabase
     .from("motorcycle_model_spec_translations")
-    .select("specs, status")
+    .select("specs, status, updated_at")
     .eq("model_id", modelId)
     .eq("locale", locale)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
   if (!data) return null;
-  const row = data as Pick<MotorcycleModelSpecTranslationRow, "specs" | "status">;
-  return { specs: row.specs ?? null, status: row.status };
+  const row = data as Pick<
+    MotorcycleModelSpecTranslationRow,
+    "specs" | "status" | "updated_at"
+  >;
+  return {
+    specs: row.specs ?? null,
+    status: row.status,
+    updatedAt: row.updated_at ?? null,
+  };
 }

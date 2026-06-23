@@ -28,6 +28,10 @@ export interface ModelSpecsState {
 
 const POLL_MS = 4000;
 const MAX_POLLS = 22; // ~90s ceiling before giving up
+// Don't re-request a translation that recently failed — it self-heals only after
+// this window. Keep in sync with the server guard in the translate-specs Edge
+// Function.
+const FAILED_RETRY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
 function hasSpecs(m: MotorcycleModel | null): boolean {
   return (
@@ -88,8 +92,14 @@ export function useModelSpecs(modelId: string | undefined): ModelSpecsState {
           setLocalizedSpecs(tr.specs);
           return;
         }
-        // No cached translation (or a stale failure) — request one and poll.
-        if (!tr || tr.status === "failed") {
+        // No cached translation (or a failure past its cooldown) — request one
+        // and poll. A recent failure is left alone so we don't re-spend an API
+        // call on every view; it retries on a later visit once the cooldown ends.
+        const failedStale =
+          tr?.status === "failed" &&
+          (!tr.updatedAt ||
+            Date.now() - Date.parse(tr.updatedAt) >= FAILED_RETRY_COOLDOWN_MS);
+        if (!tr || failedStale) {
           triggerSpecTranslation(id, locale).catch(() => {});
         }
         timers.push(setTimeout(pollTranslation, POLL_MS));
