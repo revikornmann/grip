@@ -1,8 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Card, ListItem, Button, Icon } from "@revikornmann/muka-ui";
+import {
+  Card,
+  ListItem,
+  Button,
+  Icon,
+  ProfileBadge,
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";
@@ -134,61 +139,12 @@ export default function SettingsPage() {
               padding: "var(--spacing-4)",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "var(--spacing-3)",
-              }}
-            >
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "var(--color-surface-brand-default)",
-                }}
-              >
-                {user?.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt=""
-                    referrerPolicy="no-referrer"
-                    width={32}
-                    height={32}
-                    style={{ objectFit: "cover" }}
-                    unoptimized
-                  />
-                ) : (
-                  <Icon name="google" size="sm" />
-                )}
-              </div>
-              <div>
-                <p
-                  style={{
-                    fontSize: "var(--font-size-sm)",
-                    fontWeight: "var(--font-weight-semibold)",
-                    margin: 0,
-                  }}
-                >
-                  {t("loggedInAs")}
-                </p>
-                <p
-                  style={{
-                    fontSize: "var(--font-size-xs)",
-                    color: "var(--color-text-subtle-default)",
-                    margin: 0,
-                  }}
-                >
-                  {user?.email}
-                </p>
-              </div>
-            </div>
+            <ProfileBadge
+              size="lg"
+              name={user?.displayName ?? ""}
+              email={user?.email}
+              src={user?.avatarUrl}
+            />
             <Button variant="secondary" fullWidth onClick={() => signOut()}>
               {t("logout")}
             </Button>

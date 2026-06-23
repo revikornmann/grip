@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { Avatar } from "@revikornmann/muka-ui";
+import { ProfileBadge } from "@revikornmann/muka-ui";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 const wordmarkStyle: CSSProperties = {
@@ -10,17 +10,6 @@ const wordmarkStyle: CSSProperties = {
   fontSize: "var(--font-size-lg)",
   lineHeight: 1,
   textTransform: "uppercase",
-  color: "var(--color-text-default-default)",
-};
-
-const accountStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "var(--spacing-3)",
-};
-
-const nameStyle: CSSProperties = {
-  fontSize: "var(--font-size-md)",
   color: "var(--color-text-default-default)",
 };
 
@@ -39,15 +28,11 @@ export function AppHeader() {
     <>
       <strong style={wordmarkStyle}>Grip</strong>
       {isSignedIn && (
-        <span style={accountStyle}>
-          <Avatar
-            src={user.avatarUrl}
-            name={user.displayName}
-            size="sm"
-            alt={user.displayName}
-          />
-          <span style={nameStyle}>{user.displayName}</span>
-        </span>
+        <ProfileBadge
+          size="md"
+          name={user.displayName}
+          src={user.avatarUrl}
+        />
       )}
     </>
   );
