@@ -1,22 +1,12 @@
-name: Update muka-ui
+# Update Muka UI — consumer workflow
+#
+# muka-ui's publish pipeline publishes a new version to GitHub Packages on every
+# release, then fires a `muka-released` repository_dispatch (carrying the
+# version) to each repo in muka's .github/consumers.txt. This workflow receives
+# that dispatch, installs the exact published version, and commits the lockfile
+# bump. Pushing to the default branch lets Vercel redeploy with the new version.
 
-# Auto-follows the muka-ui design system. The muka repo
-# (revikornmann/muka) fires a `muka-released` repository_dispatch whenever it
-# commits a new dist/ to its main. This workflow resolves muka's main to its
-# exact commit SHA and pins it into BOTH package.json and package-lock.json; if
-# the SHA changed it commits the bump to main, which triggers a Vercel deploy so
-# production picks up the new design system automatically.
-#
-# Why pin the exact SHA in package.json (not the moving `#main` ref): the
-# dependency stays @revikornmann/muka-ui@0.1.0 across every release, so a spec of
-# `#main` looks identical from release to release even as the resolved SHA
-# advances. That lets Vercel's build cache (npm git-dep cache + Next.js webpack
-# cache) keep serving the previously-compiled muka — production renders stale
-# components despite a healthy bump. Writing the SHA into package.json changes
-# the dependency's identity on every release, reliably busting those caches.
-#
-# `npm ci` (used by Vercel) stays reproducible because the exact resolved SHA is
-# always recorded in both package.json and the committed package-lock.json.
+name: Update Muka UI
 
 on:
   repository_dispatch:
@@ -24,7 +14,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: update-muka
+  group: update-muka-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -32,58 +22,64 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      HUSKY: '0'
+      packages: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@revikornmann'
 
-      - name: Prefer HTTPS for GitHub git fetches
-        # The lockfile resolves muka via git+ssh; the runner has no ssh key, so
-        # rewrite ssh → https for the public repo fetch.
+      - name: Install target Muka version
         run: |
-          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          VERSION="${{ github.event.client_payload.version }}"
+          npm install "@revikornmann/muka-ui@${VERSION:-latest}" --save
+        env:
+          # muka-ui is a private package. GITHUB_TOKEN only works if this repo is
+          # granted read access to the package; otherwise set MUKA_PACKAGES_TOKEN
+          # (a PAT with read:packages) as a repo secret.
+          NODE_AUTH_TOKEN: ${{ secrets.MUKA_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: Re-resolve muka-ui to latest main and pin exact SHA
-        # Resolve main → commit SHA and install by that SHA, so package.json is
-        # pinned to `#<sha>` (not the moving `#main`). See the header comment for
-        # why this matters for Vercel cache invalidation.
-        run: |
-          SHA="$(git ls-remote https://github.com/revikornmann/muka.git refs/heads/main | cut -f1)"
-          echo "Latest muka main: $SHA"
-          npm install "github:revikornmann/muka#$SHA"
-
-      - name: Commit & push if muka-ui changed
+      - name: Check for changes
+        id: changes
         run: |
           if git diff --quiet -- package.json package-lock.json; then
-            echo "muka-ui already at latest main — nothing to do."
-            exit 0
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Already on the target muka version — nothing to update."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "muka updated — will commit lockfile."
           fi
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
-          git add package.json package-lock.json
-          git commit -m "chore(deps): bump @revikornmann/muka-ui to latest main
 
-          Triggered by: ${{ github.event_name }} (source_sha: ${{ github.event.client_payload.source_sha || 'n/a' }})"
-          # Safety net against push races: if main advanced between checkout
-          # and push (e.g. a PR merged concurrently), rebase the bump onto it
-          # and retry. The bump only touches package.json/lock, so a rebase is
-          # conflict-safe in practice.
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:main; then
-              echo "Pushed on attempt ${attempt}."
-              exit 0
-            fi
-            echo "Push attempt ${attempt} rejected - fetching and rebasing onto origin/main."
-            git fetch origin main
-            git rebase origin/main || { git rebase --abort; exit 1; }
-          done
-          echo "::error::Failed to push after 5 attempts." >&2
-          exit 1
+      - name: Commit and push update
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json package-lock.json
+          git commit -m "chore(deps): update @revikornmann/muka-ui to ${{ github.event.client_payload.version || 'latest' }}
+
+          Triggered by: ${{ github.event_name }}
+          Source muka commit: ${{ github.event.client_payload.source_sha }}"
+          git push
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Muka update" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Trigger:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Target version:** ${{ github.event.client_payload.version || 'latest' }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.changes.outputs.changed }}" == "true" ]; then
+            echo "Status: updated and pushed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Status: already up to date" >> "$GITHUB_STEP_SUMMARY"
+          fi
