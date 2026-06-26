@@ -1,18 +1,28 @@
-# Update Muka UI — consumer workflow
+# Update Muka UI — consumer workflow template
 #
-# muka-ui's publish pipeline publishes a new version to GitHub Packages on every
-# release, then fires a `muka-released` repository_dispatch (carrying the
-# version) to each repo in muka's .github/consumers.txt. This workflow receives
-# that dispatch, installs the exact published version, and commits the lockfile
-# bump. Pushing to the default branch lets Vercel redeploy with the new version.
+# Copy this file into the CONSUMER repo at:
+#   .github/workflows/update-muka.yml
+#
+# How it fits together:
+#   muka-ui's publish.yml publishes a new version to the public npm registry on
+#   every release, then fires a `muka-released` repository_dispatch (carrying the
+#   version) to each repo in .github/consumers.txt. This workflow receives that
+#   dispatch, installs the exact published version, and commits the lockfile
+#   bump. Pushing to the default branch lets your host (e.g. Vercel) redeploy.
+#
+#   Muka UI is a public npm package, so installing needs no registry config or
+#   auth token.
 
 name: Update Muka UI
 
 on:
+  # Fired by muka-ui when a new version is published.
   repository_dispatch:
     types: [muka-released]
+  # Allow manual updates from the Actions tab (installs @latest).
   workflow_dispatch:
 
+# Never let two updates race on git push.
 concurrency:
   group: update-muka-${{ github.ref }}
   cancel-in-progress: false
@@ -22,7 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: read
 
     steps:
       - name: Checkout
@@ -35,18 +44,13 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@revikornmann'
 
       - name: Install target Muka version
+        # repository_dispatch carries the published version; workflow_dispatch
+        # falls back to @latest. Public npm package — no registry config or auth.
         run: |
           VERSION="${{ github.event.client_payload.version }}"
           npm install "@revikornmann/muka-ui@${VERSION:-latest}" --save
-        env:
-          # muka-ui is a private package. GITHUB_TOKEN only works if this repo is
-          # granted read access to the package; otherwise set MUKA_PACKAGES_TOKEN
-          # (a PAT with read:packages) as a repo secret.
-          NODE_AUTH_TOKEN: ${{ secrets.MUKA_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
         id: changes
@@ -65,7 +69,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add package.json package-lock.json
-          git commit -m "chore(deps): update @revikornmann/muka-ui to ${{ github.event.client_payload.version || 'latest' }}
+          git commit -m "⬆️ Update @revikornmann/muka-ui to ${{ github.event.client_payload.version || 'latest' }}
 
           Triggered by: ${{ github.event_name }}
           Source muka commit: ${{ github.event.client_payload.source_sha }}"
@@ -74,12 +78,13 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## Muka update" >> "$GITHUB_STEP_SUMMARY"
+          echo "## ⬆️ Muka update" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Trigger:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Target version:** ${{ github.event.client_payload.version || 'latest' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Source muka commit:** ${{ github.event.client_payload.source_sha }}" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ steps.changes.outputs.changed }}" == "true" ]; then
-            echo "Status: updated and pushed" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ **Status:** updated and pushed" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Status: already up to date" >> "$GITHUB_STEP_SUMMARY"
+            echo "ℹ️ **Status:** already up to date" >> "$GITHUB_STEP_SUMMARY"
           fi
