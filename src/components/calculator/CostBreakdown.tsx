@@ -9,7 +9,7 @@ import {
   TableRow,
   TableCell,
   TableHeaderCell,
-} from "muka-ui";
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { CostBreakdown as CostBreakdownType } from "@/lib/calculator";
 import { formatCurrency } from "@/lib/formatting";

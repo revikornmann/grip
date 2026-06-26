@@ -1,8 +1,9 @@
 "use client";
 
-import { Card, Button, Alert } from "muka-ui";
+import { Card, Button, Alert } from "@revikornmann/muka-ui";
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { BoundaryIntlProvider } from "@/components/BoundaryIntlProvider";
 
 export default function Error({
   error,
@@ -11,11 +12,19 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const t = useTranslations("error");
-
   useEffect(() => {
     console.error("[Grip Error]", error);
   }, [error]);
+
+  return (
+    <BoundaryIntlProvider>
+      <ErrorContent reset={reset} />
+    </BoundaryIntlProvider>
+  );
+}
+
+function ErrorContent({ reset }: { reset: () => void }) {
+  const t = useTranslations("error");
 
   return (
     <div

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, Input, Button, RadioTile, Icon } from "muka-ui";
+import { Dialog, Input, Button, RadioTile, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import type { Vehicle } from "@/types/vehicle";

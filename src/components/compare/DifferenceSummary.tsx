@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Card, Badge, Icon } from "muka-ui";
+import { Card, Badge, Icon } from "@revikornmann/muka-ui";
 import type { ComparisonResult } from "@/lib/comparison";
 import { formatCurrency, formatPercentage } from "@/lib/formatting";
 

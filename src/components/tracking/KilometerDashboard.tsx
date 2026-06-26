@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Card, Badge, Progress, Alert, Divider } from "muka-ui";
+import { Card, Badge, Progress, Alert, Divider } from "@revikornmann/muka-ui";
 import type { TripStats } from "@/lib/trips";
 import { PRIVATE_KM_LIMIT, PRIVATE_KM_WARNING } from "@/lib/trips";
 import { formatNumber, formatPercentage } from "@/lib/formatting";

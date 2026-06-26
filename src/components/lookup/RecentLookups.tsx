@@ -1,6 +1,6 @@
 "use client";
 
-import { ListItem, Button } from "muka-ui";
+import { ListItem, Button } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { RecentLookup } from "@/types/vehicle";
 import { formatPlateDisplay } from "@/lib/validation";

@@ -1,10 +1,19 @@
 "use client";
 
-import { Button } from "muka-ui";
+import { Button } from "@revikornmann/muka-ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { BoundaryIntlProvider } from "@/components/BoundaryIntlProvider";
 
 export default function NotFound() {
+  return (
+    <BoundaryIntlProvider>
+      <NotFoundContent />
+    </BoundaryIntlProvider>
+  );
+}
+
+function NotFoundContent() {
   const router = useRouter();
   const t = useTranslations("notFound");
 

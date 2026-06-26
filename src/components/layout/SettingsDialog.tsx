@@ -14,7 +14,7 @@ import {
   RadioTile,
   Divider,
   NavigationTransition,
-} from "muka-ui";
+} from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTheme } from "@/components/ThemeProvider";

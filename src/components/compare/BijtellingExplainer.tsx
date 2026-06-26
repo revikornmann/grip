@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Card, Button, Icon, Badge, Divider } from "muka-ui";
+import { Card, Button, Icon, Badge, Divider } from "@revikornmann/muka-ui";
 import type { GarageVehicle } from "@/types/garage";
 import {
   getBijtellingPercentage,

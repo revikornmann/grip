@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Chip } from "muka-ui";
+import { Button, Card, Chip } from "@revikornmann/muka-ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 

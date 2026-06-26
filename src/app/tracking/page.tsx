@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Dialog, Alert, Toast, Icon, Tabs, TabList, Tab, TabPanel } from "muka-ui";
+import { Button, Dialog, Alert, Toast, Icon, Tabs, TabList, Tab, TabPanel } from "@revikornmann/muka-ui";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getGarage } from "@/lib/garage";

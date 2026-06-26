@@ -1,8 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { BoundaryIntlProvider } from "@/components/BoundaryIntlProvider";
 
-export default function Loading() {
+function LoadingContent() {
   const t = useTranslations("loading");
 
   return (
@@ -14,5 +15,13 @@ export default function Loading() {
     >
       <p style={{ color: "var(--color-text-subtle-default)" }}>{t("text")}</p>
     </div>
+  );
+}
+
+export default function Loading() {
+  return (
+    <BoundaryIntlProvider>
+      <LoadingContent />
+    </BoundaryIntlProvider>
   );
 }

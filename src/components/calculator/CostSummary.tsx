@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Badge, Divider } from "muka-ui";
+import { Card, Badge, Divider } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { CostBreakdown } from "@/lib/calculator";
 import { formatCurrency, formatNumber } from "@/lib/formatting";

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Alert, Button, Badge } from "muka-ui";
+import { Alert, Button, Badge } from "@revikornmann/muka-ui";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getGarage } from "@/lib/garage";

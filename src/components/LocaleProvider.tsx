@@ -58,6 +58,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     <LocaleContext.Provider value={{ locale, setLocale }}>
       <NextIntlClientProvider
         locale={locale}
+        timeZone="Europe/Amsterdam"
         messages={messagesMap[locale]}
       >
         {children}

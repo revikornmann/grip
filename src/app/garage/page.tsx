@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Select, Dialog, Button, Alert, Toast, Icon } from "muka-ui";
+import { Select, Dialog, Button, Alert, Toast, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import {

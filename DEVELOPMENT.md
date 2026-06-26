@@ -21,7 +21,7 @@ Every button, input, card, badge, and UI element must be imported from `muka-ui`
 
 ```tsx
 // ✅ Import UI components from muka-ui
-import { Button, Card, Input, Badge } from 'muka-ui';
+import { Button, Card, Input, Badge } from '@revikornmann/muka-ui';
 
 // ✅ Use Muka UI tokens for layout spacing
 <div style={{
@@ -174,15 +174,15 @@ npm unlink
 
 ```tsx
 // Import components
-import { Button, Card, Input, Badge } from 'muka-ui';
+import { Button, Card, Input, Badge } from '@revikornmann/muka-ui';
 
 // Import styles in your root layout (already configured in src/app/layout.tsx)
-import 'muka-ui/styles';
+import '@revikornmann/muka-ui/styles';
 
 // For specific themes:
-import 'muka-ui/styles/muka-dark.css';      // Dark theme
-import 'muka-ui/styles/wireframe-light.css'; // Wireframe brand, light
-import 'muka-ui/styles/wireframe-dark.css';  // Wireframe brand, dark
+import '@revikornmann/muka-ui/styles/muka-dark.css';      // Dark theme
+import '@revikornmann/muka-ui/styles/wireframe-light.css'; // Wireframe brand, light
+import '@revikornmann/muka-ui/styles/wireframe-dark.css';  // Wireframe brand, dark
 ```
 
 ## Available Components
@@ -200,7 +200,7 @@ import 'muka-ui/styles/wireframe-dark.css';  // Wireframe brand, dark
 
 ## Troubleshooting
 
-### "Module not found: Can't resolve 'muka-ui'"
+### "Module not found: Can't resolve '@revikornmann/muka-ui'"
 
 The link may be broken. Re-run:
 ```bash
@@ -221,7 +221,7 @@ npm ls react
 
 ### Styles Not Loading
 
-Make sure you have `import 'muka-ui/styles';` in your root layout.
+Make sure you have `import '@revikornmann/muka-ui/styles';` in your root layout.
 
 ### TypeScript Errors After muka-ui Changes
 

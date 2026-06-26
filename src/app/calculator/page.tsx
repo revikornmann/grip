@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Alert, Button } from "muka-ui";
+import { Alert, Button } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getGarage } from "@/lib/garage";

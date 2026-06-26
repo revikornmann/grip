@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Card, Input, Select, Button, Label, Divider, DatePicker } from "muka-ui";
+import { Card, Input, Select, Button, Label, Divider, DatePicker } from "@revikornmann/muka-ui";
 import type { Trip, TripInput, TripPurpose } from "@/lib/trips";
 import { TRIP_PURPOSE_LABELS, getCategoryFromPurpose } from "@/lib/trips";
 import type { GarageVehicle } from "@/types/garage";
@@ -93,7 +93,7 @@ export function TripForm({
               <DatePicker
                 value={date}
                 onChange={(d) => setDate(d)}
-                maxDate={new Date()}
+                max={new Date()}
                 size="md"
               />
             </div>

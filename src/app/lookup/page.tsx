@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Input, Button, Alert, Toast } from "muka-ui";
+import { Input, Button, Alert, Toast } from "@revikornmann/muka-ui";
 import { lookupVehicle, RDWError } from "@/lib/rdw";
 import {
   isValidDutchPlate,

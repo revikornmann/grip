@@ -1,6 +1,6 @@
 "use client";
 
-import { Select, Card, Badge, Icon } from "muka-ui";
+import { Select, Card, Badge, Icon } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import { isElectric, isYoungtimer } from "@/lib/calculator";

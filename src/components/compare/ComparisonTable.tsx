@@ -10,7 +10,7 @@ import {
   TableRow,
   TableCell,
   TableHeaderCell,
-} from "muka-ui";
+} from "@revikornmann/muka-ui";
 import type { ComparisonResult } from "@/lib/comparison";
 import { formatCurrency } from "@/lib/formatting";
 

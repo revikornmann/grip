@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Chip, Label, Divider } from "muka-ui";
+import { Card, Chip, Label, Divider } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { Vehicle } from "@/types/vehicle";
 import { formatCurrency, formatDate } from "@/lib/formatting";

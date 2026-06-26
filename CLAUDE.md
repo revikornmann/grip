@@ -10,7 +10,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ### What this means
 
-- Import components exclusively from `'muka-ui'`
+- Import components exclusively from `'@revikornmann/muka-ui'`
 - Use Muka UI CSS custom properties (tokens) for any layout or spacing
 - Check [storybook.mukaui.com](https://storybook.mukaui.com) for available components
 - If a component doesn't exist in Muka UI, it must be built there first
@@ -36,7 +36,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ```tsx
 // GOOD: Import components from muka-ui
-import { Button, Card, Input } from 'muka-ui';
+import { Button, Card, Input } from '@revikornmann/muka-ui';
 
 // GOOD: Use token values for layout
 <div style={{

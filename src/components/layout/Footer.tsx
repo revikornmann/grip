@@ -1,6 +1,6 @@
 "use client";
 
-import { Divider, Container, Section } from "muka-ui";
+import { Divider, Container, Section } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 export function Footer() {

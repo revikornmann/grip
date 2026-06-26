@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Card, Badge, Button, Icon, Select, Input } from "muka-ui";
+import { Card, Badge, Button, Icon, Select, Input } from "@revikornmann/muka-ui";
 import type { Trip, TripPurpose, TripCategory } from "@/lib/trips";
 import { TRIP_PURPOSE_LABELS } from "@/lib/trips";
 import { formatCurrency, formatDate, formatNumber } from "@/lib/formatting";

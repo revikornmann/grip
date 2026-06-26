@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "muka-ui/styles/index.css";
+import "@revikornmann/muka-ui/styles";
 import { TopNav, BottomNav, Footer, MainContent } from "@/components/layout";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";

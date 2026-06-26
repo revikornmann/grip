@@ -26,10 +26,10 @@ npx muka-ui link /path/to/muka
 
 ```tsx
 // Import individual components
-import { Button, Card, Input, Badge, Select } from 'muka-ui';
+import { Button, Card, Input, Badge, Select } from '@revikornmann/muka-ui';
 
 // Import types for TypeScript
-import type { ButtonProps, InputProps } from 'muka-ui';
+import type { ButtonProps, InputProps } from '@revikornmann/muka-ui';
 ```
 
 ---
@@ -40,13 +40,13 @@ Import styles once in your app's root layout or entry point:
 
 ```tsx
 // Default theme (muka-light)
-import 'muka-ui/styles';
+import '@revikornmann/muka-ui/styles';
 
 // Or choose a specific theme:
-import 'muka-ui/styles/muka-light.css';
-import 'muka-ui/styles/muka-dark.css';
-import 'muka-ui/styles/wireframe-light.css';
-import 'muka-ui/styles/wireframe-dark.css';
+import '@revikornmann/muka-ui/styles/muka-light.css';
+import '@revikornmann/muka-ui/styles/muka-dark.css';
+import '@revikornmann/muka-ui/styles/wireframe-light.css';
+import '@revikornmann/muka-ui/styles/wireframe-dark.css';
 ```
 
 ### Theme Switching
@@ -55,8 +55,8 @@ To support dynamic theme switching, import all themes and toggle via a CSS class
 
 ```tsx
 // In your root layout
-import 'muka-ui/styles/muka-light.css';
-import 'muka-ui/styles/muka-dark.css';
+import '@revikornmann/muka-ui/styles/muka-light.css';
+import '@revikornmann/muka-ui/styles/muka-dark.css';
 
 // Apply theme via data attribute or class
 <html data-theme="muka-dark">
@@ -173,7 +173,7 @@ If you need a component that doesn't exist in Muka UI:
 ### Form with Validation
 
 ```tsx
-import { Input, Button, Card } from 'muka-ui';
+import { Input, Button, Card } from '@revikornmann/muka-ui';
 
 function LoginForm() {
   const [error, setError] = useState('');
@@ -201,7 +201,7 @@ function LoginForm() {
 ### Button Variants
 
 ```tsx
-import { Button } from 'muka-ui';
+import { Button } from '@revikornmann/muka-ui';
 
 // Primary action
 <Button variant="primary">Save</Button>
@@ -221,7 +221,7 @@ import { Button } from 'muka-ui';
 ### Tabbed Interface
 
 ```tsx
-import { Tabs, TabList, Tab, TabPanel } from 'muka-ui';
+import { Tabs, TabList, Tab, TabPanel } from '@revikornmann/muka-ui';
 
 <Tabs defaultValue="tab1">
   <TabList>

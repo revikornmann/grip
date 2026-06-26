@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Card, Button } from "muka-ui";
+import { Card, Button } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 
 export function EmptyGarage() {

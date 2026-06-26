@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, Select, Card, Button, Divider } from "muka-ui";
+import { Input, Select, Card, Button, Divider } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { CostInputs as CostInputsType, Province } from "@/lib/calculator";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Chip, Button, Divider, Label } from "muka-ui";
+import { Card, Chip, Button, Divider, Label } from "@revikornmann/muka-ui";
 import { useTranslations } from "next-intl";
 import type { GarageVehicle } from "@/types/garage";
 import { formatPlateDisplay } from "@/lib/validation";
