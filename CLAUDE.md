@@ -8,7 +8,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 **This app is a proof-of-concept for the Muka UI design system. ALL UI components must come from Muka UI — no exceptions.**
 
-Muka UI is consumed as the scoped package **`@revikornmann/muka-ui`** — a GitHub dependency tracking `#main` and auto-bumped by CI (see `package.json` and `.github/workflows/update-muka.yml`). The bare `muka-ui` name on npm is an unrelated package; never use it.
+Muka UI is consumed as the scoped package **`@revikornmann/muka-ui`** — published to the public npm registry and pinned in `package.json` as a semver range (e.g. `^0.2.4`). CI auto-bumps it on each Muka UI **release** (see `package.json` and `.github/workflows/update-muka.yml`). The bare `muka-ui` name on npm is an unrelated package; never use it.
 
 ### What this means
 
@@ -30,9 +30,10 @@ Muka UI is consumed as the scoped package **`@revikornmann/muka-ui`** — a GitH
 1. **Stop** — the feature is blocked
 2. **Create a story** in the Muka UI backlog (Linear team Muka UI) for the missing component
 3. **Build the component** in the muka repo (`github.com/revikornmann/muka`) and verify it in Storybook
-4. **Merge to `main`** — CI builds and commits `dist/` on push (see Linear MUK-41), then dispatches `muka-released` to this repo
-5. **Auto-bump** — the `update-muka` workflow re-resolves `#main` and commits the new lockfile here, which redeploys via Vercel (no manual step). To pull it immediately, run the `Update muka-ui` workflow manually (Actions → Run workflow)
-6. **Continue** with the Grip feature
+4. **Merge to `main`** — this alone does **not** propagate to Grip. Merging only lands the code on muka's main branch
+5. **Cut a release** — bump the version in muka's `package.json`, then publish a GitHub Release (tag `vX.Y.Z`). `publish.yml` builds `dist/` fresh, publishes to npm, and dispatches `muka-released` to this repo
+6. **Auto-bump** — the `update-muka` workflow installs the new published version and commits the lockfile here, which redeploys via Vercel (no manual step). To pull it immediately, run the `Update muka-ui` workflow manually (Actions → Run workflow)
+7. **Continue** with the Grip feature
 
 ### Acceptable styling patterns
 
@@ -86,17 +87,17 @@ npm run lint     # ESLint check
 
 ### Working with Muka UI
 
-Muka UI is consumed as the GitHub dependency `@revikornmann/muka-ui` tracking `#main` (committed `dist/`, no build step at install). Propagation is automatic:
+Muka UI is published to the public npm registry and pinned here as a semver range. Propagation happens **per release** (not per merge to muka main):
 
 ```text
-muka main: merge → CI commits dist/ → dispatches `muka-released`
-grip:      update-muka workflow re-resolves #main → commits new package-lock.json → Vercel deploys
+muka: bump version + publish GitHub Release → publish.yml builds dist/, publishes to npm, dispatches `muka-released`
+grip: update-muka workflow installs the new version → commits package.json + package-lock.json → Vercel deploys
 ```
 
-`package.json` points at `github:revikornmann/muka#main`; the exact resolved SHA lives in the committed `package-lock.json`, which the workflow advances. This keeps Vercel's `npm ci` reproducible while still following main.
+`package.json` pins `@revikornmann/muka-ui` to a semver range (e.g. `^0.2.4`); the exact resolved version lives in the committed `package-lock.json`, which the workflow advances. This keeps Vercel's `npm ci` reproducible. **Merging to muka `main` is not enough — a new release must be cut for changes to reach Grip.**
 
-- **Pull a muka change now (don't wait for the next release):** Actions → "Update muka-ui" → Run workflow.
-- **Local dev against an unlanded component:** `npm link` a local muka checkout temporarily — but never commit a `link:`/`file:` spec; the committed dependency must stay a real `github:revikornmann/muka#…` ref so clean installs (CI / Vercel) succeed.
+- **Pull a muka change now:** first confirm a release was published (merging to muka main alone won't propagate), then Actions → "Update muka-ui" → Run workflow (installs `@latest`).
+- **Local dev against an unreleased component:** `npm link` a local muka checkout temporarily — but never commit a `link:`/`file:` spec; the committed dependency must stay a real published `@revikornmann/muka-ui@x.y.z` range so clean installs (CI / Vercel) succeed.
 - **Setup note:** cross-repo dispatch requires the `CONSUMER_DISPATCH_TOKEN` PAT secret in the muka repo (Contents: write on this repo).
 
 ---
@@ -133,7 +134,7 @@ src/
 
 ## Available Muka UI Components
 
-Muka UI is consumed via the pinned `@revikornmann/muka-ui` GitHub dependency. Check the Storybook at `http://localhost:6006` (or [storybook.mukaui.com](https://storybook.mukaui.com)) to verify current component availability.
+Muka UI is consumed via the published `@revikornmann/muka-ui` npm package (semver-pinned). Check the Storybook at `http://localhost:6006` (or [storybook.mukaui.com](https://storybook.mukaui.com)) to verify current component availability.
 
 Mobile P0 components landed for this pivot: `Sheet`, `Spinner`, `SpecList`, `FAB`, `ActionSheet`, `SearchInput`, `Combobox`, `SwipeActions`, `PullToRefresh`, plus a 6-piece chat family.
 
