@@ -138,6 +138,6 @@ Muka UI is consumed via the published `@revikornmann/muka-ui` npm package (semve
 
 Mobile P0 components landed for this pivot: `Sheet`, `Spinner`, `SpecList`, `FAB`, `ActionSheet`, `SearchInput`, `Combobox`, `SwipeActions`, `PullToRefresh`, plus a 6-piece chat family.
 
-Earlier components: `Alert`, `Badge`, `BottomBar`, `Button`, `Card`, `Checkbox`, `CheckboxTile`, `Chip`, `Container`, `DatePicker`, `Dialog`, `Divider`, `FormProgressBar`, `Icon`, `Input`, `Label`, `ListItem`, `PriceTag`, `Progress`, `Radio`, `RadioTile`, `Section`, `SegmentGroup`, `Select`, `Table`, `Tabs/TabList/Tab/TabPanel`, `Tile`, `Toast`, `Toggle`, `TopBar`.
+Earlier components: `Alert`, `Badge`, `BottomBar`, `Button`, `Card`, `Checkbox`, `CheckboxTile`, `Chip`, `Container`, `DatePicker`, `Dialog`, `Divider`, `Icon`, `Input`, `Label`, `ListItem`, `PriceTag`, `Progress`, `ProgressTracker`, `Radio`, `RadioTile`, `Section`, `SegmentGroup`, `Select`, `Table`, `Tabs/TabList/Tab/TabPanel`, `Tile`, `Toast`, `Toggle`, `TopBar`.
 
 Still needed: Skeleton, Tooltip, Empty State.
